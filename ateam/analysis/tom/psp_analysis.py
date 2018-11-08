@@ -3,10 +3,14 @@ import pandas as pd
 import bmtk.analyzer.cell_vars as cell_vars
 
 def epsp_analysis(report_file=None, config_file='config.json', t_min=100, t_duration=1000, t_spike=None):
-    """ Analyze epsp's as contained in a bionet cell vars report.
+    """ Analyze epsp's as contained in a bionet cell vars report,
+    for a simulation consisting of a single presynaptic spike,
+     together with postsynaptic effects.
     Specify report_file directly, or lookup in simulation config file.
+
     If exact presynaptic input time is known, specify as t_spike
-    Otherwise, will search for a spike starting at t_min
+    Otherwise, include presynaptic cell and the method 
+    will search for a spike starting at t_min.
     """
     amp_min = 0.1
     amp_max = 50

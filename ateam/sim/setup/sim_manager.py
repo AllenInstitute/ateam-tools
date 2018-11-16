@@ -6,6 +6,7 @@ from bmtk.simulator.utils.config import ConfigDict
 import bmtk.builder.networks as buildnet
 import bmtk.utils.sim_setup as setup
 from .config_class import ConfigBuilder
+from .spike_input import SpikeInput
 
 ConfigClass = ConfigBuilder
 
@@ -42,6 +43,9 @@ class SimManager(object):
         self._networks = {}
         self._files_dict = {}
     
+    @property
+    def config_path(self):
+        return self.config.path
 
     @property
     def networks(self):
@@ -59,6 +63,10 @@ class SimManager(object):
     def add_network(self, network):
         # TODO: check for name collision
         self._networks[network.name] = network
+
+    def add_networks(self, networks):
+        for network in networks:
+            self.add_network(network)
 
     def save_network_files(self, net_folder_name=''):
         net_path = os.path.join(self.sim_folder, net_folder_name)
@@ -87,21 +95,28 @@ class SimManager(object):
 
 ### Configure inputs and modules
 
-    def add_spike_input(self, input_file, net, trial=None):
+    def add_spike_input(self, input_file, net_name, trial=None):
+        """Add specified spikeinput file to the config.
+        Note that node ids in the file must match those for the specified net.
+        """
         # assert(self._networks.has_key(net_name))
         ext = os.path.splitext(input_file)[1][1:]
-        inputs = {net: 
+        inputs = {net_name: 
             {
             'input_type': 'spikes',
             'module': ext,
             'input_file': input_file,
-            'node_set': net,
+            'node_set': net_name,
             'trial': trial
             }}
         self.config.update_nested(inputs=inputs)
     
-    def write_spikeinput(self, spike_file_name):
-        pass
+    def write_spikeinput_csv(self, net_name, times, spike_file_name='spike_input.csv'):
+        """Write a new spikeinput file and add it to the config"""
+        spikes = SpikeInput(self._networks[net_name].nodes())
+        spikes.set_times_all(times)
+        spikes.save_csv(spike_file_name)
+        self.add_spike_input(spike_file_name, net_name)
 
     def add_ecp_report(self, electrode_file=None, cells='all', file_name='ecp.h5'):
         if electrode_file is None:
@@ -158,7 +173,6 @@ class SimManager(object):
     def set_sim_time(self, time):
         self.config.update_nested(run={"tstop": time})
 
-
     def run_bionet(self):
         from ateam.sim.run import runner
         self.config.save()
@@ -167,4 +181,4 @@ class SimManager(object):
     def run_bionet_mpi(self, ncores=1):
         from ateam.sim.run import runner
         self.config.save()
-        runner.run_bionet(self.config.path)
+        runner.run_bionet_mpi(self.config.path, ncores)

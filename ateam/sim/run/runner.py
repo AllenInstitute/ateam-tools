@@ -1,18 +1,21 @@
+"""Functions for running bionet simulations, including with MPI and submitting batch jobs."""
 
 from bmtk.simulator import bionet
+import subprocess
 
-pycommand = "from ateam.sim.run import runner; runner.run_bionet(\\\"{config}\\\")"
+_pycommand = "from ateam.sim.run import runner; runner.run_bionet(\\\"{config}\\\")"
+
+def bionet_mpi_command(config, ncores=1):
+    command = _pycommand.format(config=config)
+    mpicommand = "mpirun -np {ncores} nrniv -mpi -python -c \"{pycommand}\"".format(ncores=ncores, pycommand=command)
+    return mpicommand
 
 def run_bionet_mpi(config, ncores=1):
-    import subprocess
-    # config = os.path.basename(config)
-    command = pycommand.format(config=config)
-    mpicommand = "mpirun -np {ncores} nrniv -mpi -python -c \"{pycommand}\"".format(ncores=ncores)
-    
+    mpicommand = bionet_mpi_command(config, ncores)
     sp = subprocess.Popen([mpicommand], stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, executable='/bin/bash')
     out = sp.communicate()
-    print out[0]; print out[1]
-
+    # print out[1] (error out?)
+    print out[0]
 
 def run_bionet(config):
     conf = bionet.Config.from_json(config, validate=True)

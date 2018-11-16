@@ -14,12 +14,13 @@ default_settings = {
                     'jobname':'Default_Job_Name',
                     'email':None,
                     'email_options':None,
-                    'queue':'mindscope',
-                    'vmem':'10g',
+                    'queue':'celltypes',
+                    'mem':'4g',
+                    'vmem':None,
                     'walltime':'01:00:00',
                     'ncpus':None,
-                    'ppn':1,
-                    'nodes':1,
+                    'ppn':None,
+                    'nodes':None,
                     'jobdir':None,
                     'outfile':'$PBS_JOBID.out',
                     'errfile':'$PBS_JOBID.err',
@@ -84,6 +85,9 @@ class PBSJob(object):
         if self.rerunable == False:
             script_lines.append('#PBS -r n\n')
 
+        if not self.procs is None:
+            script_lines.append('#PBS -l procs=%d\n' % self.procs)
+
         cpu_ppn_node_list = []
 
         if not self.ncpus is None:
@@ -95,10 +99,14 @@ class PBSJob(object):
         if not self.ppn is None:
             cpu_ppn_node_list.append('ppn=%d' % self.ppn)
 
-        tmp_str = '#PBS -l %s\n' % ':'.join(cpu_ppn_node_list)
-        script_lines.append(tmp_str)
+        if len(cpu_ppn_node_list) > 0:
+            tmp_str = '#PBS -l %s\n' % ':'.join(cpu_ppn_node_list)
+            script_lines.append(tmp_str)
 
         vmem_walltime = []
+        if self.mem != None:
+            vmem_walltime.append('mem=%s' % (self.mem))
+
         if self.vmem != None:
             vmem_walltime.append('vmem=%s' % (self.vmem))
 
@@ -122,6 +130,9 @@ class PBSJob(object):
         if len(env_list) > 0:
             script_lines.append('#PBS -v %s \n' % (','.join(env_list)))
 
+        if self.conda_env != None:
+            script_lines.append('source activate %s\n' % self.conda_env )
+
         script_lines.append('%s\n' % (self.command))
 
         script_string = ''.join(script_lines)
@@ -141,10 +152,10 @@ class PBSJob(object):
 
 class PythonJob(PBSJob):
 
-    def __init__(self, script=None, command=None, python_executable='python', conda_env=None, python_args='', python_path = None, **kwargs):
+    def __init__(self, script=None, command=None, python_executable='python', python_args='', python_path = None, **kwargs):
 
         self.python_executable = python_executable
-        self.conda_env = conda_env
+        # self.conda_env = conda_env
         # assert os.path.exists(script)
         assert (script or command) and not (script and command)
         self.pycommand = "-c \"{command}\"".format(command=command) if command else script
@@ -152,8 +163,8 @@ class PythonJob(PBSJob):
 
         command = '%s %s %s' % (self.python_executable, self.pycommand, self.python_args)
 
-        if not conda_env is None:
-            command = 'source activate %s\n' % self.conda_env + command
+        # if not conda_env is None:
+        #     command = 'source activate %s\n' % self.conda_env + command
 
         if not python_path is None:
             command = ("export PYTHONPATH=%s\n" % python_path) + command

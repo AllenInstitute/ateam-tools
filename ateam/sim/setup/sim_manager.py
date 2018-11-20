@@ -3,10 +3,13 @@ import subprocess
 import itertools
 # import bmtk.simulator.utils.config as config
 from bmtk.simulator.utils.config import ConfigDict
+from bmtk.utils.io.spike_trains import PoissonSpikesGenerator
 import bmtk.builder.networks as buildnet
 import bmtk.utils.sim_setup as setup
+
 from .config_class import ConfigBuilder
 from .spike_input import SpikeInput
+from ateam.sim.run import runner
 
 ConfigClass = ConfigBuilder
 
@@ -111,11 +114,20 @@ class SimManager(object):
             }}
         self.config.update_nested(inputs=inputs)
     
-    def write_spikeinput_csv(self, net_name, times, spike_file_name='spike_input.csv'):
-        """Write a new spikeinput file and add it to the config"""
+    def write_spikeinput_vector(self, net_name, times, spike_file_name='spike_input.csv'):
+        """Write a new spikeinput file from a vector of times and add it to the config.
+        All cells are assigned the same spike times."""
         spikes = SpikeInput(self._networks[net_name].nodes())
         spikes.set_times_all(times)
         spikes.save_csv(spike_file_name)
+        self.add_spike_input(spike_file_name, net_name)
+
+    def write_spikeinput_poisson(self, net_name, rate, tstop=2000, spike_file_name='spike_input.h5'):
+        """Write a new spikeinput file for independent Poisson spiking and add it to the config."""
+        net = self._networks[net_name]
+        node_ids = [node.node_id for node in net.nodes_iter()]
+        psg = PoissonSpikesGenerator(node_ids, rate, tstop=tstop)
+        psg.to_hdf5(spike_file_name)
         self.add_spike_input(spike_file_name, net_name)
 
     def add_ecp_report(self, electrode_file=None, cells='all', file_name='ecp.h5'):
@@ -174,11 +186,9 @@ class SimManager(object):
         self.config.update_nested(run={"tstop": time})
 
     def run_bionet(self):
-        from ateam.sim.run import runner
         self.config.save()
-        runner.run_bionet(self.config.path)
+        runner.run_bionet(self.config_path)
         
     def run_bionet_mpi(self, ncores=1):
-        from ateam.sim.run import runner
         self.config.save()
-        runner.run_bionet_mpi(self.config.path, ncores)
+        runner.run_bionet_mpi(self.config_path, ncores)

@@ -97,6 +97,8 @@ class SimManager(object):
         raise NotImplementedError()
 
 ### Configure inputs and modules
+    def path(self, filename):
+        return os.path.join(self.sim_folder, filename)
 
     def add_spike_input(self, input_file, net_name, trial=None):
         """Add specified spikeinput file to the config.
@@ -119,7 +121,7 @@ class SimManager(object):
         All cells are assigned the same spike times."""
         spikes = SpikeInput(self._networks[net_name].nodes())
         spikes.set_times_all(times)
-        spikes.save_csv(spike_file_name)
+        spikes.save_csv(self.path(spike_file_name))
         self.add_spike_input(spike_file_name, net_name)
 
     def write_spikeinput_poisson(self, net_name, rate, tstop=2000, spike_file_name='spike_input.h5'):
@@ -127,7 +129,7 @@ class SimManager(object):
         net = self._networks[net_name]
         node_ids = [node.node_id for node in net.nodes_iter()]
         psg = PoissonSpikesGenerator(node_ids, rate, tstop=tstop)
-        psg.to_hdf5(spike_file_name)
+        psg.to_hdf5(self.path(spike_file_name))
         self.add_spike_input(spike_file_name, net_name)
 
     def add_ecp_report(self, electrode_file=None, cells='all', file_name='ecp.h5'):

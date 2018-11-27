@@ -72,7 +72,7 @@ def build_batch_edge_props(input_net, node_props_base, edge_props_base, n_duplic
     node_ids = get_node_ids(net)
     for key, values in edge_props.items():
         prop_dict = dict(zip(node_ids, values))
-        cm.add_properties(key, rule=lookup_by_target, rule_params={'prop_dict': prop_dict})
+        cm.add_properties(key, rule=lookup_by_target, rule_params={'prop_dict': prop_dict}, dtypes=values.dtype)
     net.build()
     return net
 

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import bmtk.analyzer.cell_vars as cell_vars
 
-def data_multicell(cellvars, gid_list, var_name=VAR_UNKNOWN, time_window=None, compartments='origin'):
+def data_multicell(cellvars, gid_list, var_name, time_window=None, compartments='origin'):
         data_iter = (cellvars.data(gid, var_name, time_window, compartments) for gid in gid_list)
         data_stacked = np.stack(data_iter)
         return data_stacked
@@ -25,7 +25,7 @@ def epsp_analysis(report_file=None, config_file='config.json', t_min=100, t_dura
     gids = np.array(var_report.gids)
 
     t_min = t_spike or t_min
-    v_all = data_multicell(cellvars, gids, 'v', time_window=[t_min, t_min+t_duration])
+    v_all = data_multicell(var_report, gids, 'v', time_window=[t_min, t_min+t_duration])
     # v array has shape (cells, time)
 
     i_bl = 0

@@ -18,7 +18,7 @@ def get_node_ids(net):
 def lookup_by_target(src, trg, prop_dict):
     return prop_dict.get(trg.node_id)
 
-def build_props_combinatorial(props_base=None, n_duplicates=1, props_linked=None, **props_indep):
+def build_props_combinatorial(props_base=None, n_duplicates=1, linked_dicts=None, **props_indep):
     """Build a props dict containing all permutations of a number of independent props
     Each property takes values from its own set.
     """
@@ -27,27 +27,32 @@ def build_props_combinatorial(props_base=None, n_duplicates=1, props_linked=None
     props_shape = [len(vals) for vals in props_dict.values()]
     indices = np.indices(props_shape)
 
-    if props_linked:
+    linked_dicts = linked_dicts or []
+    for props_linked in linked_dicts:
         n_linked = [len(prop) for prop in props_linked.values()]
         assert all(n_linked[0] == ni for ni in n_linked)
         n_linked = n_linked[0]
         # use the final dimension (-1) for linked props
         props_shape = props_shape + [n_linked]
         indices = np.indices(props_shape)
-        for prop, vals in props_linked.items():
-             prop_array = np.array(vals)
-             props[prop] = np.repeat(prop_array[indices[-1].flat], n_duplicates)
 
     for i, prop in enumerate(props_dict.keys()):
         prop_array = np.array(props_dict[prop])
         props[prop] = np.repeat(prop_array[indices[i].flat], n_duplicates)
 
+    n_props = len(props_dict)
+    for j, props_linked in enumerate(linked_dicts):
+        i = n_props + j
+        for prop, vals in props_linked.items():
+             prop_array = np.array(vals)
+             props[prop] = np.repeat(prop_array[indices[i].flat], n_duplicates)
+
     props['N'] = n_duplicates*np.prod(props_shape)
     return props
 
-def build_batch_node_props(node_props_base, n_duplicates=1, net_name='batch', props_linked=None, **vary_props):
+def build_batch_node_props(node_props_base, n_duplicates=1, net_name='batch', linked_dicts=None, **vary_props):
     net = NetworkBuilder(net_name)
-    node_props = build_props_combinatorial(node_props_base, n_duplicates, props_linked=props_linked, **vary_props)
+    node_props = build_props_combinatorial(node_props_base, n_duplicates, linked_dicts=linked_dicts, **vary_props)
     net.add_nodes(**node_props)
     net.build()
     return net
@@ -58,9 +63,9 @@ def build_input_net_simple(N=1):
     net.build()
     return net
 
-def build_batch_edge_props(input_net, node_props_base, edge_props_base, n_duplicates=1, net_name='batch', props_linked=None, **vary_edge_props):
+def build_batch_edge_props(input_net, node_props_base, edge_props_base, n_duplicates=1, net_name='batch', linked_dicts=None, **vary_edge_props):
     net = NetworkBuilder(net_name)
-    edge_props = build_props_combinatorial(n_duplicates=n_duplicates, props_linked=props_linked, **vary_edge_props)
+    edge_props = build_props_combinatorial(n_duplicates=n_duplicates, linked_dicts=linked_dicts, **vary_edge_props)
     # Attach all props to the nodes just for record-keeping
     node_props = node_props_base.copy()
     node_props.update(edge_props)

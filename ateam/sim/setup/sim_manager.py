@@ -6,6 +6,7 @@ from bmtk.simulator.utils.config import ConfigDict
 from bmtk.utils.io.spike_trains import PoissonSpikesGenerator
 import bmtk.builder.networks as buildnet
 import bmtk.utils.sim_setup as setup
+import bmtk.analyzer.visualization.spikes as vs
 
 from .config_class import ConfigBuilder
 from .spike_input import SpikeInput
@@ -169,20 +170,25 @@ class SimManager(object):
         }}
         self.config.update_nested(reports=reports)
 
+    def nodes_file(self, net):
+        # TODO: check net in networks first?
+        return self.path("{}_nodes.h5".format(net))
+        
+    def node_types_file(self, net):
+        # TODO: check net in networks first?
+        return self.path("{}_node_types.csv".format(net))
 
-    def plot_raster(self, net):
-        import bmtk.analyzer.visualization.spikes as vs
+    @property
+    def spikes_file(self):
+        # TODO: incorporate here not in ConfigDict?
         conf = ConfigDict.load(self.config.path)
-        spikes_file = conf.spikes_file
+        return conf.spikes_file
 
-        # node_dict = conf.nodes[0]
-        # cells_file_name = node_dict['nodes_file']
-        # cell_models_file_name = node_dict['node_types_file']
-        cells_file_name = "{}_nodes.h5".format(net)
-        cell_models_file_name = "{}_node_types.csv".format(net)
+    def plot_raster(self, net, group_key=None):
+        vs.plot_spikes(self.nodes_file(net), self.node_types_file(net), self.spikes_file, group_key=group_key)
 
-        vs.plot_spikes(cells_file_name, cell_models_file_name, spikes_file)
-
+    def plot_rates(self, net, group_key=None):
+        vs.plot_rates(self.nodes_file(net), self.node_types_file(net), self.spikes_file, group_key=group_key)
 
     def set_sim_time(self, time):
         self.config.update_nested(run={"tstop": time})

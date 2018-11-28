@@ -11,5 +11,6 @@ setup(
         'bmtk[bionet]'
     ],
     packages=find_packages(),
+    scripts=['bin/run_hpc'],
     platforms='any'
 )

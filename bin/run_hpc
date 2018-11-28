@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+from ateam.sim.run import pbstools
+from ateam.sim.run import runner
+import ateam.sim.setup as sim
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("dir")
+parser.add_argument("--mem", "-m", default="4g")
+parser.add_argument("--queue","-q", default="braintv")
+parser.add_argument("--time","-t", default="00:05:00")
+parser.add_argument("--nodes", "-n", default=1)
+parser.add_argument("--ppn")
+parser.add_argument("--procs","-p")
+
+args = parser.parse_args()
+if args.procs:
+    args.nodes = None
+    args.ppn = None
+    n = args.procs
+else:
+    ppn = args.ppn or 24
+    n = ppn*args.nodes
+    
+sm = sim.SimManager(sim_folder=args.dir)
+options = {
+    'email':'tom.chartrand@alleninstitute.org',
+    'email_options':'ae',
+    'queue':args.queue,
+    'jobname':'bmtk_test',
+    'walltime':args.time,
+    'nodes':1,
+    'ppn':args.ppn,
+    'mem':args.mem,
+    'procs':args.procs,
+    'priority':None
+}
+command = runner.bionet_mpi_command(config=sm.config.path, ncores=n)
+job = pbstools.PBSJob(command=command, jobdir=sm.sim_folder, conda_env='bmtk', **options)
+job.run()

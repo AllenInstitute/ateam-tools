@@ -1,14 +1,7 @@
-__version__ = '0.1.0'
-
 import argparse
 import copy
 import subprocess as sp
-import logging
 import os
-
-
-
-logger = logging.getLogger(__name__)
 
 default_settings = {
                     'jobname':'Default_Job_Name',
@@ -20,13 +13,13 @@ default_settings = {
                     'walltime':'01:00:00',
                     'ncpus':None,
                     'ppn':None,
+                    'procs':None,
                     'nodes':None,
                     'jobdir':None,
                     'outfile':'$PBS_JOBID.out',
                     'errfile':'$PBS_JOBID.err',
                     'environment':{},
                     'array':None,
-                    'priority':'low',
                     'rerunable':False
                     }
 
@@ -65,14 +58,6 @@ class PBSJob(object):
         if not self.array is None:
             script_lines.append('#PBS -t %s-%s\n' % (self.array[0], self.array[1]))
 
-        if not self.priority is None:
-            try:
-                assert self.priority in ['high', 'med', 'low']
-            except AssertionError:
-                raise ValueError('Priority "%s" is not "high/med/low"')
-
-            script_lines.append('#PBS -W x=QOS:%s\n' % (self.priority,))
-
         script_lines.append('#PBS -q %s\n' % (self.queue))
         script_lines.append('#PBS -N %s\n' % (self.jobname))
 
@@ -86,7 +71,7 @@ class PBSJob(object):
             script_lines.append('#PBS -r n\n')
 
         if not self.procs is None:
-            script_lines.append('#PBS -l procs=%d\n' % self.procs)
+            script_lines.append('#PBS -l procs={}\n'.format(self.procs))
 
         cpu_ppn_node_list = []
 
@@ -98,6 +83,8 @@ class PBSJob(object):
 
         if not self.ppn is None:
             cpu_ppn_node_list.append('ppn=%d' % self.ppn)
+        elif not self.procs:
+            script_lines.append('#PBS -n \n')
 
         if len(cpu_ppn_node_list) > 0:
             tmp_str = '#PBS -l %s\n' % ':'.join(cpu_ppn_node_list)
@@ -136,7 +123,6 @@ class PBSJob(object):
         script_lines.append('%s\n' % (self.command))
 
         script_string = ''.join(script_lines)
-        logger.info(script_string)
 
         for line in script_lines:
             if verbose: print line,

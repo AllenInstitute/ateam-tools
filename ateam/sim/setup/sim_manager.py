@@ -15,37 +15,39 @@ from ateam.sim.run import runner
 ConfigClass = ConfigBuilder
 
 class SimManager(object):
-    def __init__(self, config_file="config.json", sim_folder=None, config_template=None, overwrite=False):
-        """Creates a SimManager for a simulation, defined by a folder and config_file combination.
-        Creates folder and config file (from template) if they don't exist.
-        
-        Keyword Arguments:
-            config_file {str} -- [description] (default: {"config.json"})
-            sim_folder {str} -- [description] (default: working directory)
-            config_template {str} -- [description] (default: {None})
-            overwrite {bool} -- [overwrite existing config from template if both exist] (default: {False})
+    def __init__(self, config_path="./config.json"):
+        """Create a SimManager for a simulation defined by a config_file,
+        using the parent folder as the simulation folder.
+        If config file is not specified, looks for config.json in current directory.
         """
-
-        self.sim_folder = sim_folder or os.getcwd()
-        config_path = os.path.join(self.sim_folder, config_file)
-        if not os.path.exists(self.sim_folder):
-            os.makedirs(self.sim_folder)
-
-        assert(config_template is not None or os.path.isfile(config_path))
-        if config_template:
-            if overwrite or not os.path.isfile(config_path):
-                self.config = ConfigClass.load_template(config_template, config_path, shared_components=True)
-            else:
-                Warning("Config template specified but not used.")
-                self.config = ConfigClass.from_json(config_path)
-
-        else:
-            self.config = ConfigClass.from_json(config_path)
-
+        assert os.path.isfile(config_path)
+        self.config = ConfigClass.from_json(config_path)
+        self.sim_folder = os.path.dirname(config_path)
         # self.morphologies_dir = self.config.morphologies_dir
         # self.fit_dir = self.config.biophysical_neuron_models_dir
         self._networks = {}
         self._files_dict = {}
+
+    @classmethod
+    def from_template(cls, config_template, config_file="config.json", sim_folder=None, overwrite=False):
+        """
+        Create a SimManager from template config file in a new simulation folder.
+        Creates folder if it doesn't exist.
+        """
+
+        sim_folder = sim_folder or os.getcwd()
+        sim_folder = os.path.expandvars(os.path.expanduser(sim_folder))
+        config_path = os.path.join(sim_folder, config_file)
+        if not os.path.exists(sim_folder):
+            os.makedirs(sim_folder)
+
+        if overwrite or not os.path.isfile(config_path):
+            ConfigClass.load_template(config_template, config_path, shared_components=True)
+        else:
+            Warning("Config file already exists: loading config without template.")
+
+        return cls(config_path)
+
     
     @property
     def config_path(self):
@@ -190,7 +192,16 @@ class SimManager(object):
     def plot_rates(self, net, group_key=None):
         vs.plot_rates(self.nodes_file(net), self.node_types_file(net), self.spikes_file, group_key=group_key)
 
+    @property
+    def sim_time(self):
+        return self.config['run']['tstop']
+
+    # TODO: remove
     def set_sim_time(self, time):
+        self.sim_time = time
+    
+    @sim_time.setter
+    def sim_time(self, time):
         self.config.update_nested(run={"tstop": time})
 
     def run_bionet(self):

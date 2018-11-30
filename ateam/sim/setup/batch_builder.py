@@ -67,8 +67,8 @@ def build_batch_node_props(node_props_base, n_duplicates=1, net_name='batch', li
     net.build()
     return net
 
-def build_input_net_simple(N=1, **props):
-    net = NetworkBuilder('input')
+def build_input_net_simple(N=1, name='input', **props):
+    net = NetworkBuilder(name)
     net.add_nodes(N, model_type='virtual', **props)
     net.build()
     return net

@@ -1,6 +1,7 @@
 """Functions for running bionet simulations, including with MPI and submitting batch jobs."""
 
 from bmtk.simulator import bionet
+from ateam.sim import cell_functions 
 import subprocess
 import os
 

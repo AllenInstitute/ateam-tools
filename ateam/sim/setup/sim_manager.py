@@ -171,6 +171,7 @@ class SimManager(object):
             'sections': sections,
         }}
         self.config.update_nested(reports=reports)
+        self.config.save()
 
     def nodes_file(self, net):
         # TODO: check net in networks first?

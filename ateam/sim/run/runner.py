@@ -21,7 +21,7 @@ def run_bionet_mpi(config, ncores=1):
     print out[0]
 
 def run_bionet(config):
-    os.chdir(os.path.dirname(config))
+    # os.chdir(os.path.dirname(config))
     conf = bionet.Config.from_json(config, validate=True)
     conf.build_env()
     graph = bionet.BioNetwork.from_config(conf)

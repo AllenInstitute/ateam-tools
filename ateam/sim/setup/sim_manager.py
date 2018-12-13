@@ -10,16 +10,17 @@ import bmtk.analyzer.visualization.spikes as vs
 
 from .config_class import ConfigBuilder
 from .spike_input import SpikeInput
-from ateam.sim.run import runner
+# from ateam.sim.run import runner
 
 ConfigClass = ConfigBuilder
 
 class SimManager(object):
-    def __init__(self, config_path="./config.json"):
+    def __init__(self, config_path="./config.json", sim_folder=''):
         """Create a SimManager for a simulation defined by a config_file,
         using the parent folder as the simulation folder.
         If config file is not specified, looks for config.json in current directory.
         """
+        config_path = os.path.join(sim_folder, config_path)
         assert os.path.isfile(config_path)
         self.config = ConfigClass.from_json(config_path)
         self.sim_folder = os.path.dirname(config_path)
@@ -29,15 +30,19 @@ class SimManager(object):
         self._files_dict = {}
 
     @classmethod
-    def from_template(cls, config_template, config_file="config.json", sim_folder=None, overwrite=False):
+    def from_template(cls, config_template, config_file="config.json", sim_folder=None, config_path=None, overwrite=False):
         """
         Create a SimManager from template config file in a new simulation folder.
         Creates folder if it doesn't exist.
         """
-
-        sim_folder = sim_folder or os.getcwd()
-        sim_folder = os.path.expandvars(os.path.expanduser(sim_folder))
-        config_path = os.path.join(sim_folder, config_file)
+        if config_path:
+            config_path = os.path.expandvars(os.path.expanduser(config_path))
+            sim_folder = os.path.dirname(config_path)
+        else:
+            sim_folder = sim_folder or os.getcwd()
+            sim_folder = os.path.expandvars(os.path.expanduser(sim_folder))
+            config_path = os.path.join(sim_folder, config_file)
+        # TODO: work with relative paths?
         if not os.path.exists(sim_folder):
             os.makedirs(sim_folder)
 
@@ -77,16 +82,17 @@ class SimManager(object):
     def save_network_files(self, net_folder_name=''):
         net_path = os.path.join(self.sim_folder, net_folder_name)
 
-
+        net_folder_var = "$NETS"
         for name, net in self._networks.items():
             if not self._files_dict.get(name):
                 files = net.save(net_path)
-                self._files_dict[name] = files
+                self._files_dict[name] = [os.path.join(net_folder_var, fname) for fname in files]
         # TODO: use Config class directly, not file
         # class could simplify using $NETWORK_DIR from manifest
 
         net_json = setup.get_network_block(files=self.files_list)
         self.config.update_nested(networks=net_json)
+        self.config.update_nested(manifest={net_folder_var: net_path})
         self.config.save()
 
 
@@ -124,21 +130,23 @@ class SimManager(object):
         All cells are assigned the same spike times."""
         spikes = SpikeInput(self._networks[net_name].nodes())
         spikes.set_times_all(times)
-        spikes.save_csv(self.path(spike_file_name))
-        self.add_spike_input(spike_file_name, net_name)
+        spike_file = self.path(spike_file_name)
+        spikes.save_csv(spike_file)
+        self.add_spike_input(spike_file, net_name)
 
     def write_spikeinput_poisson(self, net_name, rate, tstop=2000, spike_file_name='spike_input.h5'):
         """Write a new spikeinput file for independent Poisson spiking and add it to the config."""
         net = self._networks[net_name]
         node_ids = [node.node_id for node in net.nodes_iter()]
         psg = PoissonSpikesGenerator(node_ids, rate, tstop=tstop)
-        psg.to_hdf5(self.path(spike_file_name))
-        self.add_spike_input(spike_file_name, net_name)
+        spike_file = self.path(spike_file_name)
+        psg.to_hdf5(spike_file)
+        self.add_spike_input(spike_file, net_name)
 
-    def add_ecp_report(self, electrode_file=None, cells='all', file_name='ecp.h5'):
+    def add_ecp_report(self, electrode_file=None, cells='all', file_name='ecp.h5', locs=[[0,0,0]], save_contributions=False):
         if electrode_file is None:
-            electrode_file = 'electrode.csv'
-            self.write_electrode_file([[0,0,0]], electrode_file)
+            electrode_file = self.path('electrode.csv')
+            self.write_electrode_file(locs, electrode_file)
 
         reports = {'ecp_report': {
             'cells': cells,
@@ -147,7 +155,7 @@ class SimManager(object):
             'electrode_positions': electrode_file,
             'file_name': file_name,
             'electrode_channels': 'all',
-            'contributions_dir': 'ecp_contributions'
+            'contributions_dir': 'ecp_contributions' if save_contributions else None
         }}
         self.config.update_nested(reports=reports)
 
@@ -186,28 +194,29 @@ class SimManager(object):
         conf = ConfigDict.load(self.config.path)
         return conf.spikes_file
 
-    def plot_raster(self, net, group_key=None):
-        vs.plot_spikes(self.nodes_file(net), self.node_types_file(net), self.spikes_file, group_key=group_key)
-
-    def plot_rates(self, net, group_key=None):
-        vs.plot_rates(self.nodes_file(net), self.node_types_file(net), self.spikes_file, group_key=group_key)
-
     @property
     def sim_time(self):
         return self.config['run']['tstop']
 
-    # TODO: remove
-    def set_sim_time(self, time):
-        self.sim_time = time
-    
     @sim_time.setter
     def sim_time(self, time):
         self.config.update_nested(run={"tstop": time})
 
-    def run_bionet(self):
-        self.config.save()
-        runner.run_bionet(self.config_path)
+    # TODO: remove below
+    def set_sim_time(self, time):
+        self.sim_time = time
+
+    # def run_bionet(self):
+    #     self.config.save()
+    #     runner.run_bionet(self.config_path)
         
-    def run_bionet_mpi(self, ncores=1):
-        self.config.save()
-        runner.run_bionet_mpi(self.config_path, ncores)
+    # def run_bionet_mpi(self, ncores=1):
+    #     self.config.save()
+    #     runner.run_bionet_mpi(self.config_path, ncores)
+
+    def plot_raster(self, net, **kwargs):
+        return vs.plot_spikes(self.nodes_file(net), self.node_types_file(net), self.spikes_file, **kwargs)
+
+    def plot_rates(self, net, **kwargs):
+        return vs.plot_rates(self.nodes_file(net), self.node_types_file(net), self.spikes_file, **kwargs)
+

@@ -21,3 +21,4 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 from .psp_analysis import *
+from .cell_vars import *

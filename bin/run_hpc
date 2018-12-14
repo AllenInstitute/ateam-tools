@@ -30,7 +30,6 @@ else:
     n = ppn*args.nodes
     
 options = {
-    'email':'tom.chartrand@alleninstitute.org',
     'email_options':'ae',
     'queue':args.queue,
     'jobname':'bmtk_test',

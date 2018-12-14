@@ -140,6 +140,7 @@ def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1, net
         cm.add_properties(key, rule=lookup_by_target, rule_params={'prop_dict': prop_dict}, dtypes=values.dtype)
     net.build()
     sm.save_network_files()
+    return net
 
 def read_node_props_batch(net_folder_path):
     # simple single-pop network, no need for fancy

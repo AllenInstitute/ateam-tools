@@ -202,12 +202,12 @@ class SimManager(object):
                 csv_writer.writerow([i] + [str(x) for x in loc])
 
 
-    def add_membrane_report(self, variables=['v'], cells='all', sections='soma', file_name='cell_vars.h5'):
-        reports = {'membrane_report': {
+    def add_membrane_report(self, name='membrane_report', variables=['v'], cells='all', sections='soma', file_name=None):
+        reports = {name: {
             'module': 'membrane_report',
             'variable_name': variables,
             'cells': cells,
-            'file_name': file_name,
+            'file_name': file_name or '{name}.h5'.format(name=name),
             'sections': sections,
         }}
         self.config.update_nested(reports=reports)

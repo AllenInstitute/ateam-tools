@@ -77,6 +77,11 @@ class SimManager(object):
         # return itertools.chain(*self.files_dict.values())
         raise NotImplementedError()
 
+    def new_network(self, net_name):
+        net = buildnet.NetworkBuilder(net_name)
+        self.add_network(net)
+        return net
+
     def add_network(self, network):
         # TODO: check for name collision
         self._networks_active[network.name] = network
@@ -238,7 +243,7 @@ class SimManager(object):
 
     def run_bionet(self):
         self.config.save()
-        runner.run_bionet(self.config_path)
+        return runner.run_bionet(self.config_path)
         
     def run_bionet_mpi(self, ncores=1):
         self.config.save()

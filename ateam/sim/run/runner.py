@@ -27,6 +27,7 @@ def run_bionet(config):
     graph = bionet.BioNetwork.from_config(conf)
     sim = bionet.BioSimulator.from_config(conf, network=graph)
     sim.run()
+    return sim
     # bionet.nrn.quit_execution()
 
 def run_bionet_hpc(config):

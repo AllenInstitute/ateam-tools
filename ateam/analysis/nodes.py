@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 import h5py
 
 def create_node_table(node_file, node_type_file, group_key=None, exclude=[], node_props=None):
@@ -33,3 +34,15 @@ def create_node_table(node_file, node_type_file, group_key=None, exclude=[], nod
             full_df = full_df[full_df[group_key] != cond]
 
     return full_df
+
+def plot_soma_positions(config_file, netname, group_key, color_dict):
+    sm = SimManager(config_file)
+    nodes_df = create_node_table(sm.nodes_file(netname), sm.node_types_file(netname), group_key=group_key, node_props=['positions'])
+    groups = nodes_df.groupby(group_key)
+
+    for group_name, group_df in groups:
+        positions = group_df['positions']
+        plt.scatter([pos[0] for pos in positions], [pos[1] for pos in positions], color=color_dict.get(group_name, 'k'))
+    
+    plt.xlabel("X pos ($\mu$m)")
+    plt.ylabel("Y pos ($\mu$m)")

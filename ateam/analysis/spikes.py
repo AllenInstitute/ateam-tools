@@ -27,7 +27,7 @@ def get_rates_config(config_file):
 def plot_spikes_rates(config_file, netname, group_key=None, exclude=[], color_dict=None, cmap='hsv', bins=100, fig=None):
     sm = SimManager(config_file)
     fig = fig or plt.figure()
-    nodes_df = vs._create_node_table(sm.nodes_file(netname), sm.node_types_file(netname), group_key=group_key, exclude=exclude)
+    nodes_df = create_node_table(sm.nodes_file(netname), sm.node_types_file(netname), group_key=group_key, exclude=exclude)
 
     # TODO: Uses utils.SpikesReader to open
     spikes_h5 = h5py.File(sm.spikes_file, 'r')
@@ -107,11 +107,11 @@ def plot_pop_rate(ax, spike_times, spike_gids, bins=100, **kwargs):
     ax.set_xlim([0, max(spike_times)])
     ax.set_ylim(bottom=0)
 
-def plot_spikes_rates_traces(config_file, netname, group_key=None, exclude=[], color_dict=None, cmap='hsv', bins=100, fig=None):
+def plot_spikes_rates_traces(config_file, netname, gids=None, group_key=None, exclude=[], color_dict=None, cmap='hsv', bins=100, fig=None):
     import ateam.analysis.cell_vars as cv
     sm = SimManager(config_file)
     fig = fig or plt.figure()
-    nodes_df = vs._create_node_table(sm.nodes_file(netname), sm.node_types_file(netname), group_key=group_key, exclude=exclude)
+    nodes_df = create_node_table(sm.nodes_file(netname), sm.node_types_file(netname), group_key=group_key, exclude=exclude)
 
     # TODO: Uses utils.SpikesReader to open
     spikes_h5 = h5py.File(sm.spikes_file, 'r')
@@ -153,7 +153,7 @@ def plot_spikes_rates_traces(config_file, netname, group_key=None, exclude=[], c
     imain = 1
 
     ax = plt.subplot(gs[0])
-    cv.plot_v( config_file, colors='bbr')
+    cv.plot_v( config_file, gids=gids, colors=color_map)
     ax.axis('off') 
     ax.axis(ymin=-80, ymax=50, xmin=0, xmax=sm.sim_time)
 

@@ -1,7 +1,8 @@
-*.pyc
+**/*.pyc
 *.ipynb_checkpoints/
 *.egg-info
 *.edgg-info
 .vscode/
 .idea/
 .cache/
+test/

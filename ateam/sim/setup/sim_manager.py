@@ -65,8 +65,8 @@ class SimManager(object):
 
     @property
     def networks(self):
-        all_nets = self._networks_active.keys() + self._nodes_dict.keys()
-        return all_nets.union()
+        all_nets = list(self._networks_active.keys()) + list(self._nodes_dict.keys())
+        return all_nets
 
     @property
     def networks_saved(self):

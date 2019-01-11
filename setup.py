@@ -12,5 +12,11 @@ setup(
     ],
     packages=find_packages(),
     scripts=['bin/run_hpc'],
+    entry_points={
+        'console_scripts':[
+            'run_bionet = ateam.sim.run.run_bionet:main',
+            'run_hpc2 = ateam.sim.run.run_hpc:main'
+        ]
+    },
     platforms='any'
 )

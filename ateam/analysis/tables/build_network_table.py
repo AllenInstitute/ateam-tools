@@ -8,8 +8,8 @@ import numpy as np
 import pandas as pd
 import itertools
 from scipy.signal import hilbert, chirp
-import bmtk.analyzer.network_utils as nu
-from  bmtk.analyzer.network_utils import StimType, ModelType, InputType
+from . import network_utils as nu
+from  .network_utils import StimType, ModelType, InputType
 from bmtk.simulator.bionet.modules.xstim_waveforms import stimx_waveform_factory
 from allensdk.ephys.ephys_extractor import EphysSweepFeatureExtractor
 

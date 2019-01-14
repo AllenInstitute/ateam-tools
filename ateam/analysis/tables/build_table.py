@@ -5,10 +5,10 @@
 
 import argparse
 
-from bmtk.analyzer.build_network_table import *
-from bmtk.analyzer.network_utils import StimType
-from bmtk.analyzer.network_utils import ModelType
-from bmtk.analyzer.network_utils import InputType
+from .build_network_table import *
+from .network_utils import StimType
+from .network_utils import ModelType
+from .network_utils import InputType
 
 
 """

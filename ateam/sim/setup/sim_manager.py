@@ -17,7 +17,7 @@ from ateam.sim.run import runner
 ConfigClass = ConfigBuilder
 
 class SimManager(object):
-    def __init__(self, config_path="./config.json", sim_folder=''):
+    def __init__(self, config_path="./config.json", sim_folder='', import_nodes=False):
         """Create a SimManager for a simulation defined by a config_file,
         using the parent folder as the simulation folder.
         If config file is not specified, looks for config.json in current directory.
@@ -32,7 +32,7 @@ class SimManager(object):
         self._nodes_dict = {}
         # Dict of (src_name, trg_name): list of edge file dicts
         self._edges_dict = defaultdict(list)
-        self.load_networks()
+        self.load_networks(import_nodes=import_nodes)
 
     @classmethod
     def from_template(cls, config_template, config_file="config.json", sim_folder=None, config_path=None, overwrite=False):
@@ -62,6 +62,10 @@ class SimManager(object):
     @property
     def config_path(self):
         return self.config.path
+
+    @property
+    def network_builders(self):
+        return self._networks_active
 
     @property
     def networks(self):
@@ -114,13 +118,21 @@ class SimManager(object):
 
 
 
-    def load_networks(self):
+    def load_networks(self, import_nodes=False):
         """Loads file paths for networks specified in the config"""
         # Need to use configdict to resolve paths
         if self.configdict.with_networks:
             nets_dict = self.configdict.networks
+            # gets network block from config file
             nodes_raw = nets_dict['nodes']
             edges_raw = nets_dict['edges']
+            if import_nodes:
+                nodes = {}
+                for nodeset in nodes_raw:
+                    name = nodes_net_name(nodeset)
+                    net = self.new_network(name)
+                    net.import_nodes(self, nodeset['nodes_file'], nodeset['node_types_file'], population=None)
+                    
             nodes = {nodes_net_name(nodeset):nodeset for nodeset in nodes_raw}
             self._nodes_dict.update(nodes)
 

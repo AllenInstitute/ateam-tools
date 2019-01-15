@@ -69,13 +69,20 @@ def build_batch_node_props(node_props_base, n_duplicates=1, net_name='batch', li
 
 def build_input_net_simple(N=1, name='input', **props):
     net = NetworkBuilder(name)
-    net.add_nodes(N, model_type='virtual', **props)
+    if 'num_input' in props.keys():
+        num_input = props.pop('num_input')
+        for k in range(num_input):
+            net.add_nodes(N, model_type='virtual', pop_name = 'input_%s'%k, **props)
+            
+    else:
+         net.add_nodes(N, model_type='virtual', **props)
     net.build()
     return net
 
 def build_batch_edge_props(input_net, node_props_base, edge_props_base, n_duplicates=1, net_name='batch', linked_dicts=None, **vary_edge_props):
     net = NetworkBuilder(net_name)
     edge_props = build_props_combinatorial(n_duplicates=n_duplicates, linked_dicts=linked_dicts, **vary_edge_props)
+    
     # Attach all props to the nodes just for record-keeping
     node_props = node_props_base.copy()
     node_props.update(edge_props)
@@ -128,11 +135,20 @@ def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1, net
     rates = input_props.pop('input_rate')
     input_net = build_input_net_simple(N=N, **input_props)
     sm.add_network(input_net)
-    sm.write_spikeinput_poisson(input_net.name, rates)
+    
+    if 'num_input' in input_props:
+        num_input = input_props.pop('num_input')
+        rates = np.kron(np.ones(num_input),rates)
+    sm.write_spikeinput_poisson(input_net.name, rates, **input_props)
     
     # For edge props, keep base and varying separate
     edge_props_vary.update( (key, all_props[key]) for key in edge_props_vary.keys() )
-    cm = net.add_edges(source=input_net.nodes(), target=net.nodes(), iterator='paired', **edge_props_base)
+    if len(input_net.nodes()) == len(net.nodes()):
+        cm = net.add_edges(source=input_net.nodes(), target=net.nodes(), iterator='paired', **edge_props_base)
+    else:
+        for ii in range(num_input):
+            cm = net.add_edges(source=input_net.nodes(pop_name='input_%s'%ii), 
+                               target=net.nodes(), iterator = 'paired',  **edge_props_base)
 
     node_ids = get_node_ids(net)
     for key, values in edge_props_vary.items():

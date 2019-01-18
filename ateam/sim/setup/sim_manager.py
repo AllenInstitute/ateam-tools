@@ -221,15 +221,15 @@ class SimManager(object):
 
 
     def add_membrane_report(self, name='membrane_report', variables=['v'], cells='all', sections='soma',
-                            file_name=None, soma_distance = None):
+                            file_name=None, **kwargs):
         reports = {name: {
             'module': 'membrane_report',
             'variable_name': variables,
             'cells': cells,
             'file_name': file_name or '{name}.h5'.format(name=name),
-            'sections': sections,
-            'soma_distance' : soma_distance
-        }}
+            'sections': sections
+            }}
+        reports[name].update(**kwargs)
         self.config.update_nested(reports=reports)
         self.config.save()
         

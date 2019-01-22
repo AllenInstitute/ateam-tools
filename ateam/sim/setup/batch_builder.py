@@ -125,10 +125,14 @@ def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1, net
 
     # For input props, combine base and varying
     input_props.update( (key, all_props[key]) for key in input_props_vary.keys() )
-    rates = input_props.pop('input_rate')
+    rates = input_props.pop('input_rate', None)
+    spike_times = input_props.pop('spike_times', None)
     input_net = build_input_net_simple(N=N, **input_props)
     sm.add_network(input_net)
-    sm.write_spikeinput_poisson(input_net.name, rates)
+    if rates:
+        sm.write_spikeinput_poisson(input_net.name, rates)
+    if spike_times is not None:
+        sm.write_spikeinput_vector(input_net.name, spike_times)
     
     # For edge props, keep base and varying separate
     edge_props_vary.update( (key, all_props[key]) for key in edge_props_vary.keys() )

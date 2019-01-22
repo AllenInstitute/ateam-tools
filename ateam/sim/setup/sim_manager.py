@@ -98,10 +98,11 @@ class SimManager(object):
         net_path = self.path(net_folder_name)
 
         for name, net in self._networks_active.items():
-            nodes_dict, edge_dicts = net.save(net_path)
-            self._nodes_dict.update({name: nodes_dict})
-            for edgeset in edge_dicts:
-                self._edges_dict[edges_net_pair(edgeset)].append(edgeset)
+            if name not in self.networks_saved: # does't try to save already loaded networks
+                nodes_dict, edge_dicts = net.save(net_path)
+                self._nodes_dict.update({name: nodes_dict})
+                for edgeset in edge_dicts:
+                    self._edges_dict[edges_net_pair(edgeset)].append(edgeset)
 
         # TODO: use relative paths or path vars in config?
         nodes = self._nodes_dict.values()
@@ -131,7 +132,7 @@ class SimManager(object):
                 for nodeset in nodes_raw:
                     name = nodes_net_name(nodeset)
                     net = self.new_network(name)
-                    net.import_nodes(self, nodeset['nodes_file'], nodeset['node_types_file'], population=None)
+                    net.import_nodes(nodeset['nodes_file'], nodeset['node_types_file'], population=None)
                     
             nodes = {nodes_net_name(nodeset):nodeset for nodeset in nodes_raw}
             self._nodes_dict.update(nodes)
@@ -183,11 +184,11 @@ class SimManager(object):
         spikes.save_csv(spike_file)
         self.add_spike_input(spike_file, net_name)
 
-    def write_spikeinput_poisson(self, net_name, rate, tstop=2000, spike_file_name='spike_input.h5'):
+    def write_spikeinput_poisson(self, net_name, rate, tstart = 0, tstop=2000, spike_file_name='spike_input.h5'):
         """Write a new spikeinput file for independent Poisson spiking and add it to the config."""
         net = self._networks_active[net_name]
         node_ids = [node.node_id for node in net.nodes_iter()]
-        psg = PoissonSpikesGenerator(node_ids, rate, tstop=tstop)
+        psg = PoissonSpikesGenerator(node_ids, rate, tstart = tstart, tstop=tstop)
         spike_file = self.path(spike_file_name)
         psg.to_hdf5(spike_file)
         self.add_spike_input(spike_file, net_name)
@@ -219,16 +220,19 @@ class SimManager(object):
                 csv_writer.writerow([i] + [str(x) for x in loc])
 
 
-    def add_membrane_report(self, name='membrane_report', variables=['v'], cells='all', sections='soma', file_name=None):
+    def add_membrane_report(self, name='membrane_report', variables=['v'], cells='all', sections='soma',
+                            file_name=None, **kwargs):
         reports = {name: {
             'module': 'membrane_report',
             'variable_name': variables,
             'cells': cells,
             'file_name': file_name or '{name}.h5'.format(name=name),
-            'sections': sections,
-        }}
+            'sections': sections
+            }}
+        reports[name].update(**kwargs)
         self.config.update_nested(reports=reports)
-
+        self.config.save()
+        
     def nodes_file(self, net):
         # TODO: check net in networks first?
         return self.path("{}_nodes.h5".format(net))

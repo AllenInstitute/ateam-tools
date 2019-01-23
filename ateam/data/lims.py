@@ -38,7 +38,7 @@ class LimsReader(object):
 
     def get_sweep_info(self, cell, sweepname):
         sql = """SELECT sw.sweep_number, sw.workflow_state,
-            stype.name, stim
+            stype.name, stim.description
             FROM ephys_sweeps sw
             JOIN ephys_stimuli stim ON stim.id = sw.ephys_stimulus_id
             JOIN ephys_stimulus_types stype ON stype.id = stim.ephys_stimulus_type_id

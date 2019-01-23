@@ -307,7 +307,7 @@ def read_table_h5(fpath):
         table = build_df(extra_cols)
         un_touched_data_cols = (dc_cols + extra_cols)
 
-        ids = f5['ids'].value
+        ids = f5['ids'].values
         spike_data = f5['spikes']
 
         if set(['spike_threshold_t', 'spike_phase']).issubset(un_touched_data_cols):

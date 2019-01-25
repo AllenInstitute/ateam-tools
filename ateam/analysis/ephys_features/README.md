@@ -6,7 +6,7 @@ The first notebook 'extract_features_and_save.ipynb' extracts features from stan
 
 The second notebook 'analyze_features.ipynb' contains the feature analysis code. The first part corresponds to the feature download from .csv files. The feature extraction procedure takes a lot of time, therefore it is better to save the results in csv files and start the analysis from there. All results in various analysis types will be saved in eps and svg formats in the corresponding folder.
 
-The original nwb files take too much space and could not be uploaded on github directly. If you would like to run feature extraction yourself, you could find the nwb files here:
+The original nwb files take too much space and could not be uploaded on github directly. If you would like to run feature extraction yourself, you could find the nwb files here in nwb subfolder:
 
 H16.06.008
 https://drive.google.com/open?id=15XlUQFNo_km1eel08zPQ3Y4EBB1S30tV

@@ -2,13 +2,14 @@
 
 import subprocess
 import os
+import os.path
 
-# TODO: could put cd to config dir in subproc commands?
 _pycommand = r'from ateam.sim.run import run_bionet; run_bionet.run(\"{config}\")'
 
 def bionet_mpi_command(config, ncores=1):
     command = _pycommand.format(config=config)
-    mpicommand = 'mpirun -np {ncores} nrniv -mpi -python -c "{pycommand}"'.format(ncores=ncores, pycommand=command)
+    sim_dir = os.path.dirname(config)
+    mpicommand = 'cd {dir}; mpirun -np {ncores} nrniv -mpi -python -c "{pycommand}"'.format(dir=sim_dir, ncores=ncores, pycommand=command)
     return mpicommand
 
 def run_bionet_mpi(config, ncores=1):
@@ -20,7 +21,8 @@ def run_bionet_mpi(config, ncores=1):
     print out[0]
 
 def run_bionet(config):
-    command = 'python -c "{cmd}"'.format(cmd=_pycommand).format(config=config)
+    sim_dir = os.path.dirname(config)
+    command = 'cd {dir}; python -c "{cmd}"'.format(cmd=_pycommand).format(dir=sim_dir, config=config)
     sp = subprocess.Popen([command], stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, executable='/bin/bash')
     out = sp.communicate()
     # error first

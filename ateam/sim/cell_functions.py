@@ -3,9 +3,7 @@
 
 from neuron import h
 from bmtk.simulator.bionet.pyfunction_cache import add_cell_processor
-from bmtk.simulator.bionet.default_setters.cell_models import set_params_allactive
-from bmtk.simulator.bionet.default_setters.cell_models import fix_axon_peri
-
+from bmtk.simulator.bionet.default_setters.cell_models import fix_axon_peri, fix_axon_allactive, set_params_allactive
 
 def fix_axon_allactive_bpopt(hobj):
   """Replace reconstructed axon with a stub which is consistent with BluePyOpt
@@ -53,6 +51,33 @@ def fix_axon_allactive_bpopt(hobj):
 
   h.define_shape()
 
+def add_ais_segment(hobj, name):
+    ais = h.Section(name=name, cell=hobj)
+    ais.L = 20
+    ais.diam = 1
+    hobj.all.append(sec=ais)
+    hobj.axon[0].disconnect()
+    ais.connect(hobj.soma[0], 1.0, 0)
+    hobj.axon[0].connect(ais, 1.0, 0)
+    return ais
+
+def allactive_ais_passive(hobj, cell, dynamics_params):
+    # Adds a segment between the AIS and soma,
+    # with passive properties (default cm=1 and Rm and Ra from params)
+    fix_axon_allactive(hobj)
+    ais = add_ais_segment(hobj, name='ais')
+    set_params_allactive(hobj, dynamics_params)
+    return hobj
+
+def allactive_ais_somatic(hobj, cell, dynamics_params):
+    # Adds a segment between the AIS and soma,
+    # with active properties matching the soma
+    fix_axon_allactive(hobj)
+    # the soma2 name will be treated as somatic by set_params_allactive
+    # (checks only the first 4 chars of names)
+    ais = add_ais_segment(hobj, name='soma2')
+    set_params_allactive(hobj, dynamics_params)
+    return hobj
 
 def aibs_allactive_bpopt_axon(hobj, cell, dynamics_params):
    # Write custom function for replacing axon with stub
@@ -68,5 +93,7 @@ def aibs_allactive_stub_axon(hobj, cell, dynamics_params):
    return hobj
 
 
+add_cell_processor(allactive_ais_somatic)
+add_cell_processor(allactive_ais_passive)
 add_cell_processor(aibs_allactive_bpopt_axon)
 add_cell_processor(aibs_allactive_stub_axon)

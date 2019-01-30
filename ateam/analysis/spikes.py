@@ -1,5 +1,6 @@
 import numpy as np 
 import h5py
+import warnings
 # from bmtk.analyzer.spikes_loader import load_spikes
 from bmtk.utils.spike_trains import SpikesFile
 from ateam.analysis.nodes import create_node_table
@@ -24,8 +25,9 @@ def get_rates_config(config_file):
     return dict(zip(gids, rates))
 
 
-def plot_spikes_rates(config_file, netname, group_key=None, exclude=[], color_dict=None, cmap='hsv', bins=100, fig=None):
+def plot_spikes_rates(config_file, netname, group_key=None, exclude=[], color_dict=None, cmap='hsv', bins=100, fig=None, tlim=None):
     sm = SimManager(config_file)
+    tlim = tlim or [0, sm.sim_time]
     fig = fig or plt.figure()
     nodes_df = create_node_table(sm.nodes_file(netname), sm.node_types_file(netname), group_key=group_key, exclude=exclude)
 
@@ -78,7 +80,7 @@ def plot_spikes_rates(config_file, netname, group_key=None, exclude=[], color_di
     #ax1.set_xlabel('time (s)')
     ax1.axes.get_xaxis().set_visible(False)
     ax1.set_ylabel('cell_id')
-    ax1.set_xlim([0, max(spike_times)])
+    ax1.set_xlim(tlim)
     ax1.set_ylim([gid_min, gid_max])
     plt.legend(markerscale=2, scatterpoints=1)
 
@@ -89,7 +91,7 @@ def plot_spikes_rates(config_file, netname, group_key=None, exclude=[], color_di
         indexes = np.in1d(spike_gids, gids_group)
 
         ax = plt.subplot(gs[i+1])
-        plot_pop_rate(ax, spike_times[indexes], spike_gids[indexes], color=color, bins=bins)
+        plot_pop_rate(ax, spike_times[indexes], spike_gids[indexes], color=color, bins=bins, tlim=tlim)
         ax.axes.get_xaxis().set_visible(False)
 
     fig.text(0.05, 0.3, 'Firing rate (Hz)', rotation='vertical')
@@ -97,14 +99,15 @@ def plot_spikes_rates(config_file, netname, group_key=None, exclude=[], color_di
     ax.axes.get_xaxis().set_visible(True)
     ax.set_xlabel('time (ms)')
 
-def plot_pop_rate(ax, spike_times, spike_gids, bins=100, **kwargs):
+def plot_pop_rate(ax, spike_times, spike_gids, bins=100, tlim=None, **kwargs):
     n = len(np.unique(spike_gids))
     hist, bin_edges = np.histogram(spike_times, bins=bins)
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2.
     rates = hist / np.diff(bin_edges) * 1000 / n
     ax.plot(bin_centers, rates, **kwargs)
     # ax.set_xlabel('time (ms)')
-    ax.set_xlim([0, max(spike_times)])
+    if tlim:
+        ax.set_xlim(tlim)
     ax.set_ylim(bottom=0)
 
 def plot_spikes_rates_traces(config_file, netname, gids=None, group_key=None, exclude=[], color_dict=None, cmap='hsv', bins=100, fig=None):

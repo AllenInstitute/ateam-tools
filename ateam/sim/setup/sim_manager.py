@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 import itertools
 import csv
@@ -18,12 +19,13 @@ ConfigClass = ConfigBuilder
 
 class SimManager(object):
     def __init__(self, config_path="./config.json", sim_folder='', import_nodes=False):
+        # TODO: relax constraint on sim_folder as parent dir?
         """Create a SimManager for a simulation defined by a config_file,
         using the parent folder as the simulation folder.
         If config file is not specified, looks for config.json in current directory.
         """
         config_path = os.path.abspath(os.path.join(sim_folder, config_path))
-        assert os.path.isfile(config_path)
+        # assert os.path.isfile(config_path)
         self.config = ConfigClass.from_json(config_path)
         self.configdict = ConfigDict.load(config_path)
         self.sim_folder = os.path.dirname(config_path)
@@ -94,22 +96,29 @@ class SimManager(object):
         for network in networks:
             self.add_network(network)
 
+    def clear_output(self):
+        out_dir = os.path.join(self.sim_folder, "output")
+        shutil.rmtree(out_dir)
+
     def save_network_files(self, net_folder_name=''):
-        net_path = self.path(net_folder_name)
+        net_path = self.abspath(net_folder_name)
 
         for name, net in self._networks_active.items():
-            if name not in self.networks_saved: # does't try to save already loaded networks
+            if name not in self.networks_saved: # doesn't try to save already loaded networks
                 nodes_dict, edge_dicts = net.save(net_path)
+                # Convert back to relative paths for config
+                for key, path in nodes_dict.items():
+                    nodes_dict[key] = os.path.relpath(path, self.sim_folder)
                 self._nodes_dict.update({name: nodes_dict})
                 for edgeset in edge_dicts:
+                    for key, path in edgeset.items():
+                        edgeset[key] = os.path.relpath(path, self.sim_folder)
                     self._edges_dict[edges_net_pair(edgeset)].append(edgeset)
 
-        # TODO: use relative paths or path vars in config?
         nodes = self._nodes_dict.values()
         edges = sum(self._edges_dict.values(), [])
         self.config.update(networks={'nodes':nodes, 'edges':edges})
         self.config.save()
-
 
     def save_complete(self, folder_path=''):
         """Save self-contained folder with all simulation files."""
@@ -117,7 +126,20 @@ class SimManager(object):
         folder_path = folder_path or self.sim_folder
         raise NotImplementedError()
 
-
+    def save_copy(self, folder_path, overwrite=False):
+        """Save a copy of the current sim folder contents to a new directory.
+        Remove the output directory from the new folder."""
+        if os.path.exists(folder_path):
+            if overwrite:
+                shutil.rmtree(folder_path)
+            else:
+                Warning("Folder exists; aborting.")
+                return
+        shutil.copytree(self.sim_folder, folder_path)
+        config_name = os.path.basename(self.config_path)
+        sm = SimManager(config_name, sim_folder=folder_path)
+        sm.clear_output()
+        return sm
 
     def load_networks(self, import_nodes=False):
         """Loads file paths for networks specified in the config"""
@@ -143,7 +165,7 @@ class SimManager(object):
     def update_node_type_props(self, net_name, props):
         assert(net_name in self.networks_saved)
         node_types_file = self._nodes_dict[net_name]['node_types_file']
-        update_csv(node_types_file, props)
+        update_csv(self.abspath(node_types_file), props)
 
     def update_edge_type_props(self, src_name, dest_name, props):
         edges = self._edges_dict.get((src_name, dest_name))
@@ -152,11 +174,11 @@ class SimManager(object):
         if len(edges) > 1:
             Warning("Multiple edge files exist for given pair of networks.")
         edge_dict = edges[0]
-        update_csv(edge_dict['edge_types_file'], props)
+        update_csv(self.abspath(edge_dict['edge_types_file']), props)
 
 
 ### Configure inputs and modules
-    def path(self, filename):
+    def abspath(self, filename):
         return os.path.join(self.sim_folder, filename)
 
     def add_spike_input(self, input_file, net_name, trial=None):
@@ -180,23 +202,23 @@ class SimManager(object):
         All cells are assigned the same spike times."""
         spikes = SpikeInput(self._networks_active[net_name].nodes())
         spikes.set_times_all(times)
-        spike_file = self.path(spike_file_name)
+        spike_file = self.abspath(spike_file_name)
         spikes.save_csv(spike_file)
-        self.add_spike_input(spike_file, net_name)
+        self.add_spike_input(spike_file_name, net_name)
 
     def write_spikeinput_poisson(self, net_name, rate, tstart = 0, tstop=2000, spike_file_name='spike_input.h5'):
         """Write a new spikeinput file for independent Poisson spiking and add it to the config."""
         net = self._networks_active[net_name]
         node_ids = [node.node_id for node in net.nodes_iter()]
         psg = PoissonSpikesGenerator(node_ids, rate, tstart = tstart, tstop=tstop)
-        spike_file = self.path(spike_file_name)
+        spike_file = self.abspath(spike_file_name)
         psg.to_hdf5(spike_file)
-        self.add_spike_input(spike_file, net_name)
+        self.add_spike_input(spike_file_name, net_name)
 
     def add_ecp_report(self, electrode_file=None, cells='all', file_name='ecp.h5', locs=[[0,0,0]], save_contributions=False):
         if electrode_file is None:
-            electrode_file = self.path('electrode.csv')
-            self.write_electrode_file(locs, electrode_file)
+            electrode_file = 'electrode.csv'
+            self.write_electrode_file(locs, self.abspath(electrode_file))
 
         reports = {'ecp_report': {
             'cells': cells,
@@ -235,11 +257,11 @@ class SimManager(object):
         
     def nodes_file(self, net):
         # TODO: check net in networks first?
-        return self.path("{}_nodes.h5".format(net))
+        return self.abspath("{}_nodes.h5".format(net))
         
     def node_types_file(self, net):
         # TODO: check net in networks first?
-        return self.path("{}_node_types.csv".format(net))
+        return self.abspath("{}_node_types.csv".format(net))
 
     @property
     def spikes_file(self):

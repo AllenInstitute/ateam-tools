@@ -56,7 +56,7 @@ def add_ais_segment(hobj, name):
     ais.L = 20
     ais.diam = 1
     hobj.all.append(sec=ais)
-    hobj.axon[0].disconnect()
+    h.disconnect(sec=hobj.axon[0])
     ais.connect(hobj.soma[0], 1.0, 0)
     hobj.axon[0].connect(ais, 1.0, 0)
     return ais

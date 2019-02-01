@@ -100,19 +100,23 @@ class SimManager(object):
         out_dir = os.path.join(self.sim_folder, "output")
         shutil.rmtree(out_dir)
 
-    def save_network_files(self, net_folder_name=''):
+    def save_network_files(self, net_folder_name='', use_abs_paths=False):
         net_path = self.abspath(net_folder_name)
-
+        if use_abs_paths:
+            trim_path = lambda path: path
+        else:
+            trim_path = lambda path: os.path.relpath(path, self.sim_folder)
+            
         for name, net in self._networks_active.items():
             if name not in self.networks_saved: # doesn't try to save already loaded networks
                 nodes_dict, edge_dicts = net.save(net_path)
                 # Convert back to relative paths for config
                 for key, path in nodes_dict.items():
-                    nodes_dict[key] = os.path.relpath(path, self.sim_folder)
+                    nodes_dict[key] = trim_path(path)
                 self._nodes_dict.update({name: nodes_dict})
                 for edgeset in edge_dicts:
                     for key, path in edgeset.items():
-                        edgeset[key] = os.path.relpath(path, self.sim_folder)
+                        edgeset[key] = trim_path(path)
                     self._edges_dict[edges_net_pair(edgeset)].append(edgeset)
 
         nodes = self._nodes_dict.values()

@@ -15,8 +15,8 @@ parser.add_argument("--mem", "-m", default="4g")
 parser.add_argument("--queue","-q", default="celltypes")
 parser.add_argument("--time","-t", default="00:05:00")
 parser.add_argument("--nodes", "-n", default=1, type=int)
-parser.add_argument("--ppn")
-parser.add_argument("--procs","-p")
+parser.add_argument("--ppn", type=int)
+parser.add_argument("--procs","-p", type=int)
 parser.add_argument("--norerun", action='store_true')
 
 def main(args_list=None):

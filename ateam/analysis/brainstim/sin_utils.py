@@ -13,9 +13,9 @@ import pandas as pd
 from enum import Enum
 from scipy.optimize import leastsq
 from scipy import fftpack
-import reobase_analysis.reobase_utils as ru
-from reobase_analysis.stimxwaveform import stimx_waveform_factory
-from reobase_analysis.stimxwaveform import iclamp_waveform_factory
+import ateam.analysis.brainstim.reobase_utils as ru
+from .stimxwaveform import stimx_waveform_factory
+from .stimxwaveform import iclamp_waveform_factory
 
 
 def compute_fft(sig, time_step):

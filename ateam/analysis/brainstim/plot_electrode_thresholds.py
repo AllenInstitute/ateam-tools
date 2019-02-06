@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import reobase_utils as r
 import analysis as ra
 import numpy as np
-import reobase_analysis.tchelpers as tc
+import ateam.analysis.brainstim.tchelpers as tc
 
 cell_gid = [313862022, 314900022, 320668879][2]
 t = r.read_cell_tables(cell_gid, [str(x) for x in range(10,60,10)], stim_type='dc_lgn_poisson')

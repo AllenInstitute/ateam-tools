@@ -3,9 +3,9 @@
 # Date created: 9/1/2017
 ######################################################
 
-import reobase_analysis.tchelpers as tc
-import reobase_analysis.reobase_utils as ru
-from reobase_analysis.stimxwaveform import stimx_waveform_factory
+import ateam.analysis.brainstim.tchelpers as tc
+import ateam.analysis.brainstim.reobase_utils as ru
+from .stimxwaveform import stimx_waveform_factory
 
 
 # el = 409

@@ -8,7 +8,7 @@ import reobase_utils as r
 import analysis as ra
 import numpy as np
 import pandas as pd
-from reobase_analysis.reobase_utils import StimType
+from .reobase_utils import StimType
 from scipy.optimize import leastsq
 import scipy.stats as stats
 

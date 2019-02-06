@@ -8,15 +8,15 @@ import numpy as np
 import pandas as pd
 import itertools
 import allensdk
-import reobase_analysis.reobase_utils as ru
-import reobase_analysis.exper_utils as xu
-import isee_engine.bionet.config as config
-import reobase_analysis.sin_utils as su
+import ateam.analysis.brainstim.reobase_utils as ru
+import ateam.analysis.brainstim.exper_utils as xu
+import ateam.analysis.brainstim.config as config
+import ateam.analysis.brainstim.sin_utils as su
 from scipy.signal import hilbert, chirp
-from reobase_analysis.exper_utils import ElectrodeType
-from reobase_analysis.reobase_utils import StimType, ModelType, InputType
-from reobase_analysis.stimxwaveform import stimx_waveform_factory
-from reobase_analysis.stimxwaveform import iclamp_waveform_factory
+from .exper_utils import ElectrodeType
+from .reobase_utils import StimType, ModelType, InputType
+from .stimxwaveform import stimx_waveform_factory
+from .stimxwaveform import iclamp_waveform_factory
 from allensdk.ephys.ephys_extractor import EphysSweepFeatureExtractor
 from neuroanalysis.miesnwb import MiesNwb
 

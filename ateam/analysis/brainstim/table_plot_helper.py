@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import matplotlib as mlb
 import matplotlib.pyplot as plt
-import reobase_analysis.reobase_utils as ru
+import ateam.analysis.brainstim.reobase_utils as ru
 from matplotlib.mlab import griddata
 import h5py
 

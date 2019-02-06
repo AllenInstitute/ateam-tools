@@ -6,9 +6,9 @@
 from scipy.signal import hilbert, chirp
 import numpy as np
 import matplotlib.pyplot as plt
-import reobase_analysis.reobase_utils as ru
-import reobase_analysis.tchelpers as tc
-import reobase_analysis.plot_polar_angle as pol
+import ateam.analysis.brainstim.reobase_utils as ru
+import ateam.analysis.brainstim.tchelpers as tc
+import ateam.analysis.brainstim.plot_polar_angle as pol
 import pycircstat
 import pandas as pd
 import random

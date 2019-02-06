@@ -5,9 +5,9 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import reobase_analysis.tchelpers as tc
-import reobase_analysis.reobase_utils as ru
-import reobase_analysis.analysis as ra
+import ateam.analysis.brainstim.tchelpers as tc
+import ateam.analysis.brainstim.reobase_utils as ru
+import ateam.analysis.brainstim.analysis as ra
 
 #%% Compare different electrodes
 def plot_els(cell_gid, amp, els, stim_type='dc', trial=0):

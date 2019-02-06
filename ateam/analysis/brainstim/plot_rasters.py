@@ -6,7 +6,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import reobase_utils as r
-from reobase_analysis.reobase_utils import StimType
+from .reobase_utils import StimType
 
 
 #%% find raster for a given el, amp

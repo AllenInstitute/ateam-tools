@@ -1,0 +1,113 @@
+2019-02-01 15:49:05 2019 INFO: Found 12 files in upload directory
+2019-02-01 15:49:05 2021 INFO: Preprocessing 648349587: ./swc/648349587.swc
+2019-02-01 15:49:05 2022 INFO: Preprocessing 648357948: ./swc/648357948.swc
+2019-02-01 15:49:05 2023 INFO: Preprocessing 648363640: ./swc/648363640.swc
+2019-02-01 15:49:05 2021 ERROR: file ./swc/648349587.swc not a recognized pixel or micron file
+2019-02-01 15:49:05 2022 ERROR: file ./swc/648357948.swc not a recognized pixel or micron file
+2019-02-01 15:49:05 2023 ERROR: file ./swc/648363640.swc not a recognized pixel or micron file
+2019-02-01 15:49:05 2024 INFO: Preprocessing 648368561: ./swc/648368561.swc
+2019-02-01 15:49:05 2024 ERROR: file ./swc/648368561.swc not a recognized pixel or micron file
+2019-02-01 15:49:06 2021 WARNING: neuron has unknown units (None) - no scaling applied.
+2019-02-01 15:49:06 2024 WARNING: neuron has unknown units (None) - no scaling applied.
+2019-02-01 15:49:06 2021 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-02-01 15:49:06 2021 WARNING: upright transform result 648349587
+2019-02-01 15:49:06 2023 WARNING: neuron has unknown units (None) - no scaling applied.
+2019-02-01 15:49:06 2021 ERROR: Autotrace for for specimen 648349587 does not exist: 
+2019-02-01 15:49:06 2024 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-02-01 15:49:06 2024 WARNING: upright transform result 648368561
+2019-02-01 15:49:06 2023 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-02-01 15:49:06 2023 WARNING: upright transform result 648363640
+2019-02-01 15:49:06 2024 ERROR: Autotrace for for specimen 648368561 does not exist: 
+2019-02-01 15:49:06 2021 INFO: Preprocessing 648575464: ./swc/648575464.swc
+2019-02-01 15:49:06 2021 ERROR: file ./swc/648575464.swc not a recognized pixel or micron file
+2019-02-01 15:49:06 2023 ERROR: Autotrace for for specimen 648363640 does not exist: 
+2019-02-01 15:49:06 2022 WARNING: neuron has unknown units (None) - no scaling applied.
+2019-02-01 15:49:06 2024 INFO: Preprocessing 648592807: ./swc/648592807.swc
+2019-02-01 15:49:06 2024 ERROR: file ./swc/648592807.swc not a recognized pixel or micron file
+2019-02-01 15:49:06 2022 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-02-01 15:49:06 2022 WARNING: upright transform result 648357948
+2019-02-01 15:49:06 2023 INFO: Preprocessing 648606306: ./swc/648606306.swc
+2019-02-01 15:49:06 2023 ERROR: file ./swc/648606306.swc not a recognized pixel or micron file
+2019-02-01 15:49:06 2022 ERROR: Autotrace for for specimen 648357948 does not exist: 
+2019-02-01 15:49:06 2022 INFO: Preprocessing 648609532: ./swc/648609532.swc
+2019-02-01 15:49:06 2022 ERROR: file ./swc/648609532.swc not a recognized pixel or micron file
+2019-02-01 15:49:06 2022 WARNING: neuron has unknown units (None) - no scaling applied.
+2019-02-01 15:49:06 2023 WARNING: neuron has unknown units (None) - no scaling applied.
+2019-02-01 15:49:06 2021 WARNING: neuron has unknown units (None) - no scaling applied.
+2019-02-01 15:49:06 2022 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-02-01 15:49:06 2022 WARNING: upright transform result 648609532
+2019-02-01 15:49:06 2024 WARNING: neuron has unknown units (None) - no scaling applied.
+2019-02-01 15:49:06 2023 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-02-01 15:49:06 2023 WARNING: upright transform result 648606306
+2019-02-01 15:49:06 2022 ERROR: Autotrace for for specimen 648609532 does not exist: 
+2019-02-01 15:49:06 2021 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-02-01 15:49:06 2021 WARNING: upright transform result 648575464
+2019-02-01 15:49:06 2024 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-02-01 15:49:06 2024 WARNING: upright transform result 648592807
+2019-02-01 15:49:06 2023 ERROR: Autotrace for for specimen 648606306 does not exist: 
+2019-02-01 15:49:06 2022 INFO: Preprocessing 648617971: ./swc/648617971.swc
+2019-02-01 15:49:06 2022 ERROR: file ./swc/648617971.swc not a recognized pixel or micron file
+2019-02-01 15:49:06 2021 ERROR: Autotrace for for specimen 648575464 does not exist: 
+2019-02-01 15:49:06 2024 ERROR: Autotrace for for specimen 648592807 does not exist: 
+2019-02-01 15:49:06 2023 INFO: Preprocessing 648621553: ./swc/648621553.swc
+2019-02-01 15:49:06 2023 ERROR: file ./swc/648621553.swc not a recognized pixel or micron file
+2019-02-01 15:49:06 2024 INFO: Preprocessing 648870914: ./swc/648870914.swc
+2019-02-01 15:49:06 2024 ERROR: file ./swc/648870914.swc not a recognized pixel or micron file
+2019-02-01 15:49:06 2021 INFO: Preprocessing 648931407: ./swc/648931407.swc
+2019-02-01 15:49:06 2021 ERROR: file ./swc/648931407.swc not a recognized pixel or micron file
+2019-02-01 15:49:06 2022 WARNING: neuron has unknown units (None) - no scaling applied.
+2019-02-01 15:49:07 2022 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-02-01 15:49:07 2022 WARNING: upright transform result 648617971
+2019-02-01 15:49:07 2022 ERROR: Autotrace for for specimen 648617971 does not exist: 
+2019-02-01 15:49:07 2023 WARNING: neuron has unknown units (None) - no scaling applied.
+2019-02-01 15:49:07 2023 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-02-01 15:49:07 2023 WARNING: upright transform result 648621553
+2019-02-01 15:49:07 2024 WARNING: neuron has unknown units (None) - no scaling applied.
+2019-02-01 15:49:07 2023 ERROR: Autotrace for for specimen 648621553 does not exist: 
+2019-02-01 15:49:07 2024 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-02-01 15:49:07 2024 WARNING: upright transform result 648870914
+2019-02-01 15:49:07 2021 WARNING: neuron has unknown units (None) - no scaling applied.
+2019-02-01 15:49:07 2021 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-02-01 15:49:07 2021 WARNING: upright transform result 648931407
+2019-02-01 15:49:07 2024 ERROR: Autotrace for for specimen 648870914 does not exist: 
+2019-02-01 15:49:07 2021 ERROR: Autotrace for for specimen 648931407 does not exist: 
+2019-02-01 15:49:07 2019 INFO: processing mouse
+2019-02-01 15:49:07 2019 INFO: Processing 0 file(s)
+2019-02-01 15:49:07 2019 INFO: processing human
+2019-02-01 15:49:07 2019 INFO: Processing 12 file(s)
+2019-02-01 15:49:07 2031 INFO: Processing 648363640: OUT_swc/morphology_data/human/to_process/non_upright/648363640.swc
+2019-02-01 15:49:07 2029 INFO: Processing 648349587: OUT_swc/morphology_data/human/to_process/non_upright/648349587.swc
+2019-02-01 15:49:07 2032 INFO: Processing 648368561: OUT_swc/morphology_data/human/to_process/non_upright/648368561.swc
+2019-02-01 15:49:07 2030 INFO: Processing 648357948: OUT_swc/morphology_data/human/to_process/non_upright/648357948.swc
+2019-02-01 15:49:08 2029 WARNING: Cannot get normalized depth for 648349587. Using 0
+2019-02-01 15:49:08 2032 WARNING: Cannot get normalized depth for 648368561. Using 0
+2019-02-01 15:49:08 2031 WARNING: Cannot get normalized depth for 648363640. Using 0
+2019-02-01 15:49:08 2030 WARNING: Cannot get normalized depth for 648357948. Using 0
+2019-02-01 15:49:10 2029 ERROR: no specimen record found for 648349587
+2019-02-01 15:49:10 2032 ERROR: no specimen record found for 648368561
+2019-02-01 15:49:10 2031 ERROR: no specimen record found for 648363640
+2019-02-01 15:49:10 2029 INFO: Processing 648575464: OUT_swc/morphology_data/human/to_process/non_upright/648575464.swc
+2019-02-01 15:49:11 2030 ERROR: no specimen record found for 648357948
+2019-02-01 15:49:11 2032 INFO: Processing 648592807: OUT_swc/morphology_data/human/to_process/non_upright/648592807.swc
+2019-02-01 15:49:11 2029 WARNING: Cannot get normalized depth for 648575464. Using 0
+2019-02-01 15:49:11 2031 INFO: Processing 648606306: OUT_swc/morphology_data/human/to_process/non_upright/648606306.swc
+2019-02-01 15:49:11 2032 WARNING: Cannot get normalized depth for 648592807. Using 0
+2019-02-01 15:49:11 2031 WARNING: Cannot get normalized depth for 648606306. Using 0
+2019-02-01 15:49:12 2030 INFO: Processing 648609532: OUT_swc/morphology_data/human/to_process/non_upright/648609532.swc
+2019-02-01 15:49:12 2030 WARNING: Cannot get normalized depth for 648609532. Using 0
+2019-02-01 15:49:14 2030 ERROR: no specimen record found for 648609532
+2019-02-01 15:49:14 2029 ERROR: no specimen record found for 648575464
+2019-02-01 15:49:14 2031 ERROR: no specimen record found for 648606306
+2019-02-01 15:49:15 2032 ERROR: no specimen record found for 648592807
+2019-02-01 15:49:15 2030 INFO: Processing 648617971: OUT_swc/morphology_data/human/to_process/non_upright/648617971.swc
+2019-02-01 15:49:15 2031 INFO: Processing 648621553: OUT_swc/morphology_data/human/to_process/non_upright/648621553.swc
+2019-02-01 15:49:15 2030 WARNING: Cannot get normalized depth for 648617971. Using 0
+2019-02-01 15:49:15 2029 INFO: Processing 648870914: OUT_swc/morphology_data/human/to_process/non_upright/648870914.swc
+2019-02-01 15:49:16 2032 INFO: Processing 648931407: OUT_swc/morphology_data/human/to_process/non_upright/648931407.swc
+2019-02-01 15:49:16 2031 WARNING: Cannot get normalized depth for 648621553. Using 0
+2019-02-01 15:49:16 2029 WARNING: Cannot get normalized depth for 648870914. Using 0
+2019-02-01 15:49:16 2032 WARNING: Cannot get normalized depth for 648931407. Using 0
+2019-02-01 15:49:19 2030 ERROR: no specimen record found for 648617971
+2019-02-01 15:49:20 2031 ERROR: no specimen record found for 648621553
+2019-02-01 15:49:20 2029 ERROR: no specimen record found for 648870914
+2019-02-01 15:49:21 2032 ERROR: no specimen record found for 648931407

@@ -3,7 +3,7 @@
 
 from neuron import h
 from bmtk.simulator.bionet.pyfunction_cache import add_cell_processor
-from bmtk.simulator.bionet.default_setters.cell_models import fix_axon_peri, fix_axon_allactive, set_params_allactive
+from bmtk.simulator.bionet.default_setters.cell_models import fix_axon_peri, fix_axon_allactive, set_params_allactive, fix_axon_perisomatic_directed
 
 def fix_axon_allactive_bpopt(hobj):
   """Replace reconstructed axon with a stub which is consistent with BluePyOpt
@@ -87,14 +87,22 @@ def aibs_allactive_bpopt_axon(hobj, cell, dynamics_params):
    set_params_allactive(hobj, dynamics_params)
    return hobj
 
-def aibs_allactive(hobj, cell, dynamics_params):
-   
+def aibs_allactive_ani(hobj, cell, dynamics_params):
+    return aibs_allactive_stub_axon(hobj, cell, dynamics_params)
+
+def aibs_allactive_stub_axon(hobj, cell, dynamics_params):
    fix_axon_peri(hobj) # Replace axon with a stub 60 micron with 1 micron diameter
    set_params_allactive(hobj, dynamics_params)
    return hobj
 
+def aibs_allactive_ani_directed(hobj, cell, dynamics_params):
+   fix_axon_perisomatic_directed(hobj) # Replace axon with a stub 60 micron with 1 micron diameter
+   set_params_allactive(hobj, dynamics_params)
+   return hobj
 
 add_cell_processor(allactive_ais_somatic)
 add_cell_processor(allactive_ais_passive)
 add_cell_processor(aibs_allactive_bpopt_axon)
-add_cell_processor(aibs_allactive)
+add_cell_processor(aibs_allactive_stub_axon)
+add_cell_processor(aibs_allactive_ani)
+add_cell_processor(aibs_allactive_ani_directed)

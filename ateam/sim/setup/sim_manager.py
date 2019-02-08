@@ -201,21 +201,30 @@ class SimManager(object):
             }}
         self.config.update_nested(inputs=inputs)
     
-    def write_spikeinput_vector(self, net_name, times, spike_file_name='spike_input.csv'):
+    def write_spikeinput_vector(self, net_name, times, spike_file_name='spike_input.csv',use_abs_paths=False):
         """Write a new spikeinput file from a vector of times and add it to the config.
         All cells are assigned the same spike times."""
         spikes = SpikeInput(self._networks_active[net_name].nodes())
         spikes.set_times_all(times)
-        spike_file = self.abspath(spike_file_name)
+        if use_abs_paths:
+            spike_file = os.path(spike_file_name)
+        else:    
+            spike_file = self.abspath(spike_file_name)
         spikes.save_csv(spike_file)
         self.add_spike_input(spike_file_name, net_name)
 
-    def write_spikeinput_poisson(self, net_name, rate, tstart = 0, tstop=2000, spike_file_name='spike_input.h5'):
+    def write_spikeinput_poisson(self, net_name, rate, tstart = 0, tstop=2000,\
+                                 spike_file_name='spike_input.h5',use_abs_paths=False):
         """Write a new spikeinput file for independent Poisson spiking and add it to the config."""
         net = self._networks_active[net_name]
         node_ids = [node.node_id for node in net.nodes_iter()]
         psg = PoissonSpikesGenerator(node_ids, rate, tstart = tstart, tstop=tstop)
         spike_file = self.abspath(spike_file_name)
+        
+        if use_abs_paths:
+            spike_file = os.path.abspath(self.abspath(spike_file_name))
+            spike_file_name = os.path.abspath(self.abspath(spike_file_name))
+            
         psg.to_hdf5(spike_file)
         self.add_spike_input(spike_file_name, net_name)
 

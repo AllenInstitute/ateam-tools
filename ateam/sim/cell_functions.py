@@ -53,18 +53,19 @@ def fix_axon_allactive_bpopt(hobj):
 
 def add_ais_segment(hobj, name):
     ais = h.Section(name=name, cell=hobj)
-    ais.L = 20
+    ais.L = 10
     ais.diam = 1
     hobj.all.append(sec=ais)
     h.disconnect(sec=hobj.axon[0])
     ais.connect(hobj.soma[0], 1.0, 0)
     hobj.axon[0].connect(ais, 1.0, 0)
+    h.define_shape()
     return ais
 
 def allactive_ais_passive(hobj, cell, dynamics_params):
     # Adds a segment between the AIS and soma,
     # with passive properties (default cm=1 and Rm and Ra from params)
-    fix_axon_allactive(hobj)
+    fix_axon_peri(hobj)
     ais = add_ais_segment(hobj, name='ais')
     set_params_allactive(hobj, dynamics_params)
     return hobj
@@ -72,7 +73,7 @@ def allactive_ais_passive(hobj, cell, dynamics_params):
 def allactive_ais_somatic(hobj, cell, dynamics_params):
     # Adds a segment between the AIS and soma,
     # with active properties matching the soma
-    fix_axon_allactive(hobj)
+    fix_axon_peri(hobj)
     # the soma2 name will be treated as somatic by set_params_allactive
     # (checks only the first 4 chars of names)
     ais = add_ais_segment(hobj, name='soma2')
@@ -86,7 +87,7 @@ def aibs_allactive_bpopt_axon(hobj, cell, dynamics_params):
    set_params_allactive(hobj, dynamics_params)
    return hobj
 
-def aibs_allactive_stub_axon(hobj, cell, dynamics_params):
+def aibs_allactive(hobj, cell, dynamics_params):
    
    fix_axon_peri(hobj) # Replace axon with a stub 60 micron with 1 micron diameter
    set_params_allactive(hobj, dynamics_params)
@@ -96,4 +97,4 @@ def aibs_allactive_stub_axon(hobj, cell, dynamics_params):
 add_cell_processor(allactive_ais_somatic)
 add_cell_processor(allactive_ais_passive)
 add_cell_processor(aibs_allactive_bpopt_axon)
-add_cell_processor(aibs_allactive_stub_axon)
+add_cell_processor(aibs_allactive)

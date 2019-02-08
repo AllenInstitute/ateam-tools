@@ -1,0 +1,23 @@
+channels:
+  - defaults
+dependencies:
+  - h5py
+  - pillow
+  - psycopg2
+  - pyqt=4
+  - python=2.7
+  - sqlalchemy
+  - matplotlib
+  - pandas
+  - scipy
+  - pyyaml
+  - scikit-image
+  - scikit-learn
+  - statsmodels
+  - jinja2
+  - pip:
+    - allensdk
+    - lmfit
+    - pg8000
+    - git+https://github.com/pyqtgraph/pyqtgraph
+    - git+https://github.com/alleninstitute/affpyramid

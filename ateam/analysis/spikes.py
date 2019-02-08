@@ -33,7 +33,7 @@ def plot_spikes_rates(config_file, netname, group_key=None, exclude=[], color_di
 
     # TODO: Uses utils.SpikesReader to open
     spikes_h5 = h5py.File(sm.spikes_file, 'r')
-    spike_gids = np.array(spikes_h5['/spikes/gids'], dtype=np.uint)
+    spike_gids = np.array(spikes_h5['/spikes/gids'], dtype=np.int)
     spike_times = np.array(spikes_h5['/spikes/timestamps'], dtype=np.float)
     if len(spike_times)==0:
         warnings.warn("No spikes to plot")
@@ -118,7 +118,7 @@ def plot_spikes_rates_traces(config_file, netname, gids=None, group_key=None, ex
 
     # TODO: Uses utils.SpikesReader to open
     spikes_h5 = h5py.File(sm.spikes_file, 'r')
-    spike_gids = np.array(spikes_h5['/spikes/gids'], dtype=np.uint)
+    spike_gids = np.array(spikes_h5['/spikes/gids'], dtype=np.int)
     spike_times = np.array(spikes_h5['/spikes/timestamps'], dtype=np.float)
     if len(spike_times)==0:
         warnings.warn("No spikes to plot")

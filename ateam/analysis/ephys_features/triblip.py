@@ -275,16 +275,71 @@ def vpost_trend(x):
     return x[x.frequency>freq_upper].postspike_v.mean() \
         - x[(10<x.frequency)&(x.frequency<freq_lower)].postspike_v.mean()
 
-def process_tri_features(tri_df):
+def process_tri_trend(tri_df):
     groups_cell = tri_df.groupby('cell')
     series_trend = groups_cell.apply(vpost_trend).dropna()
     series_trend.name = "trend_vpost"
     return series_trend
 
-def pop_stats_robust(series_trend):
+def process_tri_burst(tri_df):
+    groups_cell = tri_df.groupby('cell')
+    series_trend = groups_cell.apply(vpost_trend).dropna()
+    series_trend.name = "trend_vpost"
+    return series_trend
+
+def process_groups(combined_df, group_col):
+    popdata = combined_df.trend_vpost
+    popstats = pop_stats_robust(popdata)
+    def frac_str(col):
+        nsig = (col>popstats.cutoff).sum()
+        ntot = col.count()
+        return '%d/%d' % (nsig, ntot)
+    def zscore(col):
+        return (col.mean() - popstats.mean)/np.sqrt(popstats.std/col.count())
+    def mw_test(col):
+        import scipy.stats as stats
+        u, p = stats.mannwhitneyu(popdata, col, alternative='less')
+        sign = np.sign(u - len(popdata)*len(col)/2)
+        return p
+    return combined_df.groupby(group_col).trend_vpost.agg([frac_str, zscore, mw_test])
+
+def pop_stats_robust(series_trend, cutoff_z=3):
     data = series_trend.values
-    robust_stats = namedtuple("robust_stats", ["mean", "std"])
+    robust_stats = namedtuple("robust_stats", ["mean", "std", "cutoff"])
     trend_med = np.median(data)
-    trend_trimean = (np.percentile(data, 25) + trend_med + np.percentile(data, 75))/4
+    trend_trimean = (np.percentile(data, 25) + 2*trend_med + np.percentile(data, 75))/4
     trend_std = 1.4826 * np.median(np.abs(data - trend_med))
-    return robust_stats(trend_trimean, trend_std)
+    cutoff = trend_trimean + cutoff_z*trend_std
+    return robust_stats(trend_trimean, trend_std, cutoff)
+
+def load_ttype_df(shiny_path):
+    ttype_df = pd.read_feather(shiny_path)
+    ttype_df.spec_id_label.replace("ZZ_Missing", None, inplace=True)
+    ttype_df['spec_id_label'] = pd.to_numeric(ttype_df['spec_id_label'])
+    ttype_df.set_index('spec_id_label', inplace=True)
+    return ttype_df
+
+def process_features_for_shiny(tri_df, shiny_path, feather_path, csv_path):
+    series_trend = process_tri_trend(tri_df)
+    ttype_df = load_ttype_df(shiny_path)
+    combined_df = ttype_df.join(series_trend, how='inner')
+    popstats = pop_stats_robust(series_trend)
+    # frac = lambda col: frac_str(col, popstats)
+    # z = lambda col: zscore(col, popstats)
+    # p = lambda col: mw_test(col, series_trend)
+    # results = combined_df.groupby('cluster_label').trend_vpost.agg([frac, z, p])
+    results = process_groups(combined_df, 'cluster_label')
+    results['bar_col'] = results.zscore
+    results.to_csv(csv_path)
+
+    feather_df = pd.read_feather(shiny_path)
+    feather_df.columns = feather_df.columns.astype(str)
+    feather_df.spec_id_label.replace("ZZ_Missing", None, inplace=True)
+    feather_df.spec_id_label = pd.to_numeric(feather_df.spec_id_label)
+    tri_df_response = series_trend > popstats.cutoff
+    tri_df_response.name = 'ephys_triple_pulse_responsive_label'
+    feather_df = feather_df.join(tri_df_response)
+    # ttype_df.reset_index(inplace=True)
+    feather_df.to_feather(feather_path)
+
+    return combined_df

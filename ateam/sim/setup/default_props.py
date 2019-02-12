@@ -21,7 +21,7 @@ def cellprops_active(cell_id, directed=False):
         'dynamics_params': fit_file_active(cell_id),
         'model_type': 'biophysical',
         'model_template': 'ctdb:Biophys1.hoc',
-        'model_processing': 'aibs_allactive_directed' if directed else 'aibs_allactive'
+        'model_processing': 'aibs_allactive_ani_directed' if directed else 'aibs_allactive_ani'
     }
     return biophys_props
 

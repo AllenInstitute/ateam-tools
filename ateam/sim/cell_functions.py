@@ -3,9 +3,10 @@
 
 from neuron import h
 from bmtk.simulator.bionet.pyfunction_cache import add_cell_processor
-from bmtk.simulator.bionet.default_setters.cell_models import fix_axon_peri, set_params_allactive, \
-                                                    fix_axon_perisomatic_directed
+
 from bmtk.simulator.bionet.io_tools import io
+from bmtk.simulator.bionet.default_setters.cell_models import fix_axon_peri, fix_axon_allactive, \
+                    set_params_allactive, fix_axon_perisomatic_directed
 
 def fix_axon_allactive_bpopt(hobj):
   """Replace reconstructed axon with a stub which is consistent with BluePyOpt

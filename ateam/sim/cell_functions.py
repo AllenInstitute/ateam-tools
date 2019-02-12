@@ -6,7 +6,9 @@ from bmtk.simulator.bionet.pyfunction_cache import add_cell_processor
 
 from bmtk.simulator.bionet.io_tools import io
 from bmtk.simulator.bionet.default_setters.cell_models import fix_axon_peri, fix_axon_allactive, \
-                    set_params_allactive, fix_axon_perisomatic_directed
+                    set_params_allactive, fix_axon_perisomatic_directed,get_axon_direction
+import numpy as np
+
 
 def fix_axon_allactive_bpopt(hobj):
   """Replace reconstructed axon with a stub which is consistent with BluePyOpt
@@ -53,6 +55,63 @@ def fix_axon_allactive_bpopt(hobj):
   hobj.axon[1].connect(hobj.axon[0], 1.0, 0)
 
   h.define_shape()
+
+def fix_axon_peri_ani(hobj):
+    """Replace reconstructed axon with a stub
+
+    :param hobj: hoc object
+    """
+    for sec in hobj.axon:
+        h.delete_section(sec=sec)
+
+    h.execute('create axon[2]', hobj)
+
+    for sec in hobj.axon:
+        sec.L = 30
+        sec.diam = 1
+        hobj.axonal.append(sec=sec)
+        hobj.all.append(sec=sec)  # need to remove this comment
+
+    hobj.axon[0].connect(hobj.soma[0], 1, 0)
+    hobj.axon[1].connect(hobj.axon[0], 1, 0)
+
+    h.define_shape()
+
+def fix_axon_peri_ani_directed(hobj):
+    # io.log_info('Fixing Axon like perisomatic')
+    all_sec_names = []
+    for sec in hobj.all:
+        all_sec_names.append(sec.name().split(".")[1][:4])
+
+    if 'axon' not in all_sec_names:
+        io.log_exception('There is no axonal recostruction in swc file.')
+    else:
+        beg1, end1, beg2, end2 = get_axon_direction(hobj)
+
+    for sec in hobj.axon:
+        h.delete_section(sec=sec)
+    h.execute('create axon[2]', hobj)
+
+    h.pt3dadd(beg1[0], beg1[1], beg1[2], 1, sec=hobj.axon[0])
+    h.pt3dadd(end1[0], end1[1], end1[2], 1, sec=hobj.axon[0])
+    hobj.all.append(sec=hobj.axon[0])
+    h.pt3dadd(beg2[0], beg2[1], beg2[2], 1, sec=hobj.axon[1])
+    h.pt3dadd(end2[0], end2[1], end2[2], 1, sec=hobj.axon[1])
+    hobj.all.append(sec=hobj.axon[1])
+
+    hobj.axon[0].connect(hobj.soma[0], 1.0, 0)
+    hobj.axon[1].connect(hobj.axon[0], 1.0, 0)
+
+    hobj.axon[0].L = 30.0
+    hobj.axon[1].L = 30.0
+
+    h.define_shape()
+
+    for sec in hobj.axon:
+        # print "sec.L:", sec.L
+        if np.abs(30-sec.L) > 0.0001:
+            io.log_exception('Axon stub L is less than 30')
+
 
 
 def set_params_allactive_AIS_seg(hobj, params_dict,**kwargs):
@@ -175,7 +234,7 @@ def add_ais_segment(hobj):
         hobj.axonal.append(sec=sec)
         hobj.all.append(sec=sec)  # need to remove this comment
 
-    hobj.axon[0].connect(hobj.soma[0], .5, 0)
+    hobj.axon[0].connect(hobj.soma[0], 1.0, 0)
     hobj.axon[1].connect(hobj.axon[0], 1.0, 0)
     hobj.axon[2].connect(hobj.axon[1], 1.0, 0)
 
@@ -186,7 +245,6 @@ def add_ais_segment(hobj):
 def allactive_ais_passive(hobj, cell, dynamics_params):
     # Adds a segment between the AIS and soma,
     # with passive properties from axon
-    fix_axon_peri(hobj)
     phantom_sec_names = add_ais_segment(hobj)
     set_params_allactive_AIS_seg(hobj, dynamics_params, \
             select_section_names = phantom_sec_names)
@@ -195,7 +253,6 @@ def allactive_ais_passive(hobj, cell, dynamics_params):
 def allactive_ais_somatic(hobj, cell, dynamics_params):
     # Adds a segment between the AIS and soma,
     # with all properties matching the soma
-    fix_axon_peri(hobj)
     phantom_sec_names = add_ais_segment(hobj)
     set_params_allactive_AIS_seg(hobj, dynamics_params,\
                 select_section_names = phantom_sec_names,
@@ -215,12 +272,12 @@ def aibs_allactive_ani(hobj, cell, dynamics_params):
     return aibs_allactive_stub_axon(hobj, cell, dynamics_params)
 
 def aibs_allactive_stub_axon(hobj, cell, dynamics_params):
-   fix_axon_peri(hobj) # Replace axon with a stub 60 micron with 1 micron diameter
+   fix_axon_peri_ani(hobj) # Replace axon with a stub 60 micron with 1 micron diameter
    set_params_allactive(hobj, dynamics_params)
    return hobj
 
 def aibs_allactive_ani_directed(hobj, cell, dynamics_params):
-   fix_axon_perisomatic_directed(hobj) # Replace axon with a stub 60 micron with 1 micron diameter
+   fix_axon_peri_ani_directed(hobj) # Replace axon with a stub 60 micron with 1 micron diameter
    set_params_allactive(hobj, dynamics_params)
    return hobj
 

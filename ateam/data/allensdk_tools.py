@@ -9,7 +9,7 @@ import os.path
 _model_types_dict = {"active": 491455321, "peri": 329230710}
 bp = BiophysicalApi()
 
-def download_morph_files(specimen_ids, folder_path):
+def download_morph_files(specimen_ids, folder_path, add_cre_info=False):
     """Download morphology for a list of cells in Cell Types database
     
     Arguments:
@@ -18,7 +18,11 @@ def download_morph_files(specimen_ids, folder_path):
     """
     ct = CellTypesApi()
     for specimen_id in specimen_ids:
-        filename = '{}.swc'.format(specimen_id)
+        if add_cre_info:
+            info = ct.get_cell(specimen_id)
+            filename = info['line_name'].split('-')[0]+'_'+'{}.swc'.format(specimen_id)
+        else:
+            filename = '{}.swc'.format(specimen_id)
         save_path = os.path.join(folder_path, filename)
         if not os.path.exists(save_path):
             ct.save_reconstruction(specimen_id, save_path)

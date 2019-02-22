@@ -14,7 +14,7 @@ class LimsReader(object):
         super(LimsReader, self).__init__()
         self.engine = sql.create_engine(base_uri)
 
-    def get_cells(self, project_id=None, project_code=None):
+    def get_cells(self, project_id=None, project_code=None, cells_list=None):
         """Get info for cell specimens in LIMS with ephys data, by project        
         """
         with open(os.path.join(os.path.dirname(__file__), 'cells.sql'), 'r') as sqlfile:
@@ -23,6 +23,8 @@ class LimsReader(object):
             sql += " AND sp.project_id = {}".format(project_id)
         if project_code:
             sql += " AND projects.code = '{}'".format(project_code)
+        if cells_list:
+            sql += " AND sp.id IN ({})".format(", ".join(cells_list))
         cells_df = pd.read_sql(sql, self.engine, index_col='id')
         return cells_df
 
@@ -52,7 +54,7 @@ class LimsReader(object):
         if sweep_type:
             sql += " AND stype.name LIKE '{}'".format(sweep_type)
         return pd.read_sql(sql, self.engine, index_col='sweep_number')
-
+  
     def get_nwb_path_from_lims(self, cell_id):
         sql = """
             SELECT nwb.storage_directory || nwb.filename AS nwb_path
@@ -68,3 +70,35 @@ class LimsReader(object):
         results = [s[0] for s in test.fetchall()]
         return results[0]
 
+
+from allensdk.core.nwb_data_set import NwbDataSet
+import matplotlib.pyplot as plt
+import numpy as np
+
+def plot_sweep_lims(cell_id, sweep_num):
+    lr = LimsReader()
+    nwb_path = lr.get_nwb_path_from_lims(cell_id)
+    dataset = NwbDataSet(nwb_path)
+    v, i, t = get_sweep_v_i_t_from_set(dataset, sweep_num)
+    plot_sweep(v, i, t)
+
+def plot_sweep(v, i, t):
+    fig, axes = plt.subplots(2, 1, sharex=True)
+    axes[0].plot(t, v, color='black')
+    axes[1].plot(t, i, color='gray')
+
+    axes[0].set_ylabel("mV")
+    axes[0].set_title("Voltage")
+    axes[1].set_title("Stimulus")
+    axes[1].set_ylabel("pA")
+    axes[1].set_xlabel("ms")
+
+def get_sweep_v_i_t_from_set(data_set, sweep_num):
+    sweep_data = data_set.get_sweep(sweep_num)
+    i = sweep_data["stimulus"] # in A
+    v = sweep_data["response"] # in V
+    i *= 1e12 # to pA
+    v *= 1e3 # to mV
+    sampling_rate = sweep_data["sampling_rate"] # in Hz
+    t = np.arange(0, len(v)) * (1.0 / sampling_rate)
+    return v, i, t

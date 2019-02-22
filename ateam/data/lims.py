@@ -14,8 +14,17 @@ class LimsReader(object):
         super(LimsReader, self).__init__()
         self.engine = sql.create_engine(base_uri)
 
-    def get_cells(self, project_id=None, project_code=None, cells_list=None):
-        """Get info for cell specimens in LIMS with ephys data, by project        
+    def get_cells_df(self, project_id=None, project_code=None, cells_list=None):
+        """Get info for cell specimens in LIMS with ephys data
+        Select by project (code or id) or list of cell specimen IDs
+        
+        Keyword Arguments:
+            project_id -- numerical project ID
+            project_code -- project code (e.g. hIVSCC-MET)
+            cells_list {list of str} -- list of cell specimen IDs
+        
+        Returns:
+            DataFrame -- cell specimen info, indexed by specimen ID
         """
         with open(os.path.join(os.path.dirname(__file__), 'cells.sql'), 'r') as sqlfile:
             sql = sqlfile.read()

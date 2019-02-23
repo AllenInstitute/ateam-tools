@@ -201,6 +201,24 @@ class SimManager(object):
             }}
         self.config.update_nested(inputs=inputs)
     
+    
+    def add_current_clamp_input(self, iclamp_name, input_dict, loop_delay = 0):
+        
+        """Add specified current clamp input  to the config.
+        Note that node ids in the file must match those for the specified net.
+        """
+                
+        inputs = {iclamp_name: 
+            {
+            'input_type': 'current_clamp',
+            'module': 'IClamp',
+            'node_set': 'all',
+            'amp' : input_dict['amp'],
+            'delay' : input_dict['delay'] + loop_delay,
+            'duration' : input_dict['duration']
+            }}
+        self.config.update_nested(inputs=inputs)
+    
     def write_spikeinput_vector(self, net_name, times, spike_file_name='spike_input.csv',use_abs_paths=False):
         """Write a new spikeinput file from a vector of times and add it to the config.
         All cells are assigned the same spike times."""
@@ -286,11 +304,18 @@ class SimManager(object):
 
     @sim_time.setter
     def sim_time(self, time):
-        self.config.update_nested(run={"tstop": time})
+        self.config['run']['tstop'] = time
+        self.config.save()
 
-    # TODO: remove below
-    def set_sim_time(self, time):
-        self.sim_time = time
+    @property
+    def sim_timestep(self):
+        return self.config['run']['dt']
+    
+    @sim_timestep.setter
+    def sim_timestep(self, dt):
+        self.config['run']['dt'] = dt
+        self.config.save()
+
 
     def run_bionet(self):
         self.config.save()

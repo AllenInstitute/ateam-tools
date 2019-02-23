@@ -22,7 +22,8 @@ def run_bionet_mpi(config, ncores=1):
 
 def run_bionet(config):
     sim_dir = os.path.dirname(config)
-    command = 'cd {dir}; python -c "{cmd}"'.format(cmd=_pycommand).format(dir=sim_dir, config=config)
+    cmd = _pycommand.format(config=config)
+    command = 'cd {dir}; python -c "{cmd}"'.format(cmd=cmd,dir=sim_dir)
     sp = subprocess.Popen([command], stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, executable='/bin/bash')
     out = sp.communicate()
     # error first

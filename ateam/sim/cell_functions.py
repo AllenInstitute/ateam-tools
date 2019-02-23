@@ -224,10 +224,11 @@ def add_ais_segment(hobj):
     h.execute('create axon[3]', hobj)
     for index, sec in enumerate(hobj.axon):
         if index == 0:
-            sec.L = 20
+            #sec.L = 20
             ais_sec_names.append(sec.name())
-        else:
-            sec.L = 30
+        #else:
+            #sec.L = 30
+        sec.L = 30
             
         sec.diam = axon_diams[index]  # 1
 

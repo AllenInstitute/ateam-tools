@@ -534,7 +534,7 @@ def plot1D_features(dist,A,W,TPW,t_NegPeak,maxd=50,fig_size=(10.5,1.5)):
     simpleaxis(ax)
     locs, labels = plt.yticks()
     plt.ylim([locs[0],locs[-1]+0.1])
-    ax.set(yticks=np.arange(locs[0],locs[-1]+0.1,(locs[-1]+0.2)/2))
+    ax.set(yticks=np.arange(locs[0],locs[-1]+0.1,(locs[-1]-locs[0])/2))
     plt.xlim([-maxd,maxd+1])
     ax.set(xticks=np.arange(-maxd,maxd+1,maxd))
     

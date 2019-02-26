@@ -21,7 +21,7 @@ class LimsReader(object):
         Keyword Arguments:
             project_id -- numerical project ID
             project_code -- project code (e.g. hIVSCC-MET)
-            cells_list {list of str} -- list of cell specimen IDs
+            cells_list {list} -- list of cell specimen IDs (as int or str)
         
         Returns:
             DataFrame -- cell specimen info, indexed by specimen ID
@@ -32,8 +32,8 @@ class LimsReader(object):
             sql += " AND sp.project_id = {}".format(project_id)
         if project_code:
             sql += " AND projects.code = '{}'".format(project_code)
-        if cells_list:
-            sql += " AND sp.id IN ({})".format(", ".join(cells_list))
+        if cells_list is not None:
+            sql += " AND sp.id IN ({})".format(", ".join([str(cell) for cell in cells_list]))
         cells_df = pd.read_sql(sql, self.engine, index_col='id')
         return cells_df
 
@@ -85,10 +85,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def plot_sweep_lims(cell_id, sweep_num):
-    lr = LimsReader()
-    nwb_path = lr.get_nwb_path_from_lims(cell_id)
-    dataset = NwbDataSet(nwb_path)
-    v, i, t = get_sweep_v_i_t_from_set(dataset, sweep_num)
+    v, i, t = get_sweep_v_i_t_lims(cell_id, sweep_num)
     plot_sweep(v, i, t)
 
 def plot_sweep(v, i, t):
@@ -110,4 +107,11 @@ def get_sweep_v_i_t_from_set(data_set, sweep_num):
     v *= 1e3 # to mV
     sampling_rate = sweep_data["sampling_rate"] # in Hz
     t = np.arange(0, len(v)) * (1.0 / sampling_rate)
+    return v, i, t
+
+def get_sweep_v_i_t_lims(cell_id, sweep_num):
+    lr = LimsReader()
+    nwb_path = lr.get_nwb_path_from_lims(cell_id)
+    dataset = NwbDataSet(nwb_path)
+    v, i, t = get_sweep_v_i_t_from_set(dataset, sweep_num)
     return v, i, t

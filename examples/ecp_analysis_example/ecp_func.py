@@ -542,6 +542,7 @@ def plot1D_features(dist,A,W,TPW,t_NegPeak,maxd=50,fig_size=(10.5,1.5)):
                     wspace=0.6)
     return fig
 
+
 def clean_axis(ax):
     #Hide the right and top spines
     ax.spines['top'].set_visible(False)
@@ -552,8 +553,10 @@ def clean_axis(ax):
     ax.set_yticks([])
     ax.set_xticks([])
     ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
 
-def plot_lfp_csd(lfp,csd,xrange,yrange,fs,fig_size=(5.5,3.5)):
+
+def plot_lfp_csd(lfp,csd,xrange,yrange,fs,f=100,fig_size=(5.5,3.5)):
     indx1 = xrange[0]*fs
     indx2 = xrange[1]*fs
 
@@ -561,14 +564,16 @@ def plot_lfp_csd(lfp,csd,xrange,yrange,fs,fig_size=(5.5,3.5)):
     ax=plt.subplot(121)  
     for ch in range(yrange[0],yrange[1]):
         chunkch = lfp[ch,:]
-        plt.plot(chunkch+ch*100,'k',lw=.5)
+        plt.plot(chunkch+ch*f,'k',lw=.5)
     plt.xlabel('Time (ms)')  
     plt.xlim([indx1,indx2+1])
     ax.set(xticks=np.arange(indx1,indx2+1,(indx2-indx1)/2))
     ax.set(xticklabels=np.arange(indx1,indx2+1,(indx2-indx1)/2)*1000/fs)
     simpleaxis(ax)
-    plt.ylim([yrange[0]*100,yrange[1]*100])
-    ax.set(yticks=[])
+    plt.ylim([yrange[0]*f,yrange[1]*f])
+    ax.set(yticks=np.arange(yrange[0]*f,yrange[1]*f+1,(yrange[1]-yrange[0])*f/2))
+    ax.set(yticklabels=np.arange(yrange[0],yrange[1]+1,(yrange[1]-yrange[0])/2))
+    plt.ylabel('Ch #')
     
     ax=plt.subplot(122)  
     r = abs(csd).max()/5
@@ -584,13 +589,12 @@ def plot_lfp_csd(lfp,csd,xrange,yrange,fs,fig_size=(5.5,3.5)):
     ax.set(xticks=np.arange(indx1,indx2+1,(indx2-indx1)/2))
     ax.set(xticklabels=np.arange(indx1,indx2+1,(indx2-indx1)/2)*1000/fs)
     plt.ylim([yrange[0],yrange[1]])
-    ax.set(yticks=[])
+    ax.set(yticks=np.arange(yrange[0],yrange[1]+1,(yrange[1]-yrange[0])/2))
+    ax.set(yticklabels=np.arange(yrange[0],yrange[1]+1,(yrange[1]-yrange[0])/2))
+    plt.ylabel('Ch #')    
         
     plt.subplots_adjust(top=0.92, bottom=0.08, left=0.10, right=0.95, hspace=0.4,
                wspace=0.4)
     return fig
 
-
-
-    ax.spines['left'].set_visible(False)
 

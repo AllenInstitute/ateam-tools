@@ -1,5 +1,6 @@
 """Tools for accessing internal data directly through the LIMS database
 """
+import warnings
 import os.path
 import pandas as pd
 import sqlalchemy as sql
@@ -75,9 +76,30 @@ class LimsReader(object):
             AND nwb.attachable_type = 'EphysRoiResult'
             AND ftype.name = 'NWB'
             """
-        test = self.engine.execute(sql.format(id=cell_id))
+        return self.single_result_query(sql.format(id=cell_id))
+    
+    def get_swc_path_from_lims(self, cell_id, manual_only=True):
+        sql = """
+            SELECT f.storage_directory || f.filename AS nwb_path FROM 
+            neuron_reconstructions n JOIN well_known_files f ON n.id = f.attachable_id 
+            AND n.specimen_id = {id} AND f.well_known_file_type_id = 303941301
+            AND NOT n.superseded
+            """
+        # Not sure whether this manual flag is needed, found it in Nathan's code...
+        if manual_only:
+            sql += "AND n.manual"
+        return self.single_result_query(sql.format(id=cell_id))
+
+    def single_result_query(self, sql):
+        test = self.engine.execute(sql)
         results = [s[0] for s in test.fetchall()]
+        if len(results)>1:
+            warnings.warn("Multiple results found in LIMS, expected single.")
+        if len(results)==0:
+            warnings.warn("No results found in LIMS.")
+            return None
         return results[0]
+
 
 
 from allensdk.core.nwb_data_set import NwbDataSet

@@ -38,7 +38,7 @@ class LimsReader(object):
         cells_df = pd.read_sql(sql, self.engine, index_col='id')
         return cells_df
 
-    def get_sweeps(self, cell_id, sweep_type):
+    def get_sweeps(self, cell_id, sweep_type, passed_only=False):
         """Get a list of sweeps for a single cell specimen, by sweep type name
         """
         sql = """SELECT sw.sweep_number
@@ -47,6 +47,8 @@ class LimsReader(object):
             JOIN ephys_stimulus_types stype ON stype.id = stim.ephys_stimulus_type_id
             WHERE sw.specimen_id = %s AND stype.name LIKE '%s'
             """ % (cell_id, sweep_type)
+        if passed_only:
+            sql += " AND sw.workflow_state LIKE '%%passed'"
         test = self.engine.execute(sql)
         sweeps = [s[0] for s in test.fetchall()]
         return sweeps
@@ -65,7 +67,7 @@ class LimsReader(object):
             sql += " AND stype.name LIKE '{}'".format(sweep_type)
         return pd.read_sql(sql, self.engine, index_col='sweep_number')
   
-    def get_nwb_path_from_lims(self, cell_id):
+    def get_nwb_path_from_lims(self, cell_id, get_sdk_version=False):
         sql = """
             SELECT nwb.storage_directory || nwb.filename AS nwb_path
             FROM specimens sp
@@ -74,8 +76,11 @@ class LimsReader(object):
             JOIN well_known_file_types ftype ON nwb.well_known_file_type_id = ftype.id
             WHERE sp.id = {id}
             AND nwb.attachable_type = 'EphysRoiResult'
-            AND ftype.name = 'NWB'
             """
+        if get_sdk_version:
+            sql += "AND ftype.name = 'NWBDownload'"
+        else:
+            sql += "AND ftype.name = 'NWB'"
         return self.single_result_query(sql.format(id=cell_id))
     
     def get_swc_path_from_lims(self, cell_id, manual_only=True):
@@ -119,12 +124,16 @@ def plot_sweep(v, i, t):
     axes[0].set_title("Voltage")
     axes[1].set_title("Stimulus")
     axes[1].set_ylabel("pA")
-    axes[1].set_xlabel("ms")
+    axes[1].set_xlabel("time (s)")
 
-def get_sweep_v_i_t_from_set(data_set, sweep_num):
+def get_sweep_v_i_t_from_set(data_set, sweep_num, window_data=True):
     sweep_data = data_set.get_sweep(sweep_num)
     i = sweep_data["stimulus"] # in A
     v = sweep_data["response"] # in V
+    if window_data:
+        index_range = sweep_data["index_range"]
+        i = i[index_range[0]:index_range[1]]
+        v = v[index_range[0]:index_range[1]]
     i *= 1e12 # to pA
     v *= 1e3 # to mV
     sampling_rate = sweep_data["sampling_rate"] # in Hz

@@ -58,7 +58,7 @@ def set_params_allactive_AIS_seg(hobj, params_dict, select_section_names=[], sel
         g_name = genome_dict['name']
         g_mechanism = genome_dict.get("mechanism", "")
         for sec in section_map.get(g_section, []):
-            if sec.name() not in select_sec_names:
+            if sec.name() not in select_section_names:
                 if g_mechanism != "":
                     sec.insert(g_mechanism)
                 setattr(sec, g_name, g_value)

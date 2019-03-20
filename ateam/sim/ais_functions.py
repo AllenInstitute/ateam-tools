@@ -4,7 +4,7 @@ from bmtk.simulator.bionet.default_setters.cell_models import fix_axon_peri, fix
                     set_params_allactive, fix_axon_perisomatic_directed,get_axon_direction
 import numpy as np
 
-def set_params_allactive_AIS_seg(hobj, params_dict, select_section_names=[], select_section):
+def set_params_allactive_AIS_seg(hobj, params_dict, select_section_names=[], select_section=''):
     '''
         Sets the properties of section elements defined in select_section_names from 
         the Section template ('soma', 'axon', 'apic', 'dend')
@@ -127,7 +127,8 @@ def add_ais_segment(hobj, directed=False):
         hobj.axonal.append(sec=sec)
         hobj.all.append(sec=sec)  # need to remove this comment
         if directed:
-            h.pt3dadd(beg, end, sec.diam, sec=sec)
+            h.pt3dadd(beg[0], beg[1], beg[2], sec.diam, sec=sec)
+            h.pt3dadd(end[0], end[1], end[2], sec.diam, sec=sec)
 
     hobj.axon[0].connect(hobj.soma[0], 1.0, 0)
     hobj.axon[1].connect(hobj.axon[0], 1.0, 0)

@@ -4,11 +4,11 @@ from bmtk.simulator.bionet.default_setters.cell_models import fix_axon_peri, fix
                     set_params_allactive, fix_axon_perisomatic_directed,get_axon_direction
 import numpy as np
 
-def set_params_allactive_AIS_seg(hobj, params_dict,**kwargs):
+def set_params_allactive_AIS_seg(hobj, params_dict, select_section_names=[], select_section):
     '''
-        Sets the properties of section elements defined in kwargs from 
+        Sets the properties of section elements defined in select_section_names from 
         the Section template ('soma', 'axon', 'apic', 'dend')
-        defined in kwargs. If no section template is defined the section elements
+        defined in select_section. If no section template is defined the section elements
         were only set passive properties
     '''
 
@@ -45,8 +45,6 @@ def set_params_allactive_AIS_seg(hobj, params_dict,**kwargs):
             for sec in section_map.get(cm_dict['section'], []):
                 sec.cm = cm
      
-    select_sec_names = kwargs.get('select_section_names', [])
-    select_section =  kwargs.get('select_section','')
     genome_dict_select_list = []
     sec_select_list = []
     
@@ -149,7 +147,7 @@ def allactive_ais_passive(hobj, cell, dynamics_params):
 def allactive_ais_somatic(hobj, cell, dynamics_params):
     # Adds a segment between the AIS and soma,
     # with all properties matching the soma
-    phantom_sec_names = add_ais_segment(hobj)
+    phantom_sec_names = add_ais_segment(hobj, directed=True)
     set_params_allactive_AIS_seg(hobj, dynamics_params,\
                 select_section_names = phantom_sec_names,
                 select_section = 'soma')

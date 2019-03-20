@@ -3,6 +3,7 @@
 
 from allensdk.api.queries.biophysical_api import BiophysicalApi
 from allensdk.api.queries.cell_types_api import CellTypesApi
+from allensdk.core.cell_types_cache import CellTypesCache
 from bmtk.simulator.utils.config import ConfigDict
 import os.path
 
@@ -70,3 +71,15 @@ def _download_file(id_dict, working_directory, rename=None):
             filename = str(rename) + ext
         save_path = os.path.join(working_directory, filename)
         bp.retrieve_file_over_http(well_known_file_url, save_path)
+
+def get_cells_ephys_df(manifest_file=None, species=["Homo_Sapiens"], **kwargs):
+    """Gets a combined cell feature dataframe, merging CellTypesCache.get_cells
+    and CellTypesCache.get_ephys_features.
+    Takes the same options as get_cells() to restrict the query (species, morphology, etc.)
+    """
+    ctc = CellTypesCache(manifest_file=manifest_file)
+    human_cells_df = pd.DataFrame.from_records(ctc.get_cells(species=[species], **kwargs), index="id")
+
+    cells_ephys = pd.DataFrame.from_records(ctc.get_ephys_features(), index="specimen_id", exclude=["id"])
+    cells_ephys = human_cells_df.join(cells_ephys[cells_ephys.columns.difference(human_cells_df.columns)], how='inner')
+    return cells_ephys

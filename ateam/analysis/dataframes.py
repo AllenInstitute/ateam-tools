@@ -1,11 +1,79 @@
 """Module for analysing and plotting data in pandas dataframes.
 """
+import warnings
 import numpy as np
 import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.stats import mannwhitneyu
+from scipy.stats import mannwhitneyu, linregress
 from itertools import combinations
+from six import string_types
+
+def flatten_columns(df):
+    """Flatten a dataframe with hierarchically indexed columns
+    by concatenating labels across levels with underscores 
+    """
+    df = df.copy()
+    df.columns = [col if isinstance(col, string_types) else '_'.join(col).rstrip('_') 
+        for col in df.columns.values]
+    return df
+
+# TODO: write generic wrapper function?
+def group_fit_df(df, xvar, yvar, compare):
+#     to use multiple return values in apply(), create Series from dict
+    fit_function = lambda df: pd.Series(linfit(*trend_from_df(df, xvar, yvar)))
+    df_fit = df.groupby([compare]).apply(fit_function)
+    return df_fit
+
+def combine_functions_hierarchical(xvar, yvar, functions, dropna=True):
+    # 
+    def combined_fcn(df):
+        x, y = trend_from_df(df, xvar, yvar, dropna=True)
+        outputs = [pd.Series(function(x,y)) for function in functions]
+        keys = [function.__name__ for function in functions]
+        df_hierarch = pd.concat(outputs, axis=0, keys=keys, names=["analysis", "feature"])
+        return df_hierarch
+    return combined_fcn
+
+def summary(series):
+    unique = series.unique()
+    if len(unique)==1:
+        out = unique[0]
+    else:
+        out = "{} values".format(len(unique))
+    return out
+
+def trend_from_df(df, xvar, yvar, dropna=True):
+    if dropna:
+        df = df[~df[yvar].isna()]
+    x = df[xvar]
+    y = df[yvar]
+    return x, y
+
+def threshold(x, y, n_repeats=5):
+    error_out = {'thresh-min': np.nan, 'thresh-mean': np.nan}
+    if len(y)<n_repeats:
+        return error_out
+    x_mins = np.partition(x, n_repeats)[:n_repeats]
+    return {'thresh-min': np.min(x_mins), 'thresh-mean': np.mean(x_mins)}
+    
+def linfit(x, y):
+    error_out = {'slope':np.nan, 'yint':np.nan, 'xint':np.nan, 'error':np.nan}
+    try:
+        if len(y)==0:
+            return error_out
+        slope, yint = linregress(x,y)[:2]
+        xint = np.nan if slope==0 else -yint/slope
+        yfit = slope*x + yint
+        rmse = np.sqrt(np.mean( (y - yfit) ** 2))
+        results = {'slope':slope, 'yint':yint, 'xint':xint, 'error':rmse}
+    except Exception as e:
+        warnings.warn(e)
+        results = error_out
+    return results
+
+# Plotting functions
+# 
 
 def boxplot(data, var, group, show_swarm=True):
     data = data[~data[var].isna()].sort_values(group)

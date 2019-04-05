@@ -1,113 +1,737 @@
-2019-02-01 15:49:05 2019 INFO: Found 12 files in upload directory
-2019-02-01 15:49:05 2021 INFO: Preprocessing 648349587: ./swc/648349587.swc
-2019-02-01 15:49:05 2022 INFO: Preprocessing 648357948: ./swc/648357948.swc
-2019-02-01 15:49:05 2023 INFO: Preprocessing 648363640: ./swc/648363640.swc
-2019-02-01 15:49:05 2021 ERROR: file ./swc/648349587.swc not a recognized pixel or micron file
-2019-02-01 15:49:05 2022 ERROR: file ./swc/648357948.swc not a recognized pixel or micron file
-2019-02-01 15:49:05 2023 ERROR: file ./swc/648363640.swc not a recognized pixel or micron file
-2019-02-01 15:49:05 2024 INFO: Preprocessing 648368561: ./swc/648368561.swc
-2019-02-01 15:49:05 2024 ERROR: file ./swc/648368561.swc not a recognized pixel or micron file
-2019-02-01 15:49:06 2021 WARNING: neuron has unknown units (None) - no scaling applied.
-2019-02-01 15:49:06 2024 WARNING: neuron has unknown units (None) - no scaling applied.
-2019-02-01 15:49:06 2021 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
-2019-02-01 15:49:06 2021 WARNING: upright transform result 648349587
-2019-02-01 15:49:06 2023 WARNING: neuron has unknown units (None) - no scaling applied.
-2019-02-01 15:49:06 2021 ERROR: Autotrace for for specimen 648349587 does not exist: 
-2019-02-01 15:49:06 2024 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
-2019-02-01 15:49:06 2024 WARNING: upright transform result 648368561
-2019-02-01 15:49:06 2023 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
-2019-02-01 15:49:06 2023 WARNING: upright transform result 648363640
-2019-02-01 15:49:06 2024 ERROR: Autotrace for for specimen 648368561 does not exist: 
-2019-02-01 15:49:06 2021 INFO: Preprocessing 648575464: ./swc/648575464.swc
-2019-02-01 15:49:06 2021 ERROR: file ./swc/648575464.swc not a recognized pixel or micron file
-2019-02-01 15:49:06 2023 ERROR: Autotrace for for specimen 648363640 does not exist: 
-2019-02-01 15:49:06 2022 WARNING: neuron has unknown units (None) - no scaling applied.
-2019-02-01 15:49:06 2024 INFO: Preprocessing 648592807: ./swc/648592807.swc
-2019-02-01 15:49:06 2024 ERROR: file ./swc/648592807.swc not a recognized pixel or micron file
-2019-02-01 15:49:06 2022 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
-2019-02-01 15:49:06 2022 WARNING: upright transform result 648357948
-2019-02-01 15:49:06 2023 INFO: Preprocessing 648606306: ./swc/648606306.swc
-2019-02-01 15:49:06 2023 ERROR: file ./swc/648606306.swc not a recognized pixel or micron file
-2019-02-01 15:49:06 2022 ERROR: Autotrace for for specimen 648357948 does not exist: 
-2019-02-01 15:49:06 2022 INFO: Preprocessing 648609532: ./swc/648609532.swc
-2019-02-01 15:49:06 2022 ERROR: file ./swc/648609532.swc not a recognized pixel or micron file
-2019-02-01 15:49:06 2022 WARNING: neuron has unknown units (None) - no scaling applied.
-2019-02-01 15:49:06 2023 WARNING: neuron has unknown units (None) - no scaling applied.
-2019-02-01 15:49:06 2021 WARNING: neuron has unknown units (None) - no scaling applied.
-2019-02-01 15:49:06 2022 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
-2019-02-01 15:49:06 2022 WARNING: upright transform result 648609532
-2019-02-01 15:49:06 2024 WARNING: neuron has unknown units (None) - no scaling applied.
-2019-02-01 15:49:06 2023 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
-2019-02-01 15:49:06 2023 WARNING: upright transform result 648606306
-2019-02-01 15:49:06 2022 ERROR: Autotrace for for specimen 648609532 does not exist: 
-2019-02-01 15:49:06 2021 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
-2019-02-01 15:49:06 2021 WARNING: upright transform result 648575464
-2019-02-01 15:49:06 2024 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
-2019-02-01 15:49:06 2024 WARNING: upright transform result 648592807
-2019-02-01 15:49:06 2023 ERROR: Autotrace for for specimen 648606306 does not exist: 
-2019-02-01 15:49:06 2022 INFO: Preprocessing 648617971: ./swc/648617971.swc
-2019-02-01 15:49:06 2022 ERROR: file ./swc/648617971.swc not a recognized pixel or micron file
-2019-02-01 15:49:06 2021 ERROR: Autotrace for for specimen 648575464 does not exist: 
-2019-02-01 15:49:06 2024 ERROR: Autotrace for for specimen 648592807 does not exist: 
-2019-02-01 15:49:06 2023 INFO: Preprocessing 648621553: ./swc/648621553.swc
-2019-02-01 15:49:06 2023 ERROR: file ./swc/648621553.swc not a recognized pixel or micron file
-2019-02-01 15:49:06 2024 INFO: Preprocessing 648870914: ./swc/648870914.swc
-2019-02-01 15:49:06 2024 ERROR: file ./swc/648870914.swc not a recognized pixel or micron file
-2019-02-01 15:49:06 2021 INFO: Preprocessing 648931407: ./swc/648931407.swc
-2019-02-01 15:49:06 2021 ERROR: file ./swc/648931407.swc not a recognized pixel or micron file
-2019-02-01 15:49:06 2022 WARNING: neuron has unknown units (None) - no scaling applied.
-2019-02-01 15:49:07 2022 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
-2019-02-01 15:49:07 2022 WARNING: upright transform result 648617971
-2019-02-01 15:49:07 2022 ERROR: Autotrace for for specimen 648617971 does not exist: 
-2019-02-01 15:49:07 2023 WARNING: neuron has unknown units (None) - no scaling applied.
-2019-02-01 15:49:07 2023 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
-2019-02-01 15:49:07 2023 WARNING: upright transform result 648621553
-2019-02-01 15:49:07 2024 WARNING: neuron has unknown units (None) - no scaling applied.
-2019-02-01 15:49:07 2023 ERROR: Autotrace for for specimen 648621553 does not exist: 
-2019-02-01 15:49:07 2024 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
-2019-02-01 15:49:07 2024 WARNING: upright transform result 648870914
-2019-02-01 15:49:07 2021 WARNING: neuron has unknown units (None) - no scaling applied.
-2019-02-01 15:49:07 2021 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
-2019-02-01 15:49:07 2021 WARNING: upright transform result 648931407
-2019-02-01 15:49:07 2024 ERROR: Autotrace for for specimen 648870914 does not exist: 
-2019-02-01 15:49:07 2021 ERROR: Autotrace for for specimen 648931407 does not exist: 
-2019-02-01 15:49:07 2019 INFO: processing mouse
-2019-02-01 15:49:07 2019 INFO: Processing 0 file(s)
-2019-02-01 15:49:07 2019 INFO: processing human
-2019-02-01 15:49:07 2019 INFO: Processing 12 file(s)
-2019-02-01 15:49:07 2031 INFO: Processing 648363640: OUT_swc/morphology_data/human/to_process/non_upright/648363640.swc
-2019-02-01 15:49:07 2029 INFO: Processing 648349587: OUT_swc/morphology_data/human/to_process/non_upright/648349587.swc
-2019-02-01 15:49:07 2032 INFO: Processing 648368561: OUT_swc/morphology_data/human/to_process/non_upright/648368561.swc
-2019-02-01 15:49:07 2030 INFO: Processing 648357948: OUT_swc/morphology_data/human/to_process/non_upright/648357948.swc
-2019-02-01 15:49:08 2029 WARNING: Cannot get normalized depth for 648349587. Using 0
-2019-02-01 15:49:08 2032 WARNING: Cannot get normalized depth for 648368561. Using 0
-2019-02-01 15:49:08 2031 WARNING: Cannot get normalized depth for 648363640. Using 0
-2019-02-01 15:49:08 2030 WARNING: Cannot get normalized depth for 648357948. Using 0
-2019-02-01 15:49:10 2029 ERROR: no specimen record found for 648349587
-2019-02-01 15:49:10 2032 ERROR: no specimen record found for 648368561
-2019-02-01 15:49:10 2031 ERROR: no specimen record found for 648363640
-2019-02-01 15:49:10 2029 INFO: Processing 648575464: OUT_swc/morphology_data/human/to_process/non_upright/648575464.swc
-2019-02-01 15:49:11 2030 ERROR: no specimen record found for 648357948
-2019-02-01 15:49:11 2032 INFO: Processing 648592807: OUT_swc/morphology_data/human/to_process/non_upright/648592807.swc
-2019-02-01 15:49:11 2029 WARNING: Cannot get normalized depth for 648575464. Using 0
-2019-02-01 15:49:11 2031 INFO: Processing 648606306: OUT_swc/morphology_data/human/to_process/non_upright/648606306.swc
-2019-02-01 15:49:11 2032 WARNING: Cannot get normalized depth for 648592807. Using 0
-2019-02-01 15:49:11 2031 WARNING: Cannot get normalized depth for 648606306. Using 0
-2019-02-01 15:49:12 2030 INFO: Processing 648609532: OUT_swc/morphology_data/human/to_process/non_upright/648609532.swc
-2019-02-01 15:49:12 2030 WARNING: Cannot get normalized depth for 648609532. Using 0
-2019-02-01 15:49:14 2030 ERROR: no specimen record found for 648609532
-2019-02-01 15:49:14 2029 ERROR: no specimen record found for 648575464
-2019-02-01 15:49:14 2031 ERROR: no specimen record found for 648606306
-2019-02-01 15:49:15 2032 ERROR: no specimen record found for 648592807
-2019-02-01 15:49:15 2030 INFO: Processing 648617971: OUT_swc/morphology_data/human/to_process/non_upright/648617971.swc
-2019-02-01 15:49:15 2031 INFO: Processing 648621553: OUT_swc/morphology_data/human/to_process/non_upright/648621553.swc
-2019-02-01 15:49:15 2030 WARNING: Cannot get normalized depth for 648617971. Using 0
-2019-02-01 15:49:15 2029 INFO: Processing 648870914: OUT_swc/morphology_data/human/to_process/non_upright/648870914.swc
-2019-02-01 15:49:16 2032 INFO: Processing 648931407: OUT_swc/morphology_data/human/to_process/non_upright/648931407.swc
-2019-02-01 15:49:16 2031 WARNING: Cannot get normalized depth for 648621553. Using 0
-2019-02-01 15:49:16 2029 WARNING: Cannot get normalized depth for 648870914. Using 0
-2019-02-01 15:49:16 2032 WARNING: Cannot get normalized depth for 648931407. Using 0
-2019-02-01 15:49:19 2030 ERROR: no specimen record found for 648617971
-2019-02-01 15:49:20 2031 ERROR: no specimen record found for 648621553
-2019-02-01 15:49:20 2029 ERROR: no specimen record found for 648870914
-2019-02-01 15:49:21 2032 ERROR: no specimen record found for 648931407
+2019-04-02 15:45:06 2066 INFO: Found 102 files in upload directory
+2019-04-02 15:45:06 2069 INFO: Preprocessing 676271847: ./swc/H16.06.008.21.02.01_685741524_m_dendriteaxon.swc
+2019-04-02 15:45:06 2068 INFO: Preprocessing 688734408: ./swc/H16.06.008.21.01.01.01_688788732_m_dendriteaxon.swc
+2019-04-02 15:45:06 2070 INFO: Preprocessing 572415708: ./swc/H16.06.013.05.01.01_576675715_m_dendriteaxon.swc
+2019-04-02 15:45:06 2071 INFO: Preprocessing 572416226: ./swc/H16.06.013.05.01.02_576679789_m_dendriteaxon.swc
+/Volumes/Brain&Co/SCIENCE/Programming/ateam-tools/morpho_feature_extractor/bin/neuron_morphology/validation/radius_validation.py:130: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
+To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
+  m, c = np.linalg.lstsq(a, y)[0]
+/Volumes/Brain&Co/SCIENCE/Programming/ateam-tools/morpho_feature_extractor/bin/neuron_morphology/validation/radius_validation.py:130: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
+To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
+  m, c = np.linalg.lstsq(a, y)[0]
+2019-04-02 15:45:06 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:06 2068 WARNING: upright transform result 688734408
+2019-04-02 15:45:06 2068 ERROR: Autotrace for for specimen 688734408 does not exist: Unable to fetch autotrace for 688734408
+2019-04-02 15:45:07 2068 INFO: Preprocessing 574254931: ./swc/H16.06.013.05.01.03_576683819_m_DendriteAxon.swc
+2019-04-02 15:45:07 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:07 2071 WARNING: upright transform result 572416226
+/Volumes/Brain&Co/SCIENCE/Programming/ateam-tools/morpho_feature_extractor/bin/neuron_morphology/validation/radius_validation.py:130: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
+To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
+  m, c = np.linalg.lstsq(a, y)[0]
+2019-04-02 15:45:07 2071 ERROR: Autotrace for for specimen 572416226 does not exist: 
+2019-04-02 15:45:07 2071 INFO: Preprocessing 573949955: ./swc/H16.06.013.05.03.01_575210452_m_dendriteaxon.swc
+2019-04-02 15:45:07 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:07 2069 WARNING: upright transform result 676271847
+2019-04-02 15:45:07 2069 ERROR: Autotrace for for specimen 676271847 does not exist: Unable to fetch autotrace for 676271847
+/Volumes/Brain&Co/SCIENCE/Programming/ateam-tools/morpho_feature_extractor/bin/neuron_morphology/validation/radius_validation.py:130: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
+To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
+  m, c = np.linalg.lstsq(a, y)[0]
+2019-04-02 15:45:07 2069 INFO: Preprocessing 573950105: ./swc/H16.06.013.05.03.02_575214001_m_dendriteaxon.swc
+2019-04-02 15:45:07 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:07 2071 WARNING: upright transform result 573949955
+2019-04-02 15:45:07 2071 ERROR: Autotrace for for specimen 573949955 does not exist: 
+2019-04-02 15:45:07 2071 INFO: Preprocessing 573950135: ./swc/H16.06.013.05.03.04_597701859_m_DendriteAxon.swc
+2019-04-02 15:45:07 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:07 2070 WARNING: upright transform result 572415708
+2019-04-02 15:45:07 2070 ERROR: Autotrace for for specimen 572415708 does not exist: 
+2019-04-02 15:45:07 2070 INFO: Preprocessing 573950640: ./swc/H16.06.013.05.04.03_574838391_m_dendriteaxon.swc
+2019-04-02 15:45:07 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:07 2068 WARNING: upright transform result 574254931
+2019-04-02 15:45:07 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:07 2070 WARNING: upright transform result 573950640
+2019-04-02 15:45:07 2068 ERROR: Autotrace for for specimen 574254931 does not exist: 
+2019-04-02 15:45:07 2070 ERROR: Autotrace for for specimen 573950640 does not exist: 
+2019-04-02 15:45:08 2070 INFO: Preprocessing 573950656: ./swc/H16.06.013.05.05.01_574877028_m_dendriteaxon.swc
+2019-04-02 15:45:08 2068 INFO: Preprocessing 573950663: ./swc/H16.06.013.05.05.02_574874790_m_dendriteaxon.swc
+2019-04-02 15:45:08 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:08 2069 WARNING: upright transform result 573950105
+2019-04-02 15:45:08 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:08 2071 WARNING: upright transform result 573950135
+2019-04-02 15:45:08 2069 ERROR: Autotrace for for specimen 573950105 does not exist: 
+2019-04-02 15:45:08 2071 ERROR: Autotrace for for specimen 573950135 does not exist: 
+2019-04-02 15:45:08 2071 INFO: Preprocessing 573950698: ./swc/H16.06.013.05.05.04_575138382_m_DendriteAxon.swc
+2019-04-02 15:45:08 2069 INFO: Preprocessing 573950869: ./swc/H16.06.013.05.06.02_576010060_m_DendriteAxon.swc
+2019-04-02 15:45:08 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:08 2068 WARNING: upright transform result 573950663
+2019-04-02 15:45:08 2068 ERROR: Autotrace for for specimen 573950663 does not exist: 
+2019-04-02 15:45:08 2068 INFO: Preprocessing 573952412: ./swc/H16.06.013.05.07.03_575154708_m_dendriteaxon.swc
+2019-04-02 15:45:08 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:08 2070 WARNING: upright transform result 573950656
+2019-04-02 15:45:08 2070 ERROR: Autotrace for for specimen 573950656 does not exist: 
+2019-04-02 15:45:09 2070 INFO: Preprocessing 573953810: ./swc/H16.06.013.05.08.01_575586329_m_DendriteAxon.swc
+2019-04-02 15:45:09 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:09 2070 WARNING: upright transform result 573953810
+2019-04-02 15:45:09 2070 ERROR: Autotrace for for specimen 573953810 does not exist: 
+2019-04-02 15:45:09 2070 INFO: Preprocessing 573954205: ./swc/H16.06.013.05.09.01_575972036_m_dendriteaxon.swc
+2019-04-02 15:45:09 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:09 2071 WARNING: upright transform result 573950698
+2019-04-02 15:45:09 2071 ERROR: Autotrace for for specimen 573950698 does not exist: 
+2019-04-02 15:45:09 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:09 2068 WARNING: upright transform result 573952412
+2019-04-02 15:45:09 2068 ERROR: Autotrace for for specimen 573952412 does not exist: 
+2019-04-02 15:45:09 2068 INFO: Preprocessing 618148310: ./swc/H17.06.012.21.03.06_637409352_m_DendriteAxon.swc
+2019-04-02 15:45:09 2071 INFO: Preprocessing 618149887: ./swc/H17.06.012.21.03.07_637431736_m_dendriteaxon.swc
+2019-04-02 15:45:10 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:10 2069 WARNING: upright transform result 573950869
+2019-04-02 15:45:10 2069 ERROR: Autotrace for for specimen 573950869 does not exist: 
+2019-04-02 15:45:10 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:10 2070 WARNING: upright transform result 573954205
+2019-04-02 15:45:10 2070 ERROR: Autotrace for for specimen 573954205 does not exist: 
+2019-04-02 15:45:10 2070 INFO: Preprocessing 618151485: ./swc/H17.06.012.21.03.08_637428776_m_dendriteaxon.swc
+2019-04-02 15:45:10 2069 INFO: Preprocessing 618156959: ./swc/H17.06.012.21.03.10_637436627_m_dendriteaxon.swc
+2019-04-02 15:45:10 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:10 2071 WARNING: upright transform result 618149887
+2019-04-02 15:45:10 2071 ERROR: Autotrace for for specimen 618149887 does not exist: 
+2019-04-02 15:45:10 2071 INFO: Preprocessing 618166932: ./swc/H17.06.012.21.04.03_637422705_m_dendriteaxon.swc
+2019-04-02 15:45:10 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:10 2070 WARNING: upright transform result 618151485
+2019-04-02 15:45:10 2070 ERROR: Autotrace for for specimen 618151485 does not exist: 
+2019-04-02 15:45:10 2070 INFO: Preprocessing 618170528: ./swc/H17.06.012.21.05.01_637398172_m_dendriteaxon.swc
+2019-04-02 15:45:11 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:11 2071 WARNING: upright transform result 618166932
+2019-04-02 15:45:11 2071 ERROR: Autotrace for for specimen 618166932 does not exist: 
+2019-04-02 15:45:11 2071 INFO: Preprocessing 618172126: ./swc/H17.06.012.21.05.02_637418678_m_dendriteaxon.swc
+2019-04-02 15:45:11 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:11 2070 WARNING: upright transform result 618170528
+2019-04-02 15:45:11 2070 ERROR: Autotrace for for specimen 618170528 does not exist: 
+2019-04-02 15:45:11 2070 INFO: Preprocessing 612302699: ./swc/H17.06.012.21.06.01_637451159_m_dendriteaxon.swc
+2019-04-02 15:45:11 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:11 2071 WARNING: upright transform result 618172126
+2019-04-02 15:45:11 2071 ERROR: Autotrace for for specimen 618172126 does not exist: 
+2019-04-02 15:45:11 2071 INFO: Preprocessing 612334272: ./swc/H17.06.012.21.06.02_637459612_m_dendriteaxon.swc
+2019-04-02 15:45:12 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:12 2071 WARNING: upright transform result 612334272
+2019-04-02 15:45:12 2071 ERROR: Autotrace for for specimen 612334272 does not exist: 
+2019-04-02 15:45:12 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:12 2069 WARNING: upright transform result 618156959
+2019-04-02 15:45:12 2069 ERROR: Autotrace for for specimen 618156959 does not exist: 
+2019-04-02 15:45:12 2071 INFO: Preprocessing 623129546: ./swc/H17.06.012.21.06.04_637447498_m_dendriteaxon.swc
+2019-04-02 15:45:12 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:12 2070 WARNING: upright transform result 612302699
+2019-04-02 15:45:12 2070 ERROR: Autotrace for for specimen 612302699 does not exist: 
+2019-04-02 15:45:12 2070 INFO: Preprocessing 623129640: ./swc/H17.06.012.21.09.03_639282608_m_DendriteAxon.swc
+2019-04-02 15:45:12 2069 INFO: Preprocessing 623130995: ./swc/H17.06.012.21.12.01_637385534_m_DendriteAxon.swc
+2019-04-02 15:45:12 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:12 2071 WARNING: upright transform result 623129546
+2019-04-02 15:45:12 2071 ERROR: Autotrace for for specimen 623129546 does not exist: 
+2019-04-02 15:45:12 2071 INFO: Preprocessing 623131354: ./swc/H17.06.012.21.12.02_684832231_m_dendriteaxon.swc
+2019-04-02 15:45:13 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:13 2070 WARNING: upright transform result 623129640
+2019-04-02 15:45:13 2070 ERROR: Autotrace for for specimen 623129640 does not exist: 
+2019-04-02 15:45:13 2070 INFO: Preprocessing 623131636: ./swc/H17.06.012.21.12.03_637405538_m_dendrite.swc
+2019-04-02 15:45:13 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:13 2071 WARNING: upright transform result 623131354
+2019-04-02 15:45:13 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:13 2068 WARNING: upright transform result 618148310
+2019-04-02 15:45:13 2071 ERROR: Autotrace for for specimen 623131354 does not exist: 
+2019-04-02 15:45:13 2068 ERROR: Autotrace for for specimen 618148310 does not exist: 
+2019-04-02 15:45:13 2071 INFO: Preprocessing 623132275: ./swc/H17.06.012.21.12.05_638293893_m_dendriteaxon.swc
+2019-04-02 15:45:13 2068 INFO: Preprocessing 648349587: ./swc/H17.06.014.11.02.01_663019250_m_dendriteaxon.swc
+2019-04-02 15:45:14 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:14 2070 WARNING: upright transform result 623131636
+2019-04-02 15:45:14 2070 ERROR: Autotrace for for specimen 623131636 does not exist: 
+2019-04-02 15:45:14 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:14 2069 WARNING: upright transform result 623130995
+2019-04-02 15:45:14 2069 ERROR: Autotrace for for specimen 623130995 does not exist: 
+2019-04-02 15:45:14 2070 INFO: Preprocessing 648357948: ./swc/H17.06.014.11.02.02_663013039_m_dendriteaxon.swc
+2019-04-02 15:45:14 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:14 2068 WARNING: upright transform result 648349587
+2019-04-02 15:45:14 2068 ERROR: Autotrace for for specimen 648349587 does not exist: 
+2019-04-02 15:45:14 2069 INFO: Preprocessing 648363640: ./swc/H17.06.014.11.02.03_663002070_m_dendriteaxon.swc
+2019-04-02 15:45:14 2068 INFO: Preprocessing 648368561: ./swc/H17.06.014.11.02.04_663025846_m_dendriteaxon.swc
+2019-04-02 15:45:14 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:14 2070 WARNING: upright transform result 648357948
+2019-04-02 15:45:14 2070 ERROR: Autotrace for for specimen 648357948 does not exist: 
+2019-04-02 15:45:14 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:14 2068 WARNING: upright transform result 648368561
+2019-04-02 15:45:14 2068 ERROR: Autotrace for for specimen 648368561 does not exist: 
+2019-04-02 15:45:14 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:14 2069 WARNING: upright transform result 648363640
+2019-04-02 15:45:14 2070 INFO: Preprocessing 648376926: ./swc/H17.06.014.11.02.05_663030990_m_dendriteaxon.swc
+2019-04-02 15:45:14 2069 ERROR: Autotrace for for specimen 648363640 does not exist: 
+2019-04-02 15:45:14 2068 INFO: Preprocessing 648575464: ./swc/H17.06.014.11.05.01_657986045_m_dendriteaxon.swc
+2019-04-02 15:45:14 2069 INFO: Preprocessing 648592807: ./swc/H17.06.014.11.05.02_657989328_m_dendriteaxon.swc
+2019-04-02 15:45:14 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:14 2071 WARNING: upright transform result 623132275
+2019-04-02 15:45:14 2071 ERROR: Autotrace for for specimen 623132275 does not exist: 
+2019-04-02 15:45:15 2071 INFO: Preprocessing 648606306: ./swc/H17.06.014.11.07.01_661307789_m_dendriteaxon.swc
+2019-04-02 15:45:15 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:15 2070 WARNING: upright transform result 648376926
+2019-04-02 15:45:15 2070 ERROR: Autotrace for for specimen 648376926 does not exist: 
+2019-04-02 15:45:15 2070 INFO: Preprocessing 648609532: ./swc/H17.06.014.11.07.02_661304936_m_dendriteaxon.swc
+2019-04-02 15:45:15 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:15 2069 WARNING: upright transform result 648592807
+2019-04-02 15:45:15 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:15 2068 WARNING: upright transform result 648575464
+2019-04-02 15:45:15 2069 ERROR: Autotrace for for specimen 648592807 does not exist: 
+2019-04-02 15:45:15 2068 ERROR: Autotrace for for specimen 648575464 does not exist: 
+2019-04-02 15:45:15 2069 INFO: Preprocessing 648617971: ./swc/H17.06.014.11.07.03_661310115_m_dendriteaxon.swc
+2019-04-02 15:45:15 2068 INFO: Preprocessing 648621553: ./swc/H17.06.014.11.07.04_661301900_m_dendriteArtificialAxon.swc
+2019-04-02 15:45:15 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:15 2071 WARNING: upright transform result 648606306
+2019-04-02 15:45:15 2071 ERROR: Autotrace for for specimen 648606306 does not exist: 
+2019-04-02 15:45:15 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:15 2070 WARNING: upright transform result 648609532
+2019-04-02 15:45:15 2070 ERROR: Autotrace for for specimen 648609532 does not exist: 
+2019-04-02 15:45:15 2071 INFO: Preprocessing 648870914: ./swc/H17.06.014.11.12.01_663006852_m_dendriteaxon.swc
+2019-04-02 15:45:15 2070 INFO: Preprocessing 648931407: ./swc/H17.06.014.11.12.02_663035867_m_dendriteaxon.swc
+2019-04-02 15:45:15 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:15 2069 WARNING: upright transform result 648617971
+2019-04-02 15:45:15 2069 ERROR: Autotrace for for specimen 648617971 does not exist: 
+2019-04-02 15:45:15 2069 INFO: Preprocessing 652309488: ./swc/H17.06.015.21.08.02_669338200_m_dendriteaxon.swc
+2019-04-02 15:45:16 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:16 2068 WARNING: upright transform result 648621553
+2019-04-02 15:45:16 2068 ERROR: Autotrace for for specimen 648621553 does not exist: 
+2019-04-02 15:45:16 2068 INFO: Preprocessing 652312846: ./swc/H17.06.015.21.08.03_669330890_m_dendriteaxon.swc
+2019-04-02 15:45:16 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:16 2071 WARNING: upright transform result 648870914
+2019-04-02 15:45:16 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:16 2070 WARNING: upright transform result 648931407
+2019-04-02 15:45:16 2071 ERROR: Autotrace for for specimen 648870914 does not exist: 
+2019-04-02 15:45:16 2070 ERROR: Autotrace for for specimen 648931407 does not exist: 
+2019-04-02 15:45:16 2071 INFO: Preprocessing 652079547: ./swc/H17.06.015.21.09.01_669292996_m_dendriteaxon.swc
+2019-04-02 15:45:16 2070 INFO: Preprocessing 652080861: ./swc/H17.06.015.21.09.02_669302550_m_dendriteaxon.swc
+2019-04-02 15:45:16 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:16 2069 WARNING: upright transform result 652309488
+2019-04-02 15:45:16 2069 ERROR: Autotrace for for specimen 652309488 does not exist: 
+2019-04-02 15:45:16 2069 INFO: Preprocessing 652085118: ./swc/H17.06.015.21.09.03_669312443_m_dendriteaxon.swc
+2019-04-02 15:45:16 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:16 2068 WARNING: upright transform result 652312846
+2019-04-02 15:45:16 2068 ERROR: Autotrace for for specimen 652312846 does not exist: 
+2019-04-02 15:45:16 2068 INFO: Preprocessing 653197469: ./swc/H17.06.015.21.09.04_669321959_m_dendriteaxon.swc
+2019-04-02 15:45:17 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:17 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:17 2071 WARNING: upright transform result 652079547
+2019-04-02 15:45:17 2070 WARNING: upright transform result 652080861
+2019-04-02 15:45:17 2070 ERROR: Autotrace for for specimen 652080861 does not exist: 
+2019-04-02 15:45:17 2071 ERROR: Autotrace for for specimen 652079547 does not exist: 
+2019-04-02 15:45:17 2070 INFO: Preprocessing 653198382: ./swc/H17.06.015.21.09.05_670420867_m_dendriteaxon.swc
+2019-04-02 15:45:17 2071 INFO: Preprocessing 653198853: ./swc/H17.06.015.21.09.06_669903838_m_dendriteaxon.swc
+2019-04-02 15:45:17 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:17 2069 WARNING: upright transform result 652085118
+2019-04-02 15:45:17 2069 ERROR: Autotrace for for specimen 652085118 does not exist: 
+2019-04-02 15:45:17 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:17 2068 WARNING: upright transform result 653197469
+2019-04-02 15:45:17 2069 INFO: Preprocessing 653199449: ./swc/H17.06.015.21.09.07_669884986_m_dendriteaxon.swc
+2019-04-02 15:45:17 2068 ERROR: Autotrace for for specimen 653197469 does not exist: 
+2019-04-02 15:45:17 2068 INFO: Preprocessing 653200035: ./swc/H17.06.015.21.09.08_669893886_m_dendriteaxon.swc
+2019-04-02 15:45:17 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:17 2069 WARNING: upright transform result 653199449
+2019-04-02 15:45:17 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:17 2070 WARNING: upright transform result 653198382
+2019-04-02 15:45:17 2069 ERROR: Autotrace for for specimen 653199449 does not exist: 
+2019-04-02 15:45:17 2070 ERROR: Autotrace for for specimen 653198382 does not exist: 
+2019-04-02 15:45:17 2069 INFO: Preprocessing 656151421: ./swc/H17.06.015.21.12.02_666323589_m_dendriteaxon.swc
+2019-04-02 15:45:17 2070 INFO: Preprocessing 656151434: ./swc/H17.06.015.21.12.03_663159807_m_dendriteaxon.swc
+2019-04-02 15:45:18 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:18 2068 WARNING: upright transform result 653200035
+2019-04-02 15:45:18 2068 ERROR: Autotrace for for specimen 653200035 does not exist: 
+2019-04-02 15:45:18 2068 INFO: Preprocessing 787217020: ./swc/H18.06.366.99.01.01_791130666_m_dendriteOnly.swc
+2019-04-02 15:45:18 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:18 2071 WARNING: upright transform result 653198853
+2019-04-02 15:45:18 2071 ERROR: Autotrace for for specimen 653198853 does not exist: 
+2019-04-02 15:45:18 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:18 2070 WARNING: upright transform result 656151434
+2019-04-02 15:45:18 2070 ERROR: Autotrace for for specimen 656151434 does not exist: 
+2019-04-02 15:45:18 2066 ERROR: Error uploading SWC: could not find specimen id from file name: ./swc/H17.06.015.21.10.01_664501117_m_dendriteaxon.swc
+2019-04-02 15:45:18 2071 INFO: Preprocessing 787220829: ./swc/H18.06.366.99.01.02_791144869_m_dendriteOnly.swc
+2019-04-02 15:45:18 2070 INFO: Preprocessing 787225969: ./swc/H18.06.366.99.01.03_791126235_m_dendriteOnly_problem.swc
+2019-04-02 15:45:18 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:18 2068 WARNING: upright transform result 787217020
+2019-04-02 15:45:19 2068 ERROR: Autotrace for for specimen 787217020 does not exist: Unable to fetch autotrace for 787217020
+2019-04-02 15:45:19 2068 INFO: Preprocessing 785402862: ./swc/H18.06.366.99.02.01_792349553_m_dendriteOnly.swc
+2019-04-02 15:45:19 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:19 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:19 2069 WARNING: upright transform result 656151421
+2019-04-02 15:45:19 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:19 2070 WARNING: upright transform result 787225969
+2019-04-02 15:45:19 2071 WARNING: upright transform result 787220829
+2019-04-02 15:45:19 2071 ERROR: Autotrace for for specimen 787220829 does not exist: 
+2019-04-02 15:45:19 2070 ERROR: Autotrace for for specimen 787225969 does not exist: 
+2019-04-02 15:45:19 2069 ERROR: Autotrace for for specimen 656151421 does not exist: 
+2019-04-02 15:45:19 2071 INFO: Preprocessing 785402927: ./swc/H18.06.366.99.02.02_792338560_m_dendriteOnly.swc
+2019-04-02 15:45:19 2070 INFO: Preprocessing 785403247: ./swc/H18.06.366.99.02.03_790840300_m_dendriteOnly.swc
+2019-04-02 15:45:19 2069 INFO: Preprocessing 767043837: ./swc/H18.06.366.99.03.01_792328800_m_dendriteOnly.swc
+2019-04-02 15:45:19 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:19 2068 WARNING: upright transform result 785402862
+2019-04-02 15:45:19 2068 ERROR: Autotrace for for specimen 785402862 does not exist: 
+2019-04-02 15:45:19 2068 INFO: Preprocessing 767105103: ./swc/H18.06.366.99.03.02_791188232_m_dendriteOnly.swc
+2019-04-02 15:45:20 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:20 2070 WARNING: upright transform result 785403247
+2019-04-02 15:45:20 2070 ERROR: Autotrace for for specimen 785403247 does not exist: 
+2019-04-02 15:45:20 2070 INFO: Preprocessing 767155928: ./swc/H18.06.366.99.03.03_791542189_m_dendriteNoAxon.swc
+2019-04-02 15:45:20 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:20 2069 WARNING: upright transform result 767043837
+2019-04-02 15:45:20 2069 ERROR: Autotrace for for specimen 767043837 does not exist: 
+2019-04-02 15:45:20 2069 INFO: Preprocessing 767242535: ./swc/H18.06.366.99.03.04_791546606_m_dendriteOnly.swc
+2019-04-02 15:45:20 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:20 2068 WARNING: upright transform result 767105103
+2019-04-02 15:45:20 2068 ERROR: Autotrace for for specimen 767105103 does not exist: Unable to fetch autotrace for 767105103
+2019-04-02 15:45:20 2068 INFO: Preprocessing 767277152: ./swc/H18.06.366.99.03.05_792319695_m_dendriteOnly.swc
+2019-04-02 15:45:20 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:20 2071 WARNING: upright transform result 785402927
+2019-04-02 15:45:20 2071 ERROR: Autotrace for for specimen 785402927 does not exist: Unable to fetch autotrace for 785402927
+2019-04-02 15:45:20 2071 INFO: Preprocessing 767196903: ./swc/H18.06.366.99.04.01_803313649_m_dendriteOnly_noAxon.swc
+2019-04-02 15:45:20 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:20 2070 WARNING: upright transform result 767155928
+2019-04-02 15:45:20 2070 ERROR: Autotrace for for specimen 767155928 does not exist: 
+2019-04-02 15:45:20 2070 INFO: Preprocessing 767396338: ./swc/H18.06.366.99.04.05_803302369_m_dendriteOnly_noaxon.swc
+2019-04-02 15:45:20 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:20 2069 WARNING: upright transform result 767242535
+2019-04-02 15:45:21 2069 ERROR: Autotrace for for specimen 767242535 does not exist: 
+2019-04-02 15:45:21 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:21 2068 WARNING: upright transform result 767277152
+2019-04-02 15:45:21 2068 ERROR: Autotrace for for specimen 767277152 does not exist: 
+2019-04-02 15:45:21 2069 INFO: Preprocessing 767412044: ./swc/H18.06.366.99.04.06_805365743_m_dendriteOnly.swc
+2019-04-02 15:45:21 2068 INFO: Preprocessing 767418838: ./swc/H18.06.366.99.04.07_812122713_m_dendriteOnly.swc
+2019-04-02 15:45:21 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:21 2070 WARNING: upright transform result 767396338
+2019-04-02 15:45:21 2070 ERROR: Autotrace for for specimen 767396338 does not exist: 
+2019-04-02 15:45:21 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:21 2071 WARNING: upright transform result 767196903
+2019-04-02 15:45:21 2071 ERROR: Autotrace for for specimen 767196903 does not exist: 
+2019-04-02 15:45:21 2070 INFO: Preprocessing 767421681: ./swc/H18.06.366.99.04.08_798567369_m_dendriteOnly.swc
+2019-04-02 15:45:21 2071 INFO: Preprocessing 785404932: ./swc/H18.06.366.99.06.01_791551088_m_dendriteOnly.swc
+2019-04-02 15:45:21 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:21 2068 WARNING: upright transform result 767418838
+2019-04-02 15:45:21 2068 ERROR: Autotrace for for specimen 767418838 does not exist: 
+2019-04-02 15:45:21 2068 INFO: Preprocessing 785405081: ./swc/H18.06.366.99.06.03_792425670_m_dendriteOnly.swc
+2019-04-02 15:45:21 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:21 2069 WARNING: upright transform result 767412044
+2019-04-02 15:45:21 2069 ERROR: Autotrace for for specimen 767412044 does not exist: 
+2019-04-02 15:45:21 2069 INFO: Preprocessing 785405127: ./swc/H18.06.366.99.06.04_802880677_m_dendriteOnly.swc
+2019-04-02 15:45:21 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:21 2070 WARNING: upright transform result 767421681
+2019-04-02 15:45:21 2070 ERROR: Autotrace for for specimen 767421681 does not exist: Unable to fetch autotrace for 767421681
+2019-04-02 15:45:22 2070 INFO: Preprocessing 768147241: ./swc/H18.06.366.99.08.02_792985714_m_dendriteOnly.swc
+2019-04-02 15:45:22 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:22 2068 WARNING: upright transform result 785405081
+2019-04-02 15:45:22 2068 ERROR: Autotrace for for specimen 785405081 does not exist: Unable to fetch autotrace for 785405081
+2019-04-02 15:45:22 2068 INFO: Preprocessing 768182562: ./swc/H18.06.366.99.08.03_792976426_m_dendriteOnly.swc
+2019-04-02 15:45:22 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:22 2069 WARNING: upright transform result 785405127
+2019-04-02 15:45:22 2069 ERROR: Autotrace for for specimen 785405127 does not exist: Unable to fetch autotrace for 785405127
+2019-04-02 15:45:22 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:22 2071 WARNING: upright transform result 785404932
+2019-04-02 15:45:22 2071 ERROR: Autotrace for for specimen 785404932 does not exist: Unable to fetch autotrace for 785404932
+2019-04-02 15:45:22 2069 INFO: Preprocessing 784179171: ./swc/H18.06.368.99.01.01_813226371_m_dendriteOnly.swc
+2019-04-02 15:45:22 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:22 2070 WARNING: upright transform result 768147241
+2019-04-02 15:45:22 2070 ERROR: Autotrace for for specimen 768147241 does not exist: Unable to fetch autotrace for 768147241
+2019-04-02 15:45:22 2071 INFO: Preprocessing 784254854: ./swc/H18.06.368.99.01.02_813182009_m_dendriteOnly.swc
+2019-04-02 15:45:22 2070 INFO: Preprocessing 784286281: ./swc/H18.06.368.99.01.03_814124801_m_dendriteOnly.swc
+2019-04-02 15:45:22 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:22 2068 WARNING: upright transform result 768182562
+2019-04-02 15:45:22 2068 ERROR: Autotrace for for specimen 768182562 does not exist: 
+2019-04-02 15:45:22 2068 INFO: Preprocessing 784315885: ./swc/H18.06.368.99.01.04_812748938_m_dendriteOnly.swc
+2019-04-02 15:45:23 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:23 2069 WARNING: upright transform result 784179171
+2019-04-02 15:45:23 2069 ERROR: Autotrace for for specimen 784179171 does not exist: 
+2019-04-02 15:45:23 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:23 2071 WARNING: upright transform result 784254854
+2019-04-02 15:45:23 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:23 2070 WARNING: upright transform result 784286281
+2019-04-02 15:45:23 2071 ERROR: Autotrace for for specimen 784254854 does not exist: 
+2019-04-02 15:45:23 2069 INFO: Preprocessing 784186399: ./swc/H18.06.368.99.02.01_813185418_m_dendriteOnly.swc
+2019-04-02 15:45:23 2070 ERROR: Autotrace for for specimen 784286281 does not exist: Unable to fetch autotrace for 784286281
+2019-04-02 15:45:23 2070 INFO: Preprocessing 784324488: ./swc/H18.06.368.99.02.03_813165001_m_dendriteaxon.swc
+2019-04-02 15:45:23 2071 INFO: Preprocessing 784254653: ./swc/H18.06.368.99.02.02_813151363_m_dendriteOnly.swc
+2019-04-02 15:45:23 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:23 2069 WARNING: upright transform result 784186399
+2019-04-02 15:45:23 2069 ERROR: Autotrace for for specimen 784186399 does not exist: 
+2019-04-02 15:45:23 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:23 2071 WARNING: upright transform result 784254653
+2019-04-02 15:45:23 2069 INFO: Preprocessing 784380873: ./swc/H18.06.368.99.03.01_823496744_m_dendriteOnly.swc
+2019-04-02 15:45:23 2071 ERROR: Autotrace for for specimen 784254653 does not exist: 
+2019-04-02 15:45:23 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:23 2068 WARNING: upright transform result 784315885
+2019-04-02 15:45:23 2068 ERROR: Autotrace for for specimen 784315885 does not exist: 
+2019-04-02 15:45:23 2071 INFO: Preprocessing 784394675: ./swc/H18.06.368.99.03.02_823499346_m_dendriteaxon.swc
+2019-04-02 15:45:23 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:23 2070 WARNING: upright transform result 784324488
+2019-04-02 15:45:23 2070 ERROR: Autotrace for for specimen 784324488 does not exist: 
+2019-04-02 15:45:23 2068 INFO: Preprocessing 784407705: ./swc/H18.06.368.99.03.03_823490783_m_dendriteaxon.swc
+2019-04-02 15:45:23 2070 INFO: Preprocessing 784424542: ./swc/H18.06.368.99.03.04_823494590_m_dendriteOnly.swc
+2019-04-02 15:45:24 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:24 2069 WARNING: upright transform result 784380873
+2019-04-02 15:45:24 2069 ERROR: Autotrace for for specimen 784380873 does not exist: 
+2019-04-02 15:45:24 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:24 2071 WARNING: upright transform result 784394675
+2019-04-02 15:45:24 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:24 2070 WARNING: upright transform result 784424542
+2019-04-02 15:45:24 2071 ERROR: Autotrace for for specimen 784394675 does not exist: 
+2019-04-02 15:45:24 2069 INFO: Preprocessing 783659362: ./swc/H18.06.368.99.04.01_815790698_m_dendriteaxon.swc
+2019-04-02 15:45:24 2070 ERROR: Autotrace for for specimen 784424542 does not exist: 
+2019-04-02 15:45:24 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:24 2068 WARNING: upright transform result 784407705
+2019-04-02 15:45:24 2071 INFO: Preprocessing 785472944: ./swc/H18.06.368.99.04.02_815793212_m_dendriteonly.swc
+2019-04-02 15:45:24 2070 INFO: Preprocessing 785473956: ./swc/H18.06.368.99.04.03_815813776_m_dendriteOnly.swc
+2019-04-02 15:45:24 2068 ERROR: Autotrace for for specimen 784407705 does not exist: 
+2019-04-02 15:45:24 2068 INFO: Preprocessing 785474710: ./swc/H18.06.368.99.04.04_815787270_m_dendriteaxon.swc
+2019-04-02 15:45:24 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:24 2069 WARNING: upright transform result 783659362
+2019-04-02 15:45:24 2069 ERROR: Autotrace for for specimen 783659362 does not exist: 
+2019-04-02 15:45:24 2069 INFO: Preprocessing 785475565: ./swc/H18.06.368.99.04.05_815821581_m_dendriteaxon.swc
+2019-04-02 15:45:24 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:24 2070 WARNING: upright transform result 785473956
+2019-04-02 15:45:24 2070 ERROR: Autotrace for for specimen 785473956 does not exist: 
+2019-04-02 15:45:24 2070 INFO: Preprocessing 785476371: ./swc/H18.06.368.99.04.06_816294814_m_dendriteOnly.swc
+2019-04-02 15:45:24 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:24 2071 WARNING: upright transform result 785472944
+2019-04-02 15:45:24 2071 ERROR: Autotrace for for specimen 785472944 does not exist: 
+2019-04-02 15:45:24 2071 INFO: Preprocessing 784345251: ./swc/H18.06.368.99.05.01_813198793_m_dendriteOnly.swc
+2019-04-02 15:45:24 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:24 2068 WARNING: upright transform result 785474710
+2019-04-02 15:45:24 2068 ERROR: Autotrace for for specimen 785474710 does not exist: 
+2019-04-02 15:45:25 2068 INFO: Preprocessing 784373410: ./swc/H18.06.368.99.05.02_813191777_m_dendriteOnly.swc
+2019-04-02 15:45:25 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:25 2070 WARNING: upright transform result 785476371
+2019-04-02 15:45:25 2070 ERROR: Autotrace for for specimen 785476371 does not exist: 
+2019-04-02 15:45:25 2070 INFO: Preprocessing 784388179: ./swc/H18.06.368.99.05.03_813194817_m_dendriteOnly.swc
+2019-04-02 15:45:25 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:25 2069 WARNING: upright transform result 785475565
+2019-04-02 15:45:25 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:25 2071 WARNING: upright transform result 784345251
+2019-04-02 15:45:25 2069 ERROR: Autotrace for for specimen 785475565 does not exist: 
+2019-04-02 15:45:25 2071 ERROR: Autotrace for for specimen 784345251 does not exist: 
+2019-04-02 15:45:25 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:25 2068 WARNING: upright transform result 784373410
+2019-04-02 15:45:25 2068 ERROR: Autotrace for for specimen 784373410 does not exist: 
+2019-04-02 15:45:25 2069 INFO: Preprocessing 785498678: ./swc/H18.06.368.99.06.02_813158411_m_dendriteOnly.swc
+2019-04-02 15:45:25 2071 INFO: Preprocessing 785504224: ./swc/H18.06.368.99.06.03_813161720_m_dendriteOnly.swc
+2019-04-02 15:45:25 2068 INFO: Preprocessing 785520801: ./swc/H18.06.368.99.06.04_813168569_m_dendriteOnly.swc
+2019-04-02 15:45:25 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:25 2070 WARNING: upright transform result 784388179
+2019-04-02 15:45:25 2070 ERROR: Autotrace for for specimen 784388179 does not exist: 
+2019-04-02 15:45:25 2068 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:25 2068 WARNING: upright transform result 785520801
+2019-04-02 15:45:25 2070 INFO: Preprocessing 785524861: ./swc/H18.06.368.99.06.05_813155163_m_dendriteOnly.swc
+2019-04-02 15:45:25 2068 ERROR: Autotrace for for specimen 785520801 does not exist: 
+2019-04-02 15:45:25 2069 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:25 2069 WARNING: upright transform result 785498678
+2019-04-02 15:45:26 2069 ERROR: Autotrace for for specimen 785498678 does not exist: 
+2019-04-02 15:45:26 2071 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:26 2071 WARNING: upright transform result 785504224
+2019-04-02 15:45:26 2071 ERROR: Autotrace for for specimen 785504224 does not exist: 
+2019-04-02 15:45:26 2070 ERROR: Error calculating transform: Failed to fetch necessary polygons -- got 0 of 3
+2019-04-02 15:45:26 2070 WARNING: upright transform result 785524861
+2019-04-02 15:45:26 2070 ERROR: Autotrace for for specimen 785524861 does not exist: 
+2019-04-02 15:45:26 2066 INFO: processing mouse
+2019-04-02 15:45:26 2066 INFO: Processing 0 file(s)
+2019-04-02 15:45:26 2066 INFO: processing human
+2019-04-02 15:45:26 2066 INFO: Processing 101 file(s)
+2019-04-02 15:45:26 2076 INFO: Processing 572415708: OUT_swc/morphology_data/human/to_process/non_upright/572415708.swc
+2019-04-02 15:45:26 2077 INFO: Processing 572416226: OUT_swc/morphology_data/human/to_process/non_upright/572416226.swc
+2019-04-02 15:45:26 2078 INFO: Processing 573949955: OUT_swc/morphology_data/human/to_process/non_upright/573949955.swc
+2019-04-02 15:45:26 2079 INFO: Processing 573950105: OUT_swc/morphology_data/human/to_process/non_upright/573950105.swc
+/Volumes/Brain&Co/SCIENCE/Programming/ateam-tools/morpho_feature_extractor/bin/neuron_morphology/validation/radius_validation.py:130: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
+To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
+  m, c = np.linalg.lstsq(a, y)[0]
+2019-04-02 15:45:26 2078 WARNING: Cannot get normalized depth for 573949955. Using 0
+/Volumes/Brain&Co/SCIENCE/Programming/ateam-tools/morpho_feature_extractor/bin/neuron_morphology/validation/radius_validation.py:130: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
+To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
+  m, c = np.linalg.lstsq(a, y)[0]
+2019-04-02 15:45:27 2077 WARNING: Cannot get normalized depth for 572416226. Using 0
+/Volumes/Brain&Co/SCIENCE/Programming/ateam-tools/morpho_feature_extractor/bin/neuron_morphology/validation/radius_validation.py:130: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
+To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
+  m, c = np.linalg.lstsq(a, y)[0]
+/Volumes/Brain&Co/SCIENCE/Programming/ateam-tools/morpho_feature_extractor/bin/neuron_morphology/validation/radius_validation.py:130: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
+To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
+  m, c = np.linalg.lstsq(a, y)[0]
+2019-04-02 15:45:27 2079 WARNING: Cannot get normalized depth for 573950105. Using 0
+2019-04-02 15:45:28 2076 WARNING: Cannot get normalized depth for 572415708. Using 0
+2019-04-02 15:45:29 2078 ERROR: no specimen record found for 573949955
+2019-04-02 15:45:30 2078 INFO: Processing 573950135: OUT_swc/morphology_data/human/to_process/non_upright/573950135.swc
+2019-04-02 15:45:31 2078 WARNING: Cannot get normalized depth for 573950135. Using 0
+2019-04-02 15:45:34 2077 ERROR: no specimen record found for 572416226
+2019-04-02 15:45:36 2077 INFO: Processing 573950640: OUT_swc/morphology_data/human/to_process/non_upright/573950640.swc
+2019-04-02 15:45:36 2077 WARNING: Cannot get normalized depth for 573950640. Using 0
+2019-04-02 15:45:37 2079 ERROR: no specimen record found for 573950105
+2019-04-02 15:45:39 2076 ERROR: no specimen record found for 572415708
+2019-04-02 15:45:40 2078 ERROR: no specimen record found for 573950135
+2019-04-02 15:45:41 2077 ERROR: no specimen record found for 573950640
+2019-04-02 15:45:41 2079 INFO: Processing 573950656: OUT_swc/morphology_data/human/to_process/non_upright/573950656.swc
+2019-04-02 15:45:42 2077 INFO: Processing 573950663: OUT_swc/morphology_data/human/to_process/non_upright/573950663.swc
+2019-04-02 15:45:42 2079 WARNING: Cannot get normalized depth for 573950656. Using 0
+2019-04-02 15:45:43 2077 WARNING: Cannot get normalized depth for 573950663. Using 0
+2019-04-02 15:45:43 2078 INFO: Processing 573950698: OUT_swc/morphology_data/human/to_process/non_upright/573950698.swc
+2019-04-02 15:45:43 2076 INFO: Processing 573950869: OUT_swc/morphology_data/human/to_process/non_upright/573950869.swc
+2019-04-02 15:45:45 2078 WARNING: Cannot get normalized depth for 573950698. Using 0
+2019-04-02 15:45:46 2076 WARNING: Cannot get normalized depth for 573950869. Using 0
+2019-04-02 15:45:50 2077 ERROR: no specimen record found for 573950663
+2019-04-02 15:45:52 2077 INFO: Processing 573952412: OUT_swc/morphology_data/human/to_process/non_upright/573952412.swc
+2019-04-02 15:45:53 2079 ERROR: no specimen record found for 573950656
+2019-04-02 15:45:53 2077 WARNING: Cannot get normalized depth for 573952412. Using 0
+2019-04-02 15:45:56 2079 INFO: Processing 573953810: OUT_swc/morphology_data/human/to_process/non_upright/573953810.swc
+2019-04-02 15:45:57 2079 WARNING: Cannot get normalized depth for 573953810. Using 0
+2019-04-02 15:46:02 2079 ERROR: no specimen record found for 573953810
+2019-04-02 15:46:04 2078 ERROR: no specimen record found for 573950698
+2019-04-02 15:46:05 2079 INFO: Processing 573954205: OUT_swc/morphology_data/human/to_process/non_upright/573954205.swc
+2019-04-02 15:46:05 2079 WARNING: Cannot get normalized depth for 573954205. Using 0
+2019-04-02 15:46:07 2077 ERROR: no specimen record found for 573952412
+2019-04-02 15:46:10 2076 ERROR: no specimen record found for 573950869
+2019-04-02 15:46:11 2078 INFO: Processing 574254931: OUT_swc/morphology_data/human/to_process/non_upright/574254931.swc
+2019-04-02 15:46:12 2077 INFO: Processing 612302699: OUT_swc/morphology_data/human/to_process/non_upright/612302699.swc
+2019-04-02 15:46:12 2078 WARNING: Cannot get normalized depth for 574254931. Using 0
+2019-04-02 15:46:13 2079 ERROR: no specimen record found for 573954205
+2019-04-02 15:46:13 2077 WARNING: Cannot get normalized depth for 612302699. Using 0
+2019-04-02 15:46:15 2079 INFO: Processing 612334272: OUT_swc/morphology_data/human/to_process/non_upright/612334272.swc
+2019-04-02 15:46:15 2079 WARNING: Cannot get normalized depth for 612334272. Using 0
+2019-04-02 15:46:16 2076 INFO: Processing 618148310: OUT_swc/morphology_data/human/to_process/non_upright/618148310.swc
+2019-04-02 15:46:18 2079 ERROR: no specimen record found for 612334272
+2019-04-02 15:46:19 2079 INFO: Processing 618149887: OUT_swc/morphology_data/human/to_process/non_upright/618149887.swc
+2019-04-02 15:46:20 2079 WARNING: Cannot get normalized depth for 618149887. Using 0
+2019-04-02 15:46:21 2077 ERROR: no specimen record found for 612302699
+2019-04-02 15:46:21 2076 WARNING: Cannot get normalized depth for 618148310. Using 0
+2019-04-02 15:46:23 2077 INFO: Processing 618151485: OUT_swc/morphology_data/human/to_process/non_upright/618151485.swc
+2019-04-02 15:46:24 2077 WARNING: Cannot get normalized depth for 618151485. Using 0
+2019-04-02 15:46:24 2078 ERROR: no specimen record found for 574254931
+2019-04-02 15:46:29 2078 INFO: Processing 618156959: OUT_swc/morphology_data/human/to_process/non_upright/618156959.swc
+2019-04-02 15:46:29 2079 ERROR: no specimen record found for 618149887
+2019-04-02 15:46:31 2079 INFO: Processing 618166932: OUT_swc/morphology_data/human/to_process/non_upright/618166932.swc
+2019-04-02 15:46:32 2078 WARNING: Cannot get normalized depth for 618156959. Using 0
+2019-04-02 15:46:32 2079 WARNING: Cannot get normalized depth for 618166932. Using 0
+2019-04-02 15:46:33 2077 ERROR: no specimen record found for 618151485
+2019-04-02 15:46:36 2077 INFO: Processing 618170528: OUT_swc/morphology_data/human/to_process/non_upright/618170528.swc
+2019-04-02 15:46:37 2077 WARNING: Cannot get normalized depth for 618170528. Using 0
+2019-04-02 15:46:40 2079 ERROR: no specimen record found for 618166932
+2019-04-02 15:46:43 2079 INFO: Processing 618172126: OUT_swc/morphology_data/human/to_process/non_upright/618172126.swc
+2019-04-02 15:46:43 2079 WARNING: Cannot get normalized depth for 618172126. Using 0
+2019-04-02 15:46:45 2077 ERROR: no specimen record found for 618170528
+2019-04-02 15:46:48 2077 INFO: Processing 623129546: OUT_swc/morphology_data/human/to_process/non_upright/623129546.swc
+2019-04-02 15:46:49 2077 WARNING: Cannot get normalized depth for 623129546. Using 0
+2019-04-02 15:46:52 2079 ERROR: no specimen record found for 618172126
+2019-04-02 15:46:54 2079 INFO: Processing 623129640: OUT_swc/morphology_data/human/to_process/non_upright/623129640.swc
+2019-04-02 15:46:57 2079 WARNING: Cannot get normalized depth for 623129640. Using 0
+2019-04-02 15:46:57 2077 ERROR: no specimen record found for 623129546
+2019-04-02 15:47:00 2077 INFO: Processing 623130995: OUT_swc/morphology_data/human/to_process/non_upright/623130995.swc
+2019-04-02 15:47:04 2077 WARNING: Cannot get normalized depth for 623130995. Using 0
+2019-04-02 15:47:09 2078 ERROR: no specimen record found for 618156959
+2019-04-02 15:47:13 2079 ERROR: no specimen record found for 623129640
+2019-04-02 15:47:17 2079 INFO: Processing 623131354: OUT_swc/morphology_data/human/to_process/non_upright/623131354.swc
+2019-04-02 15:47:19 2079 WARNING: Cannot get normalized depth for 623131354. Using 0
+2019-04-02 15:47:20 2078 INFO: Processing 623131636: OUT_swc/morphology_data/human/to_process/non_upright/623131636.swc
+2019-04-02 15:47:22 2078 WARNING: Cannot get normalized depth for 623131636. Using 0
+2019-04-02 15:47:25 2076 ERROR: no specimen record found for 618148310
+2019-04-02 15:47:35 2079 ERROR: no specimen record found for 623131354
+2019-04-02 15:47:37 2077 ERROR: no specimen record found for 623130995
+2019-04-02 15:47:38 2078 ERROR: no specimen record found for 623131636
+2019-04-02 15:47:40 2079 INFO: Processing 623132275: OUT_swc/morphology_data/human/to_process/non_upright/623132275.swc
+2019-04-02 15:47:43 2078 INFO: Processing 648349587: OUT_swc/morphology_data/human/to_process/non_upright/648349587.swc
+2019-04-02 15:47:43 2079 WARNING: Cannot get normalized depth for 623132275. Using 0
+2019-04-02 15:47:44 2078 WARNING: Cannot get normalized depth for 648349587. Using 0
+2019-04-02 15:47:46 2076 INFO: Processing 648357948: OUT_swc/morphology_data/human/to_process/non_upright/648357948.swc
+2019-04-02 15:47:47 2077 INFO: Processing 648363640: OUT_swc/morphology_data/human/to_process/non_upright/648363640.swc
+2019-04-02 15:47:47 2076 WARNING: Cannot get normalized depth for 648357948. Using 0
+2019-04-02 15:47:48 2077 WARNING: Cannot get normalized depth for 648363640. Using 0
+2019-04-02 15:47:51 2078 ERROR: no specimen record found for 648349587
+2019-04-02 15:47:53 2078 INFO: Processing 648368561: OUT_swc/morphology_data/human/to_process/non_upright/648368561.swc
+2019-04-02 15:47:53 2078 WARNING: Cannot get normalized depth for 648368561. Using 0
+2019-04-02 15:47:54 2077 ERROR: no specimen record found for 648363640
+2019-04-02 15:47:55 2076 ERROR: no specimen record found for 648357948
+2019-04-02 15:47:56 2077 INFO: Processing 648376926: OUT_swc/morphology_data/human/to_process/non_upright/648376926.swc
+2019-04-02 15:47:57 2077 WARNING: Cannot get normalized depth for 648376926. Using 0
+2019-04-02 15:47:57 2076 INFO: Processing 648575464: OUT_swc/morphology_data/human/to_process/non_upright/648575464.swc
+2019-04-02 15:47:58 2076 WARNING: Cannot get normalized depth for 648575464. Using 0
+2019-04-02 15:47:59 2078 ERROR: no specimen record found for 648368561
+2019-04-02 15:48:00 2078 INFO: Processing 648592807: OUT_swc/morphology_data/human/to_process/non_upright/648592807.swc
+2019-04-02 15:48:01 2078 WARNING: Cannot get normalized depth for 648592807. Using 0
+2019-04-02 15:48:03 2077 ERROR: no specimen record found for 648376926
+2019-04-02 15:48:04 2077 INFO: Processing 648606306: OUT_swc/morphology_data/human/to_process/non_upright/648606306.swc
+2019-04-02 15:48:04 2079 ERROR: no specimen record found for 623132275
+2019-04-02 15:48:05 2077 WARNING: Cannot get normalized depth for 648606306. Using 0
+2019-04-02 15:48:05 2076 ERROR: no specimen record found for 648575464
+2019-04-02 15:48:07 2076 INFO: Processing 648609532: OUT_swc/morphology_data/human/to_process/non_upright/648609532.swc
+2019-04-02 15:48:08 2076 WARNING: Cannot get normalized depth for 648609532. Using 0
+2019-04-02 15:48:08 2078 ERROR: no specimen record found for 648592807
+2019-04-02 15:48:09 2079 INFO: Processing 648617971: OUT_swc/morphology_data/human/to_process/non_upright/648617971.swc
+2019-04-02 15:48:10 2078 INFO: Processing 648621553: OUT_swc/morphology_data/human/to_process/non_upright/648621553.swc
+2019-04-02 15:48:10 2079 WARNING: Cannot get normalized depth for 648617971. Using 0
+2019-04-02 15:48:10 2077 ERROR: no specimen record found for 648606306
+2019-04-02 15:48:11 2078 WARNING: Cannot get normalized depth for 648621553. Using 0
+2019-04-02 15:48:12 2077 INFO: Processing 648870914: OUT_swc/morphology_data/human/to_process/non_upright/648870914.swc
+2019-04-02 15:48:12 2076 ERROR: no specimen record found for 648609532
+2019-04-02 15:48:13 2077 WARNING: Cannot get normalized depth for 648870914. Using 0
+2019-04-02 15:48:14 2076 INFO: Processing 648931407: OUT_swc/morphology_data/human/to_process/non_upright/648931407.swc
+2019-04-02 15:48:15 2076 WARNING: Cannot get normalized depth for 648931407. Using 0
+2019-04-02 15:48:16 2079 ERROR: no specimen record found for 648617971
+2019-04-02 15:48:18 2079 INFO: Processing 652079547: OUT_swc/morphology_data/human/to_process/non_upright/652079547.swc
+2019-04-02 15:48:18 2078 ERROR: no specimen record found for 648621553
+2019-04-02 15:48:19 2079 WARNING: Cannot get normalized depth for 652079547. Using 0
+2019-04-02 15:48:20 2078 INFO: Processing 652080861: OUT_swc/morphology_data/human/to_process/non_upright/652080861.swc
+2019-04-02 15:48:21 2077 ERROR: no specimen record found for 648870914
+2019-04-02 15:48:21 2078 WARNING: Cannot get normalized depth for 652080861. Using 0
+2019-04-02 15:48:23 2076 ERROR: no specimen record found for 648931407
+2019-04-02 15:48:23 2077 INFO: Processing 652085118: OUT_swc/morphology_data/human/to_process/non_upright/652085118.swc
+2019-04-02 15:48:24 2077 WARNING: Cannot get normalized depth for 652085118. Using 0
+2019-04-02 15:48:26 2076 INFO: Processing 652309488: OUT_swc/morphology_data/human/to_process/non_upright/652309488.swc
+2019-04-02 15:48:26 2076 WARNING: Cannot get normalized depth for 652309488. Using 0
+2019-04-02 15:48:27 2079 ERROR: no specimen record found for 652079547
+2019-04-02 15:48:29 2078 ERROR: no specimen record found for 652080861
+2019-04-02 15:48:30 2079 INFO: Processing 652312846: OUT_swc/morphology_data/human/to_process/non_upright/652312846.swc
+2019-04-02 15:48:30 2077 ERROR: no specimen record found for 652085118
+2019-04-02 15:48:31 2079 WARNING: Cannot get normalized depth for 652312846. Using 0
+2019-04-02 15:48:31 2078 INFO: Processing 653197469: OUT_swc/morphology_data/human/to_process/non_upright/653197469.swc
+2019-04-02 15:48:32 2078 WARNING: Cannot get normalized depth for 653197469. Using 0
+2019-04-02 15:48:32 2077 INFO: Processing 653198382: OUT_swc/morphology_data/human/to_process/non_upright/653198382.swc
+2019-04-02 15:48:33 2077 WARNING: Cannot get normalized depth for 653198382. Using 0
+2019-04-02 15:48:34 2076 ERROR: no specimen record found for 652309488
+2019-04-02 15:48:36 2076 INFO: Processing 653198853: OUT_swc/morphology_data/human/to_process/non_upright/653198853.swc
+2019-04-02 15:48:37 2078 ERROR: no specimen record found for 653197469
+2019-04-02 15:48:38 2079 ERROR: no specimen record found for 652312846
+2019-04-02 15:48:38 2076 WARNING: Cannot get normalized depth for 653198853. Using 0
+2019-04-02 15:48:39 2078 INFO: Processing 653199449: OUT_swc/morphology_data/human/to_process/non_upright/653199449.swc
+2019-04-02 15:48:39 2078 WARNING: Cannot get normalized depth for 653199449. Using 0
+2019-04-02 15:48:40 2077 ERROR: no specimen record found for 653198382
+2019-04-02 15:48:41 2079 INFO: Processing 653200035: OUT_swc/morphology_data/human/to_process/non_upright/653200035.swc
+2019-04-02 15:48:42 2079 WARNING: Cannot get normalized depth for 653200035. Using 0
+2019-04-02 15:48:42 2077 INFO: Processing 656151421: OUT_swc/morphology_data/human/to_process/non_upright/656151421.swc
+2019-04-02 15:48:44 2077 WARNING: Cannot get normalized depth for 656151421. Using 0
+2019-04-02 15:48:45 2078 ERROR: no specimen record found for 653199449
+2019-04-02 15:48:47 2078 INFO: Processing 656151434: OUT_swc/morphology_data/human/to_process/non_upright/656151434.swc
+2019-04-02 15:48:48 2078 WARNING: Cannot get normalized depth for 656151434. Using 0
+2019-04-02 15:48:49 2079 ERROR: no specimen record found for 653200035
+2019-04-02 15:48:51 2079 INFO: Processing 676271847: OUT_swc/morphology_data/human/to_process/non_upright/676271847.swc
+2019-04-02 15:48:53 2079 WARNING: Cannot get normalized depth for 676271847. Using 0
+2019-04-02 15:48:55 2076 ERROR: no specimen record found for 653198853
+2019-04-02 15:48:57 2078 ERROR: no specimen record found for 656151434
+2019-04-02 15:48:59 2076 INFO: Processing 688734408: OUT_swc/morphology_data/human/to_process/non_upright/688734408.swc
+2019-04-02 15:49:00 2078 INFO: Processing 767043837: OUT_swc/morphology_data/human/to_process/non_upright/767043837.swc
+2019-04-02 15:49:00 2076 WARNING: Cannot get normalized depth for 688734408. Using 0
+2019-04-02 15:49:01 2078 WARNING: Cannot get normalized depth for 767043837. Using 0
+2019-04-02 15:49:02 2077 ERROR: no specimen record found for 656151421
+2019-04-02 15:49:03 2079 ERROR: no specimen record found for 676271847
+2019-04-02 15:49:06 2079 INFO: Processing 767105103: OUT_swc/morphology_data/human/to_process/non_upright/767105103.swc
+2019-04-02 15:49:07 2076 ERROR: no specimen record found for 688734408
+2019-04-02 15:49:07 2079 WARNING: Cannot get normalized depth for 767105103. Using 0
+2019-04-02 15:49:08 2077 INFO: Processing 767155928: OUT_swc/morphology_data/human/to_process/non_upright/767155928.swc
+2019-04-02 15:49:08 2078 ERROR: no specimen record found for 767043837
+2019-04-02 15:49:08 2077 WARNING: Cannot get normalized depth for 767155928. Using 0
+2019-04-02 15:49:10 2076 INFO: Processing 767196903: OUT_swc/morphology_data/human/to_process/non_upright/767196903.swc
+2019-04-02 15:49:10 2076 WARNING: Cannot get normalized depth for 767196903. Using 0
+2019-04-02 15:49:11 2078 INFO: Processing 767242535: OUT_swc/morphology_data/human/to_process/non_upright/767242535.swc
+2019-04-02 15:49:12 2078 WARNING: Cannot get normalized depth for 767242535. Using 0
+2019-04-02 15:49:14 2079 ERROR: no specimen record found for 767105103
+2019-04-02 15:49:16 2079 INFO: Processing 767277152: OUT_swc/morphology_data/human/to_process/non_upright/767277152.swc
+2019-04-02 15:49:16 2077 ERROR: no specimen record found for 767155928
+2019-04-02 15:49:17 2079 WARNING: Cannot get normalized depth for 767277152. Using 0
+2019-04-02 15:49:18 2077 INFO: Processing 767396338: OUT_swc/morphology_data/human/to_process/non_upright/767396338.swc
+2019-04-02 15:49:18 2076 ERROR: no specimen record found for 767196903
+2019-04-02 15:49:19 2077 WARNING: Cannot get normalized depth for 767396338. Using 0
+2019-04-02 15:49:20 2076 INFO: Processing 767412044: OUT_swc/morphology_data/human/to_process/non_upright/767412044.swc
+2019-04-02 15:49:21 2076 WARNING: Cannot get normalized depth for 767412044. Using 0
+2019-04-02 15:49:21 2078 ERROR: no specimen record found for 767242535
+2019-04-02 15:49:23 2078 INFO: Processing 767418838: OUT_swc/morphology_data/human/to_process/non_upright/767418838.swc
+2019-04-02 15:49:23 2077 ERROR: no specimen record found for 767396338
+2019-04-02 15:49:23 2079 ERROR: no specimen record found for 767277152
+2019-04-02 15:49:23 2078 WARNING: Cannot get normalized depth for 767418838. Using 0
+2019-04-02 15:49:24 2077 INFO: Processing 767421681: OUT_swc/morphology_data/human/to_process/non_upright/767421681.swc
+2019-04-02 15:49:25 2079 INFO: Processing 768147241: OUT_swc/morphology_data/human/to_process/non_upright/768147241.swc
+2019-04-02 15:49:25 2077 WARNING: Cannot get normalized depth for 767421681. Using 0
+2019-04-02 15:49:25 2076 ERROR: no specimen record found for 767412044
+2019-04-02 15:49:26 2079 WARNING: Cannot get normalized depth for 768147241. Using 0
+2019-04-02 15:49:26 2078 ERROR: no specimen record found for 767418838
+2019-04-02 15:49:27 2078 INFO: Processing 768182562: OUT_swc/morphology_data/human/to_process/non_upright/768182562.swc
+2019-04-02 15:49:27 2076 INFO: Processing 783659362: OUT_swc/morphology_data/human/to_process/non_upright/783659362.swc
+2019-04-02 15:49:28 2076 WARNING: Cannot get normalized depth for 783659362. Using 0
+2019-04-02 15:49:28 2078 WARNING: Cannot get normalized depth for 768182562. Using 0
+2019-04-02 15:49:33 2076 ERROR: no specimen record found for 783659362
+2019-04-02 15:49:33 2079 ERROR: no specimen record found for 768147241
+2019-04-02 15:49:34 2077 ERROR: no specimen record found for 767421681
+2019-04-02 15:49:34 2076 INFO: Processing 784179171: OUT_swc/morphology_data/human/to_process/non_upright/784179171.swc
+2019-04-02 15:49:35 2076 WARNING: Cannot get normalized depth for 784179171. Using 0
+2019-04-02 15:49:35 2079 INFO: Processing 784186399: OUT_swc/morphology_data/human/to_process/non_upright/784186399.swc
+2019-04-02 15:49:36 2079 WARNING: Cannot get normalized depth for 784186399. Using 0
+2019-04-02 15:49:37 2078 ERROR: no specimen record found for 768182562
+2019-04-02 15:49:37 2077 INFO: Processing 784254653: OUT_swc/morphology_data/human/to_process/non_upright/784254653.swc
+2019-04-02 15:49:37 2077 WARNING: Cannot get normalized depth for 784254653. Using 0
+2019-04-02 15:49:39 2078 INFO: Processing 784254854: OUT_swc/morphology_data/human/to_process/non_upright/784254854.swc
+2019-04-02 15:49:40 2078 WARNING: Cannot get normalized depth for 784254854. Using 0
+2019-04-02 15:49:40 2079 ERROR: no specimen record found for 784186399
+2019-04-02 15:49:41 2077 ERROR: no specimen record found for 784254653
+2019-04-02 15:49:41 2079 INFO: Processing 784286281: OUT_swc/morphology_data/human/to_process/non_upright/784286281.swc
+2019-04-02 15:49:42 2079 WARNING: Cannot get normalized depth for 784286281. Using 0
+2019-04-02 15:49:42 2077 INFO: Processing 784315885: OUT_swc/morphology_data/human/to_process/non_upright/784315885.swc
+2019-04-02 15:49:43 2076 ERROR: no specimen record found for 784179171
+2019-04-02 15:49:43 2077 WARNING: Cannot get normalized depth for 784315885. Using 0
+2019-04-02 15:49:45 2076 INFO: Processing 784324488: OUT_swc/morphology_data/human/to_process/non_upright/784324488.swc
+2019-04-02 15:49:46 2076 WARNING: Cannot get normalized depth for 784324488. Using 0
+2019-04-02 15:49:47 2078 ERROR: no specimen record found for 784254854
+2019-04-02 15:49:49 2079 ERROR: no specimen record found for 784286281
+2019-04-02 15:49:49 2078 INFO: Processing 784345251: OUT_swc/morphology_data/human/to_process/non_upright/784345251.swc
+2019-04-02 15:49:50 2078 WARNING: Cannot get normalized depth for 784345251. Using 0
+2019-04-02 15:49:51 2076 ERROR: no specimen record found for 784324488
+2019-04-02 15:49:51 2079 INFO: Processing 784373410: OUT_swc/morphology_data/human/to_process/non_upright/784373410.swc
+2019-04-02 15:49:52 2079 WARNING: Cannot get normalized depth for 784373410. Using 0
+2019-04-02 15:49:52 2076 INFO: Processing 784380873: OUT_swc/morphology_data/human/to_process/non_upright/784380873.swc
+2019-04-02 15:49:53 2077 ERROR: no specimen record found for 784315885
+2019-04-02 15:49:53 2076 WARNING: Cannot get normalized depth for 784380873. Using 0
+2019-04-02 15:49:56 2077 INFO: Processing 784388179: OUT_swc/morphology_data/human/to_process/non_upright/784388179.swc
+2019-04-02 15:49:56 2077 WARNING: Cannot get normalized depth for 784388179. Using 0
+2019-04-02 15:49:57 2078 ERROR: no specimen record found for 784345251
+2019-04-02 15:49:57 2076 ERROR: no specimen record found for 784380873
+2019-04-02 15:49:57 2079 ERROR: no specimen record found for 784373410
+2019-04-02 15:49:59 2076 INFO: Processing 784394675: OUT_swc/morphology_data/human/to_process/non_upright/784394675.swc
+2019-04-02 15:49:59 2078 INFO: Processing 784407705: OUT_swc/morphology_data/human/to_process/non_upright/784407705.swc
+2019-04-02 15:49:59 2078 WARNING: Cannot get normalized depth for 784407705. Using 0
+2019-04-02 15:49:59 2076 WARNING: Cannot get normalized depth for 784394675. Using 0
+2019-04-02 15:49:59 2079 INFO: Processing 784424542: OUT_swc/morphology_data/human/to_process/non_upright/784424542.swc
+2019-04-02 15:49:59 2079 WARNING: Cannot get normalized depth for 784424542. Using 0
+2019-04-02 15:50:01 2077 ERROR: no specimen record found for 784388179
+2019-04-02 15:50:02 2077 INFO: Processing 785402862: OUT_swc/morphology_data/human/to_process/non_upright/785402862.swc
+2019-04-02 15:50:02 2079 ERROR: no specimen record found for 784424542
+2019-04-02 15:50:03 2077 WARNING: Cannot get normalized depth for 785402862. Using 0
+2019-04-02 15:50:03 2079 INFO: Processing 785402927: OUT_swc/morphology_data/human/to_process/non_upright/785402927.swc
+2019-04-02 15:50:03 2078 ERROR: no specimen record found for 784407705
+2019-04-02 15:50:03 2076 ERROR: no specimen record found for 784394675
+2019-04-02 15:50:04 2078 INFO: Processing 785403247: OUT_swc/morphology_data/human/to_process/non_upright/785403247.swc
+2019-04-02 15:50:04 2076 INFO: Processing 785404932: OUT_swc/morphology_data/human/to_process/non_upright/785404932.swc
+2019-04-02 15:50:04 2079 WARNING: Cannot get normalized depth for 785402927. Using 0
+2019-04-02 15:50:05 2078 WARNING: Cannot get normalized depth for 785403247. Using 0
+2019-04-02 15:50:06 2076 WARNING: Cannot get normalized depth for 785404932. Using 0
+2019-04-02 15:50:11 2078 ERROR: no specimen record found for 785403247
+2019-04-02 15:50:12 2077 ERROR: no specimen record found for 785402862
+2019-04-02 15:50:13 2078 INFO: Processing 785405081: OUT_swc/morphology_data/human/to_process/non_upright/785405081.swc
+2019-04-02 15:50:14 2077 INFO: Processing 785405127: OUT_swc/morphology_data/human/to_process/non_upright/785405127.swc
+2019-04-02 15:50:14 2078 WARNING: Cannot get normalized depth for 785405081. Using 0
+2019-04-02 15:50:15 2077 WARNING: Cannot get normalized depth for 785405127. Using 0
+2019-04-02 15:50:17 2079 ERROR: no specimen record found for 785402927
+2019-04-02 15:50:21 2079 INFO: Processing 785472944: OUT_swc/morphology_data/human/to_process/non_upright/785472944.swc
+2019-04-02 15:50:21 2076 ERROR: no specimen record found for 785404932
+2019-04-02 15:50:22 2079 WARNING: Cannot get normalized depth for 785472944. Using 0
+2019-04-02 15:50:23 2078 ERROR: no specimen record found for 785405081
+2019-04-02 15:50:26 2076 INFO: Processing 785473956: OUT_swc/morphology_data/human/to_process/non_upright/785473956.swc
+2019-04-02 15:50:26 2077 ERROR: no specimen record found for 785405127
+2019-04-02 15:50:26 2078 INFO: Processing 785474710: OUT_swc/morphology_data/human/to_process/non_upright/785474710.swc
+2019-04-02 15:50:26 2076 WARNING: Cannot get normalized depth for 785473956. Using 0
+2019-04-02 15:50:27 2078 WARNING: Cannot get normalized depth for 785474710. Using 0
+2019-04-02 15:50:28 2079 ERROR: no specimen record found for 785472944
+2019-04-02 15:50:29 2077 INFO: Processing 785475565: OUT_swc/morphology_data/human/to_process/non_upright/785475565.swc
+2019-04-02 15:50:30 2077 WARNING: Cannot get normalized depth for 785475565. Using 0
+2019-04-02 15:50:30 2079 INFO: Processing 785476371: OUT_swc/morphology_data/human/to_process/non_upright/785476371.swc
+2019-04-02 15:50:31 2079 WARNING: Cannot get normalized depth for 785476371. Using 0
+2019-04-02 15:50:33 2076 ERROR: no specimen record found for 785473956
+2019-04-02 15:50:34 2076 INFO: Processing 785498678: OUT_swc/morphology_data/human/to_process/non_upright/785498678.swc
+2019-04-02 15:50:35 2076 WARNING: Cannot get normalized depth for 785498678. Using 0
+2019-04-02 15:50:35 2078 ERROR: no specimen record found for 785474710
+2019-04-02 15:50:37 2078 INFO: Processing 785504224: OUT_swc/morphology_data/human/to_process/non_upright/785504224.swc
+2019-04-02 15:50:37 2079 ERROR: no specimen record found for 785476371
+2019-04-02 15:50:38 2078 WARNING: Cannot get normalized depth for 785504224. Using 0
+2019-04-02 15:50:39 2077 ERROR: no specimen record found for 785475565
+2019-04-02 15:50:39 2079 INFO: Processing 785520801: OUT_swc/morphology_data/human/to_process/non_upright/785520801.swc
+2019-04-02 15:50:40 2079 WARNING: Cannot get normalized depth for 785520801. Using 0
+2019-04-02 15:50:40 2076 ERROR: no specimen record found for 785498678
+2019-04-02 15:50:42 2077 INFO: Processing 785524861: OUT_swc/morphology_data/human/to_process/non_upright/785524861.swc
+2019-04-02 15:50:42 2076 INFO: Processing 787217020: OUT_swc/morphology_data/human/to_process/non_upright/787217020.swc
+2019-04-02 15:50:42 2077 WARNING: Cannot get normalized depth for 785524861. Using 0
+2019-04-02 15:50:43 2079 ERROR: no specimen record found for 785520801
+2019-04-02 15:50:43 2076 WARNING: Cannot get normalized depth for 787217020. Using 0
+2019-04-02 15:50:44 2079 INFO: Processing 787220829: OUT_swc/morphology_data/human/to_process/non_upright/787220829.swc
+2019-04-02 15:50:44 2078 ERROR: no specimen record found for 785504224
+2019-04-02 15:50:45 2079 WARNING: Cannot get normalized depth for 787220829. Using 0
+2019-04-02 15:50:46 2078 INFO: Processing 787225969: OUT_swc/morphology_data/human/to_process/non_upright/787225969.swc
+2019-04-02 15:50:46 2078 WARNING: Cannot get normalized depth for 787225969. Using 0
+2019-04-02 15:50:47 2077 ERROR: no specimen record found for 785524861
+2019-04-02 15:50:51 2079 ERROR: no specimen record found for 787220829
+2019-04-02 15:50:52 2076 ERROR: no specimen record found for 787217020
+2019-04-02 15:50:53 2078 ERROR: no specimen record found for 787225969

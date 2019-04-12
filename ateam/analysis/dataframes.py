@@ -51,11 +51,11 @@ def trend_from_df(df, xvar, yvar, dropna=True):
     return x, y
 
 def threshold(x, y, n_repeats=5):
-    error_out = {'thresh-min': np.nan, 'thresh-mean': np.nan}
+    error_out = {'min': np.nan, 'mean': np.nan}
     if len(y)<n_repeats:
         return error_out
-    x_mins = np.partition(x, n_repeats)[:n_repeats]
-    return {'thresh-min': np.min(x_mins), 'thresh-mean': np.mean(x_mins)}
+    x_mins = np.partition(x, n_repeats-1)[:n_repeats]
+    return {'min': np.min(x_mins), 'mean': np.mean(x_mins)}
     
 def linfit(x, y):
     error_out = {'slope':np.nan, 'yint':np.nan, 'xint':np.nan, 'error':np.nan}

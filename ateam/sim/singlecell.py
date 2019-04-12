@@ -107,6 +107,7 @@ def copy_sim_for_hof(sm, cell_id, hof_id, folder, overwrite=False, level='folder
     sm_mod = sm.save_copy(folder, overwrite)
     if sm_mod:
         node_props = {
+                    'cell_id': cell_id,
                     'cell_name': "{}_hof_{}".format(cell_id, hof_id),
                     'morphology': '{}.swc'.format(cell_id),
                     'dynamics_params': get_hof_params_path(cell_id, hof_id)

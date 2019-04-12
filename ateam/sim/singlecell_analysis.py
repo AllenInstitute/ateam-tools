@@ -20,19 +20,23 @@ def fit_path(base_path, cells_list=None):
     cells_fit_df = dfa.flatten_columns(cells_fit_df).reset_index(level="target_sections")
     return cells_fit_df
 
-def fit_df_all(cell, base_path, extra=None):
-    psp = fit_df_psp(cell, base_path)
-    rate = fit_df_rate(cell, base_path, extra=extra)
+def fit_df_all(cell, base_path, extra=None, hof_id=""):
+    # TODO: clean up inclusion of extra field
+    psp = fit_df_psp(cell, base_path, extra=extra, hof_id=hof_id)
+    rate = fit_df_rate(cell, base_path, hof_id=hof_id)
     if psp is None and rate is None:
         return None
-    fit_df = pd.concat([psp, rate], axis=1, sort=False)
+    fit_df = pd.concat([psp, rate], axis=1, sort=True)
     fit_df.index.name = "target_sections"
     return fit_df
 
-def fit_df_rate(cell, base_path, extra=None):
+def fit_df_rate(cell, base_path, hof_id="", extra=None):
     try:
-        df = extract_rates_data( config_path(base_path, cell, "rate") )
-    except IOError:
+        df = extract_rates_data( config_path(base_path, cell, "rate", hof_id=hof_id) )
+    except Exception as e:
+        print('Caught exception in cell (x = {}):'.format(cell)) 
+        # traceback.print_exc()
+        print(e)
         return None
     
     compare = "target_sections"
@@ -47,13 +51,16 @@ def fit_df_rate(cell, base_path, extra=None):
     
     fit_df = pd.concat([fit_df], axis=1, keys=[yvar], names=['prop'])
     if extra:
-        fit_df = pd.concat([fit_df, grouped_df[extra].agg(dfa.summary)], axis=1)
+        fit_df = pd.concat([grouped_df[extra].agg(dfa.summary), fit_df], axis=1, sort=True)
     return fit_df
 
-def fit_df_psp(cell, base_path):
+def fit_df_psp(cell, base_path, hof_id="", extra=None):
     try:
-        df = extract_psp_data( config_path(base_path, cell, "psp") )
-    except IOError:
+        df = extract_psp_data( config_path(base_path, cell, "psp", hof_id=hof_id) )
+    except Exception as e:
+        print('Caught exception in cell (x = {}):'.format(cell)) 
+        # traceback.print_exc()
+        print(e)
         return None
     
     compare = "target_sections"
@@ -61,11 +68,13 @@ def fit_df_psp(cell, base_path):
     ylist = ['amp','delay','area']
     grouped_df = df.groupby([compare])
     
-    functions = [dfa.linfit, dfa.threshold]
+    functions = [dfa.linfit]
     fit_list = [grouped_df.apply(dfa.combine_functions_hierarchical(xvar, yvar, functions, dropna=True)) 
                for yvar in ylist]
     
     fit_df = pd.concat(fit_list, axis=1, keys=ylist, names=['prop'])
+    if extra:
+        fit_df = pd.concat([grouped_df[extra].agg(dfa.summary), fit_df], axis=1, sort=True)
     return fit_df
 
 def extract_rates_data(config_path):

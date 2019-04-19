@@ -8,8 +8,11 @@ setup(
     install_requires=[
         'pandas',
         'numpy',
-        'bmtk[bionet]'
+        'matplotlib'
     ],
+    extras_require={
+        'sim': ['bmtk[bionet]']
+    },
     packages=find_packages(),
     entry_points={
         'console_scripts':[

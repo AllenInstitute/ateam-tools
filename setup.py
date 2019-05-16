@@ -16,7 +16,7 @@ setup(
     extras_require={
         'sim': ['bmtk[bionet]'],
         'brainstim': ['neuroanalysis', 'multipatch_analysis', 'pycircstat'],
-        'lims':['sqlalchemy']
+        'lims':['sqlalchemy', 'psycopg2']
     },
     dependency_links=[
         'git+https://github.com/aiephys/neuroanalysis.git#egg=neuroanalysis',

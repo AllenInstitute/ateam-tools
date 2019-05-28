@@ -2,7 +2,7 @@ import json
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import burst as brst
+import ateam.analysis.ephys_features.burst as brst
 
 
 def convert_keys_to_string(dictionary):

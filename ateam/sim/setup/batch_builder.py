@@ -57,7 +57,7 @@ def build_props_combinatorial(props_base=None, n_duplicates=1, linked_dicts=None
              prop_array = np.array(vals)
              props[prop] = np.repeat(prop_array[indices[i].flat], n_duplicates)
 
-    props['N'] = n_duplicates*np.prod(props_index_shape)
+    props['N'] = int(n_duplicates*np.prod(props_index_shape))
     return props
 
 def build_batch_node_props(node_props_base, n_duplicates=1, net_name='batch', linked_dicts=None, **vary_props):
@@ -113,7 +113,7 @@ def split_dict_lists(full_dict):
 
 
 def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1, \
-                    net_name='batch', linked_dicts=None,use_abs_paths=False):
+                    net_name='batch', linked_dicts=None,use_abs_paths=False, coordinate_props= None):
     node_props_base, node_props_vary = split_dict_lists(node_props)
     edge_props_base, edge_props_vary = split_dict_lists(edge_props)
     input_props_base, input_props_vary = split_dict_lists(input_props)
@@ -128,8 +128,29 @@ def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1, \
     # Attach all props to the nodes just for record-keeping
     net = NetworkBuilder(net_name)
     node_props.update(all_props)
-    net.add_nodes(N=N, **node_props)
-    sm.add_network(net)
+    
+    if coordinate_props:
+        
+        temp_props = node_props.copy()
+        for temp_props_key,temp_props_val in temp_props.items():
+            if temp_props_key in node_props_vary:
+                temp_props.pop(temp_props_key,None)
+        for jj in range(N):
+            
+            temp_props.update({'x' : [coordinate_props['x'][jj]],
+                               'y' : [coordinate_props['y'][jj]],
+                               'z' : [coordinate_props['z'][jj]]})
+            net.add_nodes(**temp_props)
+#        else:
+#            node_props.update({'x' : coordinate_props['x'],
+#                               'y' : coordinate_props['y'],
+#                               'z' : coordinate_props['z']})
+#            net.add_nodes(N=N, **node_props)
+    else:
+        net.add_nodes(N=N, **node_props)
+    
+    sm.add_network(net) 
+
 
     # For input props, combine base and varying
     input_props.update( (key, all_props[key]) for key in input_props_vary.keys() )
@@ -137,10 +158,16 @@ def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1, \
     spike_times = input_props.pop('spike_times', None)
     input_net = build_input_net_simple(N=N, **input_props)
     sm.add_network(input_net)
+    
+    if 'num_input' in input_props:
+        num_input = input_props.get('num_input',1)
+        input_props.pop('num_input', None)
+    
     if rates is not None:
-        if 'num_input' in input_props:
-            num_input = input_props.pop('num_input')
+        try:
             rates = np.kron(np.ones(num_input),rates)
+        except:
+            print('Synapses are synchronous')
         sm.write_spikeinput_poisson(input_net.name, rates, use_abs_paths=use_abs_paths,**input_props)
     
     if spike_times is not None:
@@ -159,9 +186,11 @@ def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1, \
     for key, values in edge_props_vary.items():
         prop_dict = dict(zip(node_ids, values))
         cm.add_properties(key, rule=lookup_by_target, rule_params={'prop_dict': prop_dict}, dtypes=values.dtype)
+    
     net.build()
+    
     sm.save_network_files(use_abs_paths=use_abs_paths)
-    return net
+    return net,input_net
 
 def read_node_props_batch(net_folder_path):
     # simple single-pop network, no need for fancy

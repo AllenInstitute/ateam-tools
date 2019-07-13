@@ -36,12 +36,13 @@ class SimManager(object):
         self._edges_dict = defaultdict(list)
         self.load_networks(import_nodes=import_nodes)
 
-    @classmethod
-    def from_template(cls, config_template, config_file="config.json", sim_folder=None, config_path=None, overwrite=False):
+    @staticmethod
+    def from_template(config_template, config_file="config.json", sim_folder=None, config_path=None, overwrite=False):
         """
         Create a SimManager from template config file in a new simulation folder.
         Creates folder if it doesn't exist.
         """
+        # TODO: clean up template loading (fewer options, configclass?)
         if config_path:
             config_path = os.path.expandvars(os.path.expanduser(config_path))
             sim_folder = os.path.dirname(config_path)
@@ -58,12 +59,19 @@ class SimManager(object):
         else:
             Warning("Config file already exists: loading config without template.")
 
-        return cls(config_path)
+        sm = SimManager(config_path)
+        if overwrite:
+            sm.clear_output()
+        return sm
 
-    
     @property
     def config_path(self):
         return self.config.path
+
+    @property
+    def network_dir(self):
+        # TODO: integrate with manifest!
+        return "networks"
 
     @property
     def network_builders(self):
@@ -83,6 +91,13 @@ class SimManager(object):
         # return itertools.chain(*self.files_dict.values())
         raise NotImplementedError()
 
+    def default_network(self):
+        if len(self.networks)==0:
+            raise Exception("No networks found for this simulation.")
+        if len(self.networks)==1:
+            return self.networks[0]
+        raise NotImplementedError()
+        
     def new_network(self, net_name):
         net = buildnet.NetworkBuilder(net_name)
         self.add_network(net)
@@ -98,10 +113,10 @@ class SimManager(object):
 
     def clear_output(self):
         out_dir = os.path.join(self.sim_folder, "output")
-        shutil.rmtree(out_dir)
+        shutil.rmtree(out_dir, ignore_errors=True)
 
-    def save_network_files(self, net_folder_name='', use_abs_paths=False):
-        net_path = self.abspath(net_folder_name)
+    def save_network_files(self, use_abs_paths=False):
+        net_path = self.abspath(self.network_dir)
         if use_abs_paths:
             trim_path = lambda path: path
         else:
@@ -130,7 +145,7 @@ class SimManager(object):
         folder_path = folder_path or self.sim_folder
         raise NotImplementedError()
 
-    def save_copy(self, folder_path, overwrite=False):
+    def save_copy(self, folder_path, overwrite=False, level='folder'):
         """Save a copy of the current sim folder contents to a new directory.
         Remove the output directory from the new folder."""
         if os.path.exists(folder_path):
@@ -139,9 +154,20 @@ class SimManager(object):
             else:
                 Warning("Folder exists; aborting.")
                 return
-        shutil.copytree(self.sim_folder, folder_path)
-        config_name = os.path.basename(self.config_path)
-        sm = SimManager(config_name, sim_folder=folder_path)
+
+        # TODO: could use shutil.ignore_patterns here
+        # also change relative to absolute paths as needed.
+        if level=='folder':
+            shutil.copytree(self.sim_folder, folder_path)
+        elif level=='network':
+            os.makedirs(folder_path)
+            shutil.copy2(self.config_path, folder_path)
+            shutil.copytree(self.abspath(self.network_dir), os.path.join(folder_path, self.network_dir))
+        elif level=='complete':
+            self.save_complete(folder_path)
+
+        new_config = os.path.join(folder_path, os.path.basename(self.config_path))
+        sm = SimManager(new_config)
         sm.clear_output()
         return sm
 
@@ -226,12 +252,12 @@ class SimManager(object):
         All cells are assigned the same spike times."""
         spikes = SpikeInput(self._networks_active[net_name].nodes())
         spikes.set_times_all(times)
+        spikes.save_csv(self.abspath(spike_file_name))
         if use_abs_paths:
-            spike_file = os.path(spike_file_name)
-        else:    
             spike_file = self.abspath(spike_file_name)
-        spikes.save_csv(spike_file)
-        self.add_spike_input(spike_file_name, net_name)
+        else:    
+            spike_file = spike_file_name
+        self.add_spike_input(spike_file, net_name)
 
     def write_spikeinput_poisson(self, net_name, rate, tstart = 0, tstop=2000,\
                                  spike_file_name='spike_input.h5',use_abs_paths=False):
@@ -284,17 +310,23 @@ class SimManager(object):
             'file_name': file_name or '{name}.h5'.format(name=name),
             'sections': sections
             }}
+        
+        # use kwargs to include distance specifier for recording segments by location
         reports[name].update(**kwargs)
         self.config.update_nested(reports=reports)
         self.config.save()
         
     def nodes_file(self, net):
         # TODO: check net in networks first?
-        return self.abspath("{}_nodes.h5".format(net))
+        # return self.abspath("{}_nodes.h5".format(net))
+        path = self._nodes_dict[net]["nodes_file"]
+        return self.abspath(path)
         
     def node_types_file(self, net):
         # TODO: check net in networks first?
-        return self.abspath("{}_node_types.csv".format(net))
+        # return self.abspath("{}_node_types.csv".format(net))
+        path = self._nodes_dict[net]["node_types_file"]
+        return self.abspath(path)
 
     @property
     def spikes_file(self):
@@ -355,3 +387,20 @@ def update_csv(csv_path, props):
         writer = csv.DictWriter(csvfile, fieldnames=rows[0].keys(), delimiter=' ')
         writer.writeheader()
         writer.writerows(rows)
+
+def create_singlecell_default(cell_id, sim_folder, sim_time=500, active=True, node_dict={}, config_dict={}, config_template=None):
+    import ateam.sim.setup.default_props as defaults
+    network = 'single'
+    config_template = config_template or "/allen/aibs/mat/tmchartrand/bmtk_networks/biophys_components_shared/default_config.json"
+
+    sm = SimManager.from_template(config_template=config_template, overwrite=True, sim_folder=sim_folder)
+
+    node_props = defaults.cellprops_active(cell_id) if active else defaults.cellprops_peri(cell_id)
+    node_props.update(node_dict)
+    net = sm.new_network(network)
+    net.add_nodes(N=1, **node_props)
+
+    sm.sim_time = sim_time
+    sm.config.update_nested(config_dict)
+    sm.save_network_files(use_abs_paths=True)
+    return sm

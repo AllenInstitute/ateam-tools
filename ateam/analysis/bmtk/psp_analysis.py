@@ -13,7 +13,7 @@ def epsp_analysis(report_file=None, config_file='config.json', t_min=100, t_dura
     Otherwise, include presynaptic cell and the method 
     will search for a spike starting at t_min.
     """
-    amp_min = 0.1
+    amp_min = 0.01
     amp_max = 50
     v_spike = -15
     report_file = report_file or cell_vars.get_cell_report(config_file)

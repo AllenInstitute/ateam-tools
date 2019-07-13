@@ -28,6 +28,7 @@ def build_props_combinatorial(props_base=None, n_duplicates=1, linked_dicts=None
     If props_base dict is supplied, output will be a merged dict of base props and varied props.
     """
     props = props_base.copy() if props_base else {}
+    # TODO: remove these lines, check for duplicate props
     keys_scalar = (key for key in props_indep.keys() if np.isscalar(props_indep[key]))
     props.update((key, props_indep.pop(key)) for key in keys_scalar)
 
@@ -49,7 +50,7 @@ def build_props_combinatorial(props_base=None, n_duplicates=1, linked_dicts=None
         prop_array = np.array(props_indep[prop])
         props[prop] = np.repeat(prop_array[indices[i].flat], n_duplicates)
 
-    # Add linked props - after independent, so can overwrite (would create duplicates)
+    # Add linked props - after independent, so can overwrite (not ideal, creates duplicates)
     n_props = len(props_indep)
     for j, props_linked in enumerate(linked_dicts):
         i = n_props + j
@@ -113,82 +114,80 @@ def split_dict_lists(full_dict):
 
 
 def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1, \
-                    net_name='batch', linked_dicts=None,use_abs_paths=False, coordinate_props= None):
+                net_name='batch', linked_dicts=None,use_abs_paths=False,\
+                coordinate_props= None):
     node_props_base, node_props_vary = split_dict_lists(node_props)
     edge_props_base, edge_props_vary = split_dict_lists(edge_props)
     input_props_base, input_props_vary = split_dict_lists(input_props)
 
     # TODO: check and distinguish duplicate keys between dicts
+    # TODO: specify linked as list, not as separate dict, to keep identity
     node_props_vary.update(edge_props_vary)
     node_props_vary.update(input_props_vary)
 
     all_props = build_props_combinatorial(n_duplicates=n_duplicates, linked_dicts=linked_dicts, **node_props_vary)
     N = all_props.pop('N')
-    
+
     # Attach all props to the nodes just for record-keeping
     net = NetworkBuilder(net_name)
+    # node_props.update(edge_props_base) fails from dynamics_params
+    node_props.update(input_props_base)
     node_props.update(all_props)
-    
+
     if coordinate_props:
-        
+
         temp_props = node_props.copy()
         for temp_props_key,temp_props_val in temp_props.items():
             if temp_props_key in node_props_vary:
                 temp_props.pop(temp_props_key,None)
         for jj in range(N):
-            
+
             temp_props.update({'x' : [coordinate_props['x'][jj]],
                                'y' : [coordinate_props['y'][jj]],
                                'z' : [coordinate_props['z'][jj]]})
             net.add_nodes(**temp_props)
-#        else:
-#            node_props.update({'x' : coordinate_props['x'],
-#                               'y' : coordinate_props['y'],
-#                               'z' : coordinate_props['z']})
-#            net.add_nodes(N=N, **node_props)
+
     else:
         net.add_nodes(N=N, **node_props)
-    
-    sm.add_network(net) 
+
+    sm.add_network(net)
 
 
     # For input props, combine base and varying
     input_props.update( (key, all_props[key]) for key in input_props_vary.keys() )
     rates = input_props.pop('input_rate', None)
-    spike_times = input_props.pop('spike_times', None)
+    spike_time = input_props.pop('spike_time', None)
     input_net = build_input_net_simple(N=N, **input_props)
     sm.add_network(input_net)
-    
-    if 'num_input' in input_props:
-        num_input = input_props.get('num_input',1)
-        input_props.pop('num_input', None)
-    
+
+    multiple_inputs = False
     if rates is not None:
-        try:
+        if 'num_input' in input_props:
+            multiple_inputs = True
+            num_input = input_props.pop('num_input')
             rates = np.kron(np.ones(num_input),rates)
-        except:
-            print('Synapses are synchronous')
-        sm.write_spikeinput_poisson(input_net.name, rates, use_abs_paths=use_abs_paths,**input_props)
-    
-    if spike_times is not None:
-        sm.write_spikeinput_vector(input_net.name, spike_times,use_abs_paths=use_abs_paths)
+        sm.write_spikeinput_poisson(input_net.name, rates, use_abs_paths=use_abs_paths, **input_props)
+
+    if spike_time is not None:
+        sm.write_spikeinput_vector(input_net.name, [spike_time], use_abs_paths=use_abs_paths)
 
     # For edge props, keep base and varying separate
     edge_props_vary.update( (key, all_props[key]) for key in edge_props_vary.keys() )
-    if len(input_net.nodes()) == len(net.nodes()):
-        cm = net.add_edges(source=input_net.nodes(), target=net.nodes(), iterator='paired', **edge_props_base)
-    else:
+    if multiple_inputs:
+        connections = []
         for ii in range(num_input):
-            cm = net.add_edges(source=input_net.nodes(pop_name='input_%s'%ii), 
-                               target=net.nodes(), iterator = 'paired',  **edge_props_base)
+            connections.append( net.add_edges(source=input_net.nodes(pop_name='input_%s'%ii),
+                               target=net.nodes(), iterator = 'paired',  **edge_props_base))
+    else:
+        connections = [net.add_edges(source=input_net.nodes(), target=net.nodes(), iterator='paired', **edge_props_base)]
 
     node_ids = get_node_ids(net)
-    for key, values in edge_props_vary.items():
-        prop_dict = dict(zip(node_ids, values))
-        cm.add_properties(key, rule=lookup_by_target, rule_params={'prop_dict': prop_dict}, dtypes=values.dtype)
-    
+
+    for cm in connections:
+        for key, values in edge_props_vary.items():
+            prop_dict = dict(zip(node_ids, values))
+            cm.add_properties(key, rule=lookup_by_target, rule_params={'prop_dict': prop_dict}, dtypes=values.dtype)
     net.build()
-    
     sm.save_network_files(use_abs_paths=use_abs_paths)
     return net,input_net
 

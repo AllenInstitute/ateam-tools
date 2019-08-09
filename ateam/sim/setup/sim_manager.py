@@ -386,14 +386,14 @@ def update_csv(csv_path, props):
         writer.writeheader()
         writer.writerows(rows)
 
-def create_singlecell_default(cell_id, sim_folder, sim_time=500, active=True, node_dict={}, config_dict={}, config_template=None):
+def create_singlecell_default(cell_id, sim_folder, sim_time=500, active=True, directed=True, node_dict={}, config_dict={}, config_template=None):
     import ateam.sim.setup.default_props as defaults
     network = 'single'
     config_template = config_template or "/allen/aibs/mat/tmchartrand/bmtk_networks/biophys_components_shared/default_config.json"
 
     sm = SimManager.from_template(config_template=config_template, overwrite=True, sim_folder=sim_folder)
 
-    node_props = defaults.cellprops_active(cell_id) if active else defaults.cellprops_peri(cell_id)
+    node_props = defaults.cellprops_active(cell_id, directed) if active else defaults.cellprops_peri(cell_id, directed)
     node_props.update(node_dict)
     net = sm.new_network(network)
     net.add_nodes(N=1, **node_props)

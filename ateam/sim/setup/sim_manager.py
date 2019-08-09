@@ -226,6 +226,7 @@ class SimManager(object):
             'trial': trial
             }}
         self.config.update_nested(inputs=inputs)
+        self.config.save()
     
     
     def add_current_clamp_input(self, iclamp_name, input_dict, loop_delay = 0):
@@ -244,6 +245,7 @@ class SimManager(object):
             'duration' : input_dict['duration']
             }}
         self.config.update_nested(inputs=inputs)
+        self.config.save()
     
     def write_spikeinput_vector(self, net_name, times, spike_file_name='spike_input.csv',use_abs_paths=False):
         """Write a new spikeinput file from a vector of times and add it to the config.

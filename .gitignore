@@ -7,3 +7,5 @@
 .idea/
 .cache/
 test/
+build/
+dist/

@@ -42,13 +42,18 @@ def scatterplot_fix(x=None, y=None, data=None, ypad=[], xpad=[], **kwargs):
     plt.xlim(*limits_pad(data[x], *xpad))
     plt.ylim(*limits_pad(data[y], *ypad))
 
-def plot_reg_df(x, y, data=None, color=None, **kwargs):
+def plot_reg_df(x, y, data=None, **kwargs):
+    """Plot regression against a continuous x variable.
+    Args use seaborn plotting conventions
+    """
     import statsmodels.api as sm
+    kwargs.pop('color',None)
     scatterplot_fix(x=x, y=y, data=data, ypad=(0.2, 0), **kwargs)
 
     xd = data[x]; yd = data[y]
     results = sm.OLS(yd, sm.add_constant(xd), hasconst=True).fit()
-    summary = "$R^2={:.2g}$, $p={:.2g}$".format(results.rsquared, results.pvalues[1])
+    logp = np.log(results.pvalues[1])
+    summary = "$R^2={:.2g}$, $log(p)={:.2g}$".format(results.rsquared, logp)
     xpred =  np.linspace(xd.min(), xd.max(), 50)
     ypred = results.predict(sm.add_constant(xpred))
     
@@ -58,10 +63,14 @@ def plot_reg_df(x, y, data=None, color=None, **kwargs):
     ax.text(0.5, 0.99, summary, transform=ax.transAxes,
             verticalalignment='top', horizontalalignment='center')
 
-def plot_category_df(x, y, data=None, color=None, ticks=False, **kwargs):
+def plot_category_df(x, y, data=None, ticks=False, **kwargs):
+    """Plot regression against a categorical x variable.
+    Args use seaborn plotting conventions
+    """
     from statsmodels.formula.api import ols
     results = ols('{} ~ {}'.format(y, x), data=data).fit()
-    summary = "$F={:.2g}$, $p={:.2g}$".format(results.fvalue, results.f_pvalue)
+    logp = np.log(results.f_pvalue)
+    summary = "$F={:.3g}$, $log(p)={:.3g}$".format(results.fvalue, logp)
 
     sns.stripplot(x=x, y=y, data=data, palette='muted')
     plt.ylim(*limits_pad(data[y], 0.2, 0))

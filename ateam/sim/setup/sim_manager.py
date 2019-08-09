@@ -226,6 +226,7 @@ class SimManager(object):
             'trial': trial
             }}
         self.config.update_nested(inputs=inputs)
+        self.config.save()
     
     
     def add_current_clamp_input(self, iclamp_name, input_dict, loop_delay = 0):
@@ -244,6 +245,7 @@ class SimManager(object):
             'duration' : input_dict['duration']
             }}
         self.config.update_nested(inputs=inputs)
+        self.config.save()
     
     def write_spikeinput_vector(self, net_name, times, spike_file_name='spike_input.csv',use_abs_paths=False):
         """Write a new spikeinput file from a vector of times and add it to the config.
@@ -385,3 +387,20 @@ def update_csv(csv_path, props):
         writer = csv.DictWriter(csvfile, fieldnames=rows[0].keys(), delimiter=' ')
         writer.writeheader()
         writer.writerows(rows)
+
+def create_singlecell_default(cell_id, sim_folder, sim_time=500, active=True, directed=True, node_dict={}, config_dict={}, config_template=None):
+    import ateam.sim.setup.default_props as defaults
+    network = 'single'
+    config_template = config_template or "/allen/aibs/mat/tmchartrand/bmtk_networks/biophys_components_shared/default_config.json"
+
+    sm = SimManager.from_template(config_template=config_template, overwrite=True, sim_folder=sim_folder)
+
+    node_props = defaults.cellprops_active(cell_id, directed) if active else defaults.cellprops_peri(cell_id, directed)
+    node_props.update(node_dict)
+    net = sm.new_network(network)
+    net.add_nodes(N=1, **node_props)
+
+    sm.sim_time = sim_time
+    sm.config.update_nested(config_dict)
+    sm.save_network_files(use_abs_paths=True)
+    return sm

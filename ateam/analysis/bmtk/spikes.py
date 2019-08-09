@@ -3,7 +3,7 @@ import h5py
 import warnings
 # from bmtk.analyzer.spikes_loader import load_spikes
 from bmtk.utils.spike_trains import SpikesFile
-from ateam.analysis.nodes import create_node_table
+from .nodes import create_node_table
 from ateam.sim.setup import SimManager
 import bmtk.analyzer.visualization.spikes as vs
 import matplotlib.pyplot as plt
@@ -111,7 +111,7 @@ def plot_pop_rate(ax, spike_times, spike_gids, bins=100, tlim=None, **kwargs):
     ax.set_ylim(bottom=0)
 
 def plot_spikes_rates_traces(config_file, netname, gids=None, group_key=None, exclude=[], color_dict=None, cmap='hsv', bins=100, fig=None):
-    import ateam.analysis.cell_vars as cv
+    from .cell_vars import plot_v
     sm = SimManager(config_file)
     fig = fig or plt.figure()
     nodes_df = create_node_table(sm.nodes_file(netname), sm.node_types_file(netname), group_key=group_key, exclude=exclude)
@@ -156,7 +156,7 @@ def plot_spikes_rates_traces(config_file, netname, gids=None, group_key=None, ex
     imain = 1
 
     ax = plt.subplot(gs[0])
-    cv.plot_v( config_file, gids=gids, colors=color_map)
+    plot_v( config_file, gids=gids, colors=color_map)
     ax.axis('off') 
     ax.axis(ymin=-80, ymax=50, xmin=0, xmax=sm.sim_time)
 

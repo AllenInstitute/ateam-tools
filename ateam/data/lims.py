@@ -38,6 +38,10 @@ class LimsReader(object):
         cells_df = pd.read_sql(sql, self.engine, index_col='id')
         return cells_df
 
+    def list_sweep_types(self):
+        sql = "SELECT name from ephys_stimulus_types"
+        return self.list_query(sql)
+
     def get_sweeps(self, cell_id, sweep_type, passed_only=False):
         """Get a list of sweeps for a single cell specimen, by sweep type name
         """
@@ -49,9 +53,7 @@ class LimsReader(object):
             """ % (cell_id, sweep_type)
         if passed_only:
             sql += " AND sw.workflow_state LIKE '%%passed'"
-        test = self.engine.execute(sql)
-        sweeps = [s[0] for s in test.fetchall()]
-        return sweeps
+        return self.list_query(sql)
 
     def get_sweep_info(self, cell_id, sweep_type=None):
         """Get a table of information for all sweeps of a given cell specimen
@@ -94,6 +96,31 @@ class LimsReader(object):
         if manual_only:
             sql += "AND n.manual"
         return self.single_result_query(sql.format(id=cell_id))
+    
+    def get_sim_nwb_path_from_lims(self, cell_id, model_type='peri', passed_only=True):
+        template_dict = {
+        'allactive': 491455321,
+        'lif4': 471355161,
+        'lif5': 395310498,
+        'lif2': 395310479,
+        'lif3': 395310475,
+        'lif1': 395310469,
+        'peri': 329230710
+        }
+        template = template_dict[model_type]
+        sql = """
+            SELECT nwb.storage_directory || nwb.filename AS nwb_path
+            FROM neuronal_models nm
+            JOIN neuronal_model_runs runs ON runs.neuronal_model_id = nm.id
+            JOIN well_known_files nwb ON nwb.attachable_id = runs.id
+            JOIN well_known_file_types ftype ON nwb.well_known_file_type_id = ftype.id
+            WHERE nm.specimen_id = {id}
+            AND nm.neuronal_model_template_id = {template}
+            AND nwb.attachable_type = 'NeuronalModelRun'
+            """
+        if passed_only:
+            sql += "AND runs.workflow_state = 'passed'"
+        return self.single_result_query(sql.format(id=cell_id, template=template))
 
     def single_result_query(self, sql):
         test = self.engine.execute(sql)
@@ -104,7 +131,11 @@ class LimsReader(object):
             warnings.warn("No results found in LIMS.")
             return None
         return results[0]
-
+    
+    def list_query(self, sql):
+        test = self.engine.execute(sql)
+        results = [s[0] for s in test.fetchall()]
+        return results
 
 
 from allensdk.core.nwb_data_set import NwbDataSet

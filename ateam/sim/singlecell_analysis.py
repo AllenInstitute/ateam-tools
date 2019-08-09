@@ -4,9 +4,9 @@ import pandas as pd
 import os.path
 import os
 from functools import partial
-import ateam.analysis.nodes as nodes
-import ateam.analysis.cell_vars.psp_analysis as psp
-import ateam.analysis.spikes as spikes
+import ateam.analysis.bmtk.nodes as nodes
+import ateam.analysis.bmtk.psp_analysis as psp
+import ateam.analysis.bmtk.spikes as spikes
 import ateam.analysis.dataframes as dfa
 import ateam.sim.setup as sim
 from ateam.sim.singlecell import sim_path, config_path

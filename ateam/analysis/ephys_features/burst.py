@@ -4,6 +4,8 @@ import ateam.data.lims as lims
 from ateam.data.lims import LimsReader
 from allensdk.core.nwb_data_set import NwbDataSet
 from allensdk.ephys.ephys_extractor import EphysSweepFeatureExtractor
+from ateam.analysis.ephys_features.triblip import postspike_v_all
+from ateam.analysis.ephys_features.common import stim_props
 
 def cost_mean(x):
     mu = np.mean(x)
@@ -66,30 +68,8 @@ def changepoint_detect(input_data, penalty=10., cost_func=cost_mean):
         last = lastchange_cpts[last]
     return cpts_out[:-1]
 
-def spike_times(v, i, t, start=None, end=None):
-    sweepex = EphysSweepFeatureExtractor(t=t, v=v, i=i, start=start, end=end)
-    try:
-        sweepex.process_spikes()
-        return sweepex.spike_feature("peak_t")
-    except ValueError:
-        warnings.warn('Error processing spikes')
-        return []
 
-def stim_props(v, i, t):
-    didt = np.diff(i)/(t[1]-t[0])
-    ichange = np.flatnonzero(np.abs(didt) > 1e-3) # 1 pA/ms
-    # past initial test pulse
-    ichange = ichange[t[ichange] > 0.1]
-    # nonconsecutive
-    # ichange = ichange[np.flatnonzero(np.diff(ichange) > 1) + 1]
-    tstim = t[ichange]
-    duration = tstim[1] - tstim[0]
-    amp = np.mean(i[ichange[0]+1 : ichange[1]-1])
-    if (len(tstim) > 2) or (abs(duration - 1) > 0.01):
-        warnings.warn('Multiple stimulus pulses')
-    return tstim, amp
-
-def process_cell(specimen_id, passed_only=True, use_silence=False):
+def process_cell(specimen_id, passed_only=True, use_silence=True):
     lr = LimsReader()
     nwb_path = lr.get_nwb_path_from_lims(specimen_id)
     longs = lr.get_sweeps(specimen_id, "Long Square")
@@ -104,23 +84,16 @@ def process_cell(specimen_id, passed_only=True, use_silence=False):
             
             if amp < 0:
                 continue
-            st = spike_times(v, i, t, start=stim[0], end=stim[1])
+            sweepex = EphysSweepFeatureExtractor(t=t, v=v, i=i, start=stim[0], end=stim[1])  
+            sweepex.process_spikes()
+            st = sweepex.spike_feature("peak_t")
 
-            if len(st) < 2:
+            if len(st) < 3:
                 segments_list.append(st)
                 continue
 
             segment_info = segment(st)
             segments = segment_info["segments"]
-
-            if use_silence:
-                # if t_silent > 2*isi_last:
-                t_silent = stim[1] - st[-1]
-                segments.append({
-                    "time": t_silent,
-                    "n": 0,
-                    "avg_rate": 0,
-                })
 
             n_values = [s["n"] for s in segments]
             rate_values = [s["avg_rate"] for s in segments]
@@ -129,27 +102,61 @@ def process_cell(specimen_id, passed_only=True, use_silence=False):
             n_max_ind = np.argmax(n_values)
             base_rate = rate_values[n_max_ind]
             max_rate = np.max(rate_values)
-            burst_ratio =  max_rate/ base_rate
+            burst_ratio = max_rate / base_rate
             # pause_ratio = base_rate / np.min(rate_values)
+            var_ratio = max_rate / np.min(rate_values)
 
-            burst_index_n = 1 - base_rate / max_rate
+            burst_index_n = 1 - 1./burst_ratio
+
             t_max_ind = np.argmax([s["time"] for s in segments])
-            burst_index_t = 1 - rate_values[t_max_ind] / max_rate
+            burst_ratio_t = max_rate / rate_values[t_max_ind]
+            burst_index_t = 1 - 1./burst_ratio_t
+
+            t_silent = stim[1] - st[-1]
+            burst_index_init = burst_index_t
+            if t_silent > segments[t_max_ind]["time"]:
+                burst_index_init = 1
+
+            # if use_silence:
+            #     burst_index_t = burst_index_init 
+
+                # segments.append({
+                #     "time": t_silent,
+                #     "n": 0,
+                #     "avg_rate": 0,
+                # })
+
+            vpost = postspike_v_all(sweepex, delta_t=0.005)
+            vpost_first = vpost[ segments[0]["n"] - 1]
+
+            vahp = sweepex.spike_feature("trough_v")
+            vahp_first = np.mean(vahp) if len(segments)==1 else vahp[ segments[0]["n"] - 1]
 
             sweep_dict = {
                 "cell_id": specimen_id,
                 "sweep_num": l,
+                "n_burst": n_values[np.argmax(rate_values)],
                 # "stimulus_amplitude": amp,
                 "burst_ratio": burst_ratio,
+                "burst_ratio_t": burst_ratio_t,
+                "burst_ratio_var": var_ratio,
                 # "pause_ratio": pause_ratio,
+                "burst_index_init": burst_index_init,
                 "burst_index_n": burst_index_n,
-                "burst_index_t": burst_index_t
+                "burst_index_t": burst_index_t,
+
+                "vpost": np.mean(vpost),
+                "delta_vpost": vpost_first - np.mean(vpost),
+
+                "vahp": np.mean(vpost),
+                "delta_vahp": vahp_first - np.mean(vahp)
             }
             results.append(sweep_dict)
             segments_list.append(segments)
-    except:
-        print "Exception on", specimen_id
-        raise
+    except ValueError as e:
+        print("Exception on", specimen_id)
+        print(e)
+        # raise
 
     return results
 

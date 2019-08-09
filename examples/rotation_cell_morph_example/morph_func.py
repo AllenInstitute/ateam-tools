@@ -59,33 +59,36 @@ def get_cell_morphXYZ(cell_id):
     return (morph_data,morph_soma)
 
 
-                
+# RXYZ, the same as the bmtk
 def cal_rotation_angle(morph_data):
     
     pca = PCA(n_components=2)
     pca.fit(morph_data)
-
     proj = morph_data.dot(pca.components_[0])  # the projection of morphology on the direction of first pca
-    v1 = np.sign(proj.mean())*pca.components_[0]  # -1 or 1 depends on the proj
+    
+    #v1 = -1*pca.components_[0]  # the first principal component, when apical dendrite goes down 
+    #v1 = 1*pca.components_[0]  # the first principal component 
+    
+    v1 = np.sign(proj.mean())*pca.components_[0]
     
     # The goal is to rotate v1 to parallel to y axis
     x1=v1[0]
     y1=v1[1]
     z1=v1[2]
     
-    # First rotate in the anticlockwise direction around x axis untill z=0
-    v2 = [x1,math.sqrt(y1*y1+z1*z1),0]
+    # First rotate in the anticlockwise direction around z axis untill x=0
+    v2 = [0,math.sqrt(y1*y1+x1*x1),z1]
     dv = [v2[0]-v1[0],v2[1]-v1[1],v2[2]-v1[2]]
-    anglex= -2*math.asin(math.sqrt(dv[0]*dv[0]+dv[1]*dv[1]+dv[2]*dv[2])*0.5/v2[1])
-    if z1<0:  # when z1 in the negative side, change the sign
-        anglex=-anglex
-
-    # Second rotate in the anticlockwise direction round z axis untill x = 0
-    v3 = [0,math.sqrt(x1*x1+y1*y1+z1*z1),0]
-    dv2= [v3[0]-v2[0],v3[1]-v2[1],v3[2]-v2[2]]
-    anglez= 2*math.asin(math.sqrt(dv2[0]*dv2[0]+dv2[1]*dv2[1]+dv2[2]*dv2[2])*0.5/v3[1])
+    anglez= 2*math.asin(math.sqrt(dv[0]*dv[0]+dv[1]*dv[1]+dv[2]*dv[2])*0.5/v2[1])
     if x1<0:  # when x1 in the negative side, change the sign
         anglez=-anglez
+
+    # Second rotate in the anticlockwise direction round x axis untill z = 0
+    v3 = [0,math.sqrt(x1*x1+y1*y1+z1*z1),0]
+    dv2= [v3[0]-v2[0],v3[1]-v2[1],v3[2]-v2[2]]
+    anglex= -2*math.asin(math.sqrt(dv2[0]*dv2[0]+dv2[1]*dv2[1]+dv2[2]*dv2[2])*0.5/v3[1])
+    if z1<0:  # when z1 in the negative side, change the sign
+        anglex=-anglex
 
     theta=[anglex,0,anglez]
     R = eulerAnglesToRotationMatrix(theta)
@@ -93,17 +96,14 @@ def cal_rotation_angle(morph_data):
 
     return (v1,theta) 
 
-
 # Calculates Rotation Matrix given euler angles.
 def eulerAnglesToRotationMatrix(theta):
-     
+
     R_x = np.array([[1,         0,                  0                   ],
                     [0,         math.cos(theta[0]), -math.sin(theta[0]) ],
                     [0,         math.sin(theta[0]), math.cos(theta[0])  ]
                     ])
-         
-         
-                     
+ 
     R_y = np.array([[math.cos(theta[1]),    0,      math.sin(theta[1])  ],
                     [0,                     1,      0                   ],
                     [-math.sin(theta[1]),   0,      math.cos(theta[1])  ]
@@ -113,12 +113,9 @@ def eulerAnglesToRotationMatrix(theta):
                     [math.sin(theta[2]),    math.cos(theta[2]),     0],
                     [0,                     0,                      1]
                     ])
-                     
-                     
-    R = np.dot(R_z, np.dot( R_y, R_x ))
- 
-    return R
+    R = np.dot(R_x, np.dot( R_y, R_z ))
 
+    return R
 
 # function to plot morphology
 def cell_morphology_rot(cell_id, x_soma, y_soma, z_soma, theta):
@@ -153,9 +150,9 @@ def cell_morphology_rot(cell_id, x_soma, y_soma, z_soma, theta):
               ]
 
     
-    morph.apply_affine(tr_rot_x)
-    morph.apply_affine(tr_rot_y)
     morph.apply_affine(tr_rot_z)
+    morph.apply_affine(tr_rot_y)
+    morph.apply_affine(tr_rot_x)
        
     # translate the soma location
     tr_soma = [1, 0, 0,
@@ -211,4 +208,42 @@ def simpleaxis(ax):
     # Only show ticks on the left and bottom spines
     ax.get_xaxis().tick_bottom()
     ax.get_yaxis().tick_left()
+
+   
+def plot_mor(axes,cell_id,add_angle):
+
+    # get the morphology data (from apical dendrite, dendrite, and soma) used for PCA
+    [morph_data,morph_soma]=get_cell_morphXYZ(cell_id)
+    print(morph_data.shape)
+
+    # get the first principal vector and the rotation angle
+    [v,theta] = cal_rotation_angle(morph_data)
+
+    # Based on the rotation angle to calculate the rotation matrix R
+    R = eulerAnglesToRotationMatrix(theta)  # rotation matrix
+
+    # the first principal component before and after rotated   
+    v = v*400
+    v_rot = R.dot(v)   
+    # The morphology locations used for PCA after rotations
+    X_rot = np.array(morph_data)    # The rotated position of new x,y,z
+    for i in range(0,len(X_rot)):
+        X_rot[i,:]=R.dot(morph_data[i,:])
+    
+    print(cell_id)
+    print(theta)
+    
+    # The location of soma, defined by the user
+    x_soma=0
+    y_soma=0
+    z_soma=0
+    # The original morphology before rotations
+    theta0=[0,0,0]
+    morph0 = cell_morphology_rot(cell_id,x_soma,y_soma,z_soma,theta0)
+    
+    # The morphology after rotations
+    theta[2] = theta[2]+add_angle
+    morph_rot = cell_morphology_rot(cell_id,x_soma,y_soma,z_soma,theta)
+
+    plot_cell_morph_xy(axes,morph_rot)
 

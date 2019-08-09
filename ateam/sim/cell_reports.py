@@ -1,6 +1,7 @@
 
-from bmtk.simulator.bionet.modules import MembraneReport
-from bmtk.simulator.bionet.modules.sim_module import SimulatorMod
+# from bmtk.simulator.bionet.modules import MembraneReport
+# from bmtk.simulator.bionet.modules.sim_module import SimulatorMod
+from ateam.sim.morph import morph_props
 import pandas as pd
 
 def save_morph_single(sim, filename):
@@ -8,18 +9,6 @@ def save_morph_single(sim, filename):
     props = morph_props(sim, gids[0])
     df = pd.DataFrame.from_dict(props)
     df.to_csv(filename)
-
-def morph_props(sim, gid):
-    cell = sim.net.get_cell_gid(gid)
-    seg_props = cell.morphology.seg_prop
-    nsegs = len(seg_props['x'])
-    seg_coords = cell._seg_coords
-    for name in ['p0', 'p1']:
-        seg_props.update({name+'_x': seg_coords[name][0], 
-                          name+'_y': seg_coords[name][1], 
-                          name+'_z': seg_coords[name][2]})
-    seg_props.update(seg_index=range(nsegs), gid=nsegs*[gid])
-    return seg_props
 
 # class SaveMorphology(SimulatorMod):
 #     def initialize(self, sim):

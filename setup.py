@@ -8,11 +8,20 @@ setup(
     install_requires=[
         'pandas',
         'numpy',
-        'matplotlib'
+        'matplotlib',
+        'scipy',
+        'h5py',
+        'allensdk'
     ],
     extras_require={
-        'sim': ['bmtk[bionet]']
+        'sim': ['bmtk[bionet]'],
+        'brainstim': ['neuroanalysis', 'multipatch_analysis', 'pycircstat'],
+        'lims':['sqlalchemy', 'psycopg2']
     },
+    dependency_links=[
+        'git+https://github.com/aiephys/neuroanalysis.git#egg=neuroanalysis',
+        'git+https://github.com/aiephys/multipatch_analysis.git#egg=multipatch_analysis'
+    ],
     packages=find_packages(),
     entry_points={
         'console_scripts':[

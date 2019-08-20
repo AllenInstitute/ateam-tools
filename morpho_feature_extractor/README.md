@@ -13,7 +13,7 @@ To start data analysis using 'analysis_morpho.ipyb' it is enougth to have the li
 ## Getting Started the feature extraction
 
 1) Go to the 'feature_extractor_CK' folder.
-2) Copy your swc files into 'swc' subfolder. The swc files should contain the cell ID name in their name, this way they will be connected to LIMS.
+2) Create the folder with the name 'swc'. Copy your swc files into this 'swc' subfolder. The swc files should contain the cell ID name in their name, this way they will be connected to LIMS.
 3) Run the following command, which will upload the swc files into LIMS, extract features and save them.
 
 python ./bin/upload.py ./swc ./OUT_swc >& log.txt

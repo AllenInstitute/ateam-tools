@@ -17,10 +17,9 @@ B. Analysis codes:
 	1. You will need:
 		a. http://fahimehb@stash.corp.alleninstitute.org/scm/mind/brain_stim.git
 		b. https://github.com/alleninstitute/aisynphys.git
-			**Note: multipatch_analysis (https://github.com/aiephys/multipatch_analysis.git) is the old package name and repo. On 9/30/2019, it was changed to aisynphys.
-			**I will also need to go through Fahimeh's code and change the name accordingly, will update when that's done.
+			**Note: multipatch_analysis (https://github.com/aiephys/multipatch_analysis.git) is the old package name and repo. On 9/30/2019, it was changed to aisynphys.			
 		c. https://github.com/aiephys/neuroanalysis.git
-	brain_stim is for running the analysis codes. Luke Campagnola's multipatch_analysis & neuroanalysis tools are for parsing through the .nwb files.
+	brain_stim is for running the analysis codes. Luke Campagnola's aisynphys & neuroanalysis tools are for parsing through the .nwb files.
 
 	1b. jupyter notebooks:
 		a. //allen/aibs/mat/sooyl/notebook_Fahimeh/Build_and_check_table_original.ipynb

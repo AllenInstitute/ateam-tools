@@ -47,11 +47,17 @@ class LimsReader(object):
     def list_sweep_types(self):
         sql = "SELECT name from ephys_stimulus_types"
         return self.list_query(sql)
-
+    
     def get_sweeps(self, cell_id, sweep_type=None, description=None, passed_only=False, spiking=None, depolarizing=None):
         """Get a list of sweeps for a single cell specimen, by sweep type name
         """
-        sql = """SELECT sw.sweep_number
+        base_query = self.sweep_filter(cell_id, sweep_type, description, passed_only, spiking, depolarizing)
+        sql = "SELECT sw.sweep_number " + base_query
+        return self.list_query(sql)
+
+    @staticmethod
+    def sweep_filter(cell_id, sweep_type=None, description=None, passed_only=False, spiking=None, depolarizing=None):
+        sql = """
             FROM ephys_sweeps sw
             JOIN ephys_stimuli stim ON stim.id = sw.ephys_stimulus_id
             JOIN ephys_stimulus_types stype ON stype.id = stim.ephys_stimulus_type_id
@@ -67,20 +73,23 @@ class LimsReader(object):
             sql += " AND sw.num_spikes {}".format("> 0" if spiking else "= 0")
         if depolarizing is not None:
             sql += " AND sw.stimulus_amplitude {}".format("> 0" if depolarizing else "< 0")
-        return self.list_query(sql)
+        return sql
 
-    def get_sweep_info(self, cell_id, sweep_type=None):
-        """Get a table of information for all sweeps of a given cell specimen
+    def count_sweeps(self, cell_id, distinct_amp=False, **sweep_filter_args):
+        """Count sweeps for a cell specimen matching specified filter
         """
+        base_query = self.sweep_filter(cell_id, **sweep_filter_args)
+        sql = "SELECT COUNT(DISTINCT {on}) " + base_query
+        distinct_col = "sw.stimulus_amplitude" if distinct_amp else "sw.id"
+        return self.single_result_query(sql.format(on=distinct_col))
+
+    def get_sweep_info(self, cell_id, **sweep_filter_args):
+        """Get a table of information for all sweeps of a given celifl specimen
+        """
+        base_query = self.sweep_filter(cell_id, **sweep_filter_args)
         sql = """SELECT sw.*, 
             stype.name, stim.description
-            FROM ephys_sweeps sw
-            JOIN ephys_stimuli stim ON stim.id = sw.ephys_stimulus_id
-            JOIN ephys_stimulus_types stype ON stype.id = stim.ephys_stimulus_type_id
-            WHERE sw.specimen_id = %s
-            """ % (cell_id)
-        if sweep_type:
-            sql += " AND stype.name LIKE '{}'".format(sweep_type)
+            """ + base_query
         return pd.read_sql(sql, self.engine)
   
     def get_nwb_path_from_lims(self, cell_id, get_sdk_version=False):

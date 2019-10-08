@@ -22,12 +22,12 @@ def fit_path(base_path, cells_list=None):
 
 def fit_df_all(cell, base_path, extra=None, hof_id=""):
     # TODO: clean up inclusion of extra field
-    psp = fit_df_psp(cell, base_path, extra=extra, hof_id=hof_id)
-    rate = fit_df_rate(cell, base_path, hof_id=hof_id)
+    psp = fit_df_psp(cell, base_path, hof_id=hof_id, extra=extra)
+    rate = fit_df_rate(cell, base_path, hof_id=hof_id, extra=extra if psp is None else None)
     if psp is None and rate is None:
         return None
     fit_df = pd.concat([psp, rate], axis=1, sort=True)
-    fit_df.index.name = "target_sections"
+    # fit_df.index.name = "target_sections"
     return fit_df
 
 def fit_df_rate(cell, base_path, hof_id="", extra=None):
@@ -65,7 +65,7 @@ def fit_df_psp(cell, base_path, hof_id="", extra=None):
     
     compare = "target_sections"
     xvar = "distance_range_min"
-    ylist = ['amp','delay','area']
+    ylist = ['amp','delay','area','width']
     grouped_df = df.groupby([compare])
     
     functions = [dfa.linfit]

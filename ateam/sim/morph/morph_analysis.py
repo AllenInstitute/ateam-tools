@@ -6,13 +6,34 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from collections import defaultdict
+import scipy.stats
+import warnings
 
 from ateam.sim.setup.sim_manager import create_singlecell_default
 from ateam.sim.run.run_bionet import create_sim
+try:
+    from ateam.data.lims import node_dict_from_lims                     
+except ImportError:
+    pass
 
-def sim_singlecell_transient(cell_id, sim_folder, active=True, sim_time=500):
+def sim_impedances(cell_id, sim_folder, freqs=[0,100], **sim_args):
+    sim = sim_singlecell_transient(cell_id, sim_folder, **sim_args)
+    imp = [morph_impedance(sim, freq=freq, detailed=True) for freq in freqs]
+    morph = morph_props(sim)
+    sim = None
+    nrn.reset()
+    return imp, morph
+
+def sim_singlecell_transient(cell_id, sim_folder, active=True, sim_time=500, from_lims=False, directed=True):
     template = "/allen/aibs/mat/tmchartrand/bmtk_networks/biophys_components_shared/fast_config.json"
-    sm = create_singlecell_default(cell_id, sim_folder, sim_time=sim_time, active=active, config_template=template)
+    node_dict = {}
+    if from_lims:
+        try:
+            node_dict = node_dict_from_lims(cell_id, model_type='peri')
+        except (NameError, UserWarning):
+            warnings.warn("Failed to load cell from LIMS.")
+            raise
+    sm = create_singlecell_default(cell_id, sim_folder, sim_time=sim_time, active=active, directed=directed, config_template=template, node_dict=node_dict)
     sim = create_sim(sm.config_path)
     sim.run()
     return sim
@@ -47,6 +68,7 @@ def morph_impedance(sim, freq=0, gid=0, detailed=True, all_segs=True):
             _save_impedance(imp_data, rin_soma, imp, sec, x=0.5)
     for key, val in imp_data.items():
         imp_data[key] = np.array(val)
+    imp_data['freq'] = freq
     return imp_data
 
 def _save_impedance(imp_data, imp, rin_soma, sec, x):
@@ -56,8 +78,6 @@ def _save_impedance(imp_data, imp, rin_soma, sec, x):
     imp_data['ratio_out'].append(imp.transfer(x, sec=sec)/rin_soma)
     imp_data['ratio'].append(imp.ratio(x, sec=sec))
 
-from scipy import stats
-
 def points_to_img(values, xlims=None, ylims=None, n=100):
 #     values shape: (# of dims, # of data)
     if xlims is None:
@@ -66,10 +86,36 @@ def points_to_img(values, xlims=None, ylims=None, n=100):
         ylims = [np.min(values[1,:]), np.max(values[1,:])]
     X, Y = np.mgrid[xlims[0]:xlims[1]:n*1j, ylims[0]:ylims[1]:n*1j]
 
-    kernel = stats.gaussian_kde(values, bw_method=None)
+    kernel = scipy.stats.gaussian_kde(values, bw_method=None)
     positions = np.vstack([X.ravel(), Y.ravel()])
     Z = np.reshape(kernel(positions).T, X.shape)
     return Z
+
+def morph_impedance_coords(imp, morph, imp_prop='ratio_out', morph_prop='dist'):
+    x = morph[morph_prop]
+    y = imp[imp_prop]
+    return x, y
+
+def morph_impedance_img(imp, morph, xlims=[0,1500], **coords_args):
+    x, y = morph_impedance_coords(imp, morph, **coords_args)
+    Z = points_to_img(np.array([x,y]), xlims=xlims, ylims=[0,1], n=100)
+    return Z
+
+def morph_impedance_features(imp, morph, **coords_args):
+    x, y = morph_impedance_coords(imp, morph, **coords_args)
+    features = {
+        'xmean': np.mean(x),
+        'xvar': np.var(x),
+        'xskew': scipy.stats.skew(x),
+        'xkurtosis': scipy.stats.kurtosis(x),
+        'ymean': np.mean(y),
+        'yvar': np.var(y),
+        'yskew': scipy.stats.skew(y),
+        'ykurtosis': scipy.stats.kurtosis(y),
+        'crosscorr': scipy.stats.pearsonr(x,y)[0]
+    }
+    return features
+
 
 def get_impedance_img_single(cell_id, sim_folder, freq=100, sim_time=200):
     sim = sim_singlecell_transient(cell_id, sim_folder, active=True, sim_time=sim_time)
@@ -78,37 +124,5 @@ def get_impedance_img_single(cell_id, sim_folder, freq=100, sim_time=200):
     x = morph_dict['dist']
     y = imp['ratio_out']
     Z = points_to_img(np.array([x,y]), xlims=[0,1500], ylims=[0,1], n=100)
-    sim = None
-    nrn.reset()
     return Z
 
-# Old work...
-def inputr_sections(soma, sec_iter, all_segs=True):
-    rin = []
-    distances = []
-    x = 0.5
-    freq=0
-    imp = h.Impedance()
-    imp.loc(x, sec=soma)
-    imp.compute(freq, sec=soma)
-    h.distance(0, x, sec=soma)
-    for sec in sec_iter:
-        if all_segs:
-            for seg in sec.allseg():
-                rin.append(imp.input(seg.x, sec=sec))
-                distances.append(h.distance(seg.x, sec=sec))
-        else:
-            rin.append(imp.input(0.5, sec=sec))
-            distances.append(h.distance(0.5, sec=sec))
-    return rin
-
-
-def plot_inputr_all(soma, apical=[], basal=[], axonal=[], all_segs=True, **kwargs):
-    plot = plt.scatter
-    plot(*inputr_sections(soma, basal, all_segs=all_segs), color='tab:red', label='dendrites', **kwargs)
-    plot(*inputr_sections(soma, apical, all_segs=all_segs), color='tab:orange', label='apical dendrites', **kwargs)
-    plot(*inputr_sections(soma, axonal, all_segs=all_segs), color='tab:blue', label='axon', **kwargs)
-    plot(*inputr_sections(soma, [soma], all_segs=all_segs), color='k', label='soma', s=50, **kwargs)
-    plt.ylabel("Input Resistance")
-    plt.xlabel("Distance from soma (um)")
-    plt.legend()

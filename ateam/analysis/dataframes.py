@@ -42,7 +42,7 @@ def scatterplot_fix(x=None, y=None, data=None, ypad=[], xpad=[], **kwargs):
     plt.xlim(*limits_pad(data[x], *xpad))
     plt.ylim(*limits_pad(data[y], *ypad))
 
-def plot_reg_df(x, y, data=None, **kwargs):
+def plot_reg_df(x, y, data=None, pval=False, **kwargs):
     """Plot regression against a continuous x variable.
     Args use seaborn plotting conventions
     """
@@ -52,8 +52,11 @@ def plot_reg_df(x, y, data=None, **kwargs):
 
     xd = data[x]; yd = data[y]
     results = sm.OLS(yd, sm.add_constant(xd), hasconst=True).fit()
-    logp = np.log(results.pvalues[1])
-    summary = "$R^2={:.2g}$, $log(p)={:.2g}$".format(results.rsquared, logp)
+    summary = "$R^2={:.2g}$".format(results.rsquared)
+    if pval=='log':
+        summary += ", $log(p)={:.2g}$".format(np.log(results.pvalues[1]))
+    elif pval:
+        summary += ", $p={:.2g}$".format(results.pvalues[1])
     xpred =  np.linspace(xd.min(), xd.max(), 50)
     ypred = results.predict(sm.add_constant(xpred))
     
@@ -130,7 +133,7 @@ def pairwise_mw(data, var, group, pairs=None):
         u, p = mannwhitneyu(groups.get_group(pair[0]), groups.get_group(pair[1]), alternative='two-sided')
         pvals.append(p)
         pairs_idx.append([group_vals.index(pair[0]), group_vals.index(pair[1])])
-    return pairs, pairs_idx, pvals
+    return list(pairs), pairs_idx, pvals
 
 
 # Analysis of two-variable relationships in dataframes

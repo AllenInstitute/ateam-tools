@@ -7,7 +7,7 @@ import statsmodels.formula.api as smf
 import patsy
 import sklearn.metrics as metrics
 import sklearn.linear_model as sklm
-import sklearn.model_selection as skms
+import sklearn.model_selection as skms   
 
 def ols_model(data, formula_rhs, feature):
     metrics = ['aic', 'bic', 'fvalue', 'f_pvalue', 'llf', 'rsquared', 'rsquared_adj', 'nobs']
@@ -60,12 +60,15 @@ def plot_fit(data, feature, formula, x=None, cluster='cluster', ax=None, legend=
     c = None if cluster in formula else 'k'
     y_fit = res.fittedvalues.reindex(data.index)
     sns.lineplot(data=data, y=y_fit, x=x, hue=hue, color=c, legend=False, ax=ax)
+    ax.set_xlabel(getattr(x, "label", None) or x)
+    ax.set_ylabel(getattr(feature, "label", None) or feature)
     if legend:
         plt.legend(bbox_to_anchor=(1,1))
     if print_attr:
         # value = getattr(res, print_attr)
         value = out_dict.get(print_attr)
-        attr_name = attr_name or print_attr
+        # attr_name = attr_name or print_attr
+        attr_name = getattr(print_attr, "label", None) or print_attr
         summary = f"{attr_name} = {value:.2g}"
         ax.text(0.5, 0.99, summary, transform=ax.transAxes,
             verticalalignment='top', horizontalalignment='center')

@@ -13,7 +13,7 @@ def _load_shiny_data(species):
 
     # add a few helpful columns for the human data
     if species=='human':
-        shiny_df["leaf_matched_seurat"] = shiny_df.seurat_cluster == shiny_df.cluster
+        shiny_df["leaf_matched_seurat"] = shiny_df.seurat_cluster == shiny_df.topLeaf
         shiny_df["leaf_mapped"] = shiny_df.topLeaf == shiny_df.cluster
         shiny_df["L23_depth_normalized"] = shiny_df.L23_cell_depth / shiny_df.L23_total_thickness
 

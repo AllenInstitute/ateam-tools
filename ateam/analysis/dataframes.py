@@ -9,6 +9,12 @@ from scipy.stats import mannwhitneyu, linregress
 from itertools import combinations
 from six import string_types
 
+from collections import UserString
+class LabeledVar(UserString):
+    def __init__(self, string=None, label=None):
+        super().__init__(string)
+        self.label = label or string
+
 # Restructuring commands
 # 
 
@@ -39,8 +45,11 @@ def scatterplot_fix(x=None, y=None, data=None, ypad=[], xpad=[], **kwargs):
     Default padding 5% of range
     """
     sns.scatterplot(x=x, y=y, data=data, **kwargs)
-    plt.xlim(*limits_pad(data[x], *xpad))
-    plt.ylim(*limits_pad(data[y], *ypad))
+    ax = kwargs.get('ax') or plt.gca()
+    ax.set_xlabel(getattr(x, "label", None) or x)
+    ax.set_ylabel(getattr(y, "label", None) or y)
+    ax.set_xlim(*limits_pad(data[x], *xpad))
+    ax.set_ylim(*limits_pad(data[y], *ypad))
 
 def plot_reg_df(x, y, data=None, pval=False, **kwargs):
     """Plot regression against a continuous x variable.
@@ -60,7 +69,7 @@ def plot_reg_df(x, y, data=None, pval=False, **kwargs):
     xpred =  np.linspace(xd.min(), xd.max(), 50)
     ypred = results.predict(sm.add_constant(xpred))
     
-    ax = plt.gca()
+    ax = kwargs.get('ax') or plt.gca()
     ax.plot(xpred, ypred)
 
     ax.text(0.5, 0.99, summary, transform=ax.transAxes,

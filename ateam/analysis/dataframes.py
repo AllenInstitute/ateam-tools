@@ -9,10 +9,12 @@ from scipy.stats import mannwhitneyu, linregress
 from itertools import combinations
 from six import string_types
 
+from future.standard_library import install_aliases
+install_aliases()
 from collections import UserString
 class LabeledVar(UserString):
     def __init__(self, string=None, label=None):
-        super().__init__(string)
+        super(LabeledVar, self).__init__(string)
         self.label = label or string
 
 # Restructuring commands

@@ -37,7 +37,7 @@ def get_node_props(cell_id, cell_name=None):
 
 def build_epsp_batch(cell_id, sim_folder, cell_name=None, inh=False,
     dmax=400, n_duplicates=10, edge_dict={}, node_dict={}, overwrite=False):
-    synapse_cluster_scale = 20
+    synapse_cluster_scale = 40
     sim_time = 300
     input_props = {'spike_time':0.2}
     edge_props = edge_props_shared()
@@ -65,7 +65,7 @@ def build_epsp_batch(cell_id, sim_folder, cell_name=None, inh=False,
     sm.add_membrane_report()
     sm.sim_time = sim_time
 
-    net = bb.build_batch_all(sm, node_props, edge_props, input_props, linked_dicts=[linked_edge_props], n_duplicates=n_duplicates, use_abs_paths=True)
+    net = bb.build_batch_all(sm, node_props, edge_props, input_props, linked_dicts=[linked_edge_props], n_duplicates=n_duplicates, use_abs_paths='input')
     return sm
 
 def build_rates_batch(cell_id, sim_folder, cell_name=None, inh=False,
@@ -94,14 +94,12 @@ def build_rates_batch(cell_id, sim_folder, cell_name=None, inh=False,
     net = bb.build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=n_duplicates, use_abs_paths=True)
     return sm
 
-def build_hof_sims(base_path, hof_path, cell_id, num_sims=40, overwrite=False, level='folder'):
-    def build_hof_internal(sim_type):
+def build_hof_sims(base_path, hof_path, cell_id, num_sims=40, overwrite=False, level='folder', sim_types=['rate','psp']):
+    for sim_type in sim_types:
         sm = sim.SimManager(config_path(base_path, cell_id, sim_type))
         for hof_id in range(num_sims):
             folder = sim_path(hof_path, cell_id, sim_type, hof_id)
             copy_sim_for_hof(sm, cell_id, hof_id, folder, overwrite=overwrite, level=level)
-    build_hof_internal("rate")
-    build_hof_internal("psp")
 
 def copy_sim_for_hof(sm, cell_id, hof_id, folder, overwrite=False, level='folder'):
     sm_mod = sm.save_copy(folder, overwrite)
@@ -114,7 +112,7 @@ def copy_sim_for_hof(sm, cell_id, hof_id, folder, overwrite=False, level='folder
         }
         sm_mod.update_node_type_props("batch", node_props)
 
-def copy_sim_for_new_cell(sm, cell_id, folder, overwrite=False, level='folder'):
+def copy_sim_for_new_cell(sm, cell_id, folder, overwrite=False, level='folder', config_dict=None, node_dict=None):
     """Save a copy of a single-cell simulation and update the cell ID in the config.
     
     Arguments:
@@ -128,11 +126,17 @@ def copy_sim_for_new_cell(sm, cell_id, folder, overwrite=False, level='folder'):
     sm_mod = sm.save_copy(folder, overwrite=overwrite, level=level)
     if sm_mod:
         node_props = {
+                    'cell_id': cell_id,
                     'cell_name': cell_id,
                     'morphology': '{}.swc'.format(cell_id),
                     'dynamics_params': 'optim_param_{}.json'.format(cell_id)
         }
+        if node_dict:
+            node_props.update(node_dict)
         sm_mod.update_node_type_props("batch", node_props)
+        if config_dict:
+            sm_mod.config.update_nested(config_dict)
+            sm_mod.config.save()
 
 def build_singlecell_sims(cells_list, base_path, inh=False, n_duplicates=10, overwrite=False, level='folder'):
     sim_path = os.path.join(base_path, "{cell}", "{sim}")

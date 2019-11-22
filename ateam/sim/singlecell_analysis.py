@@ -27,7 +27,7 @@ def fit_df_all(cell, base_path, extra=None, hof_id=""):
     if psp is None and rate is None:
         return None
     fit_df = pd.concat([psp, rate], axis=1, sort=True)
-    # fit_df.index.name = "target_sections"
+    fit_df.index.name = "target_sections"
     return fit_df
 
 def fit_df_rate(cell, base_path, hof_id="", extra=None):
@@ -92,7 +92,7 @@ def extract_psp_data(config_path):
     assert(len(spike_time)==1)
     spike_time = spike_time[0]
     # TODO: work with vector of spike times?
-    props = psp.epsp_analysis(config_file=sm.config_path, t_min=100, t_duration=1000, t_spike=1000*spike_time)
+    props = psp.epsp_analysis(config_file=sm.config_path, t_spike=1000*spike_time)
     syn_df = pd.DataFrame(props)
     syn_df.set_index('gid', inplace=True)
     df = syn_df.join(nodes_df)
@@ -112,7 +112,8 @@ def plot_rates_config(config_path, ax=None):
 def plot_psp_df(cellname, df, propname, label=None, ax=None, legend=False):
     ax = ax or plt.axes()
     plt.sca(ax)
-    plot_df_stats_comparison(df,'distance_range_max', propname, 'target_sections', ax=ax)
+    colors = ['salmon', 'firebrick', 'k']
+    plot_df_stats_comparison(df,'distance_range_max', propname, 'target_sections', ax=ax, colors=colors)
     if not legend:
         ax.get_legend().remove()
     plt.xlabel('Distance from soma ($\mu$m)')
@@ -179,11 +180,12 @@ def plot_df_stats_comparison_multiple(df, xvar, yvar, compare, separate, figsize
         ax[i].legend(title=compare)
     plt.tight_layout()
 
-def plot_df_stats_comparison(df, xvar, yvar, compare, ax=None, **plot_args):
+def plot_df_stats_comparison(df, xvar, yvar, compare, colors=None, ax=None, **plot_args):
     df_agg = df.groupby([xvar, compare])[yvar].agg(['mean','std'])
     ax = ax or plt.axes()
-    for name_compare in df_agg.index.unique(level=compare).sort_values():
-        df_agg.xs(name_compare, level=compare).plot(y='mean', yerr='std', ax=ax, label=name_compare, **plot_args)
+    for i, name_compare in enumerate(df_agg.index.unique(level=compare).sort_values()):
+        color = colors[i] if colors else None
+        df_agg.xs(name_compare, level=compare).plot(y='mean', yerr='std', ax=ax, c=color, label=name_compare, **plot_args)
     ax.set(ylabel=yvar)
     ax.legend(title=compare)
     return df_agg

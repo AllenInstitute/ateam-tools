@@ -3,38 +3,107 @@ import copy
 import subprocess as sp
 import os
 
-default_settings = {
-                    'jobname':'Default_Job_Name',
-                    'email':None,
-                    'email_options':None,
-                    'queue':'celltypes',
-                    'mem':'4g',
-                    'vmem':None,
-                    'walltime':'01:00:00',
-                    'ncpus':None,
-                    'ppn':None,
-                    'procs':None,
-                    'nodes':None,
-                    'jobdir':None,
-                    'outfile':'$PBS_JOBID.out',
-                    'errfile':'$PBS_JOBID.err',
-                    'environment':{},
-                    'array':None,
-                    'rerunable':False
-                    }
+parser = argparse.ArgumentParser(
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter
+)
+parser.add_argument("--conda", default="bmtk_ateam", help="Conda environment name")
+parser.add_argument("--walltime","-t", default="00:10:00")
+parser.add_argument("--nodes", "-n", default=1, type=int)
+parser.add_argument("--mem", "-m", default="4g", help="Memory usage (only used for single node jobs?)")
+parser.add_argument("--procs","-p", type=int, help="Number of processors. Overrides nodes and ppn.")
+parser.add_argument("--queue","-q", default="celltypes")
+parser.add_argument("--jobname", default="ateam_test_job")
+parser.add_argument("--jobdir", default=os.getcwd())
+parser.add_argument("--ppn", type=int)
+parser.add_argument("--ncpus", type=int)
+parser.add_argument("--vmem", default=None)
+parser.add_argument("--email", default=None)
+parser.add_argument("--email_options", default='a')
+parser.add_argument("--array", default=None)
+parser.add_argument("--environment", default={})
+parser.add_argument("--outfile", default='$PBS_JOBID.out')
+parser.add_argument("--errfile", default='$PBS_JOBID.err')
+parser.add_argument("--rerun", action='store_true')
+parser.add_argument("--dryrun", action='store_true')
+# subparsers = parser.add_subparsers()
+
 
 class PBSJob(object):
 
     qsub_command = 'qsub'
 
-    def __init__(self, command, **kwargs):
-
-        settings_dict = copy.copy(default_settings)
-        settings_dict.update(kwargs)
-        for key, val in settings_dict.iteritems():
-            setattr(self, key, val)
-
+    def __init__(self, command, args):
+        if args.procs:
+            args.nodes = None
+            args.ppn = None
+            self.n = args.procs
+        else:
+            ppn = args.ppn or 24
+            self.n = ppn*args.nodes
         self.command = command
+        self.script_lines = self.generate_script(args)
+
+    def generate_script(self, args):
+        script_lines = []
+        script_lines.append('#!/bin/bash\n')
+        script_lines.append('#PBS -q %s\n' % (args.queue))
+        script_lines.append('#PBS -N %s\n' % (args.jobname))
+
+        if args.array is not None:
+            script_lines.append('#PBS -t %s-%s\n' % (args.array[0], args.array[1]))
+        if args.email is not None:
+            script_lines.append('#PBS -M %s\n' % (args.email))
+        script_lines.append('#PBS -m %s\n' % (args.email_options))
+        script_lines.append('#PBS -r {}\n'.format('y' if args.rerun else 'n'))
+
+        if args.procs is not None:
+            script_lines.append('#PBS -l procs={}\n'.format(args.procs))
+
+        cpu_ppn_node_list = []
+        # if not args.ncpus is None:
+        #     cpu_ppn_node_list.append('ncpus=%d' % args.ncpus)
+        if args.nodes is not None:
+            cpu_ppn_node_list.append('nodes=%s' % args.nodes)
+        if args.ppn is not None:
+            cpu_ppn_node_list.append('ppn=%d' % args.ppn)
+        elif not args.procs:
+            script_lines.append('#PBS -n \n')
+
+        if len(cpu_ppn_node_list) > 0:
+            tmp_str = '#PBS -l %s\n' % ':'.join(cpu_ppn_node_list)
+            script_lines.append(tmp_str)
+
+        vmem_walltime = []
+        if args.mem != None:
+            vmem_walltime.append('mem=%s' % (args.mem))
+        if args.vmem != None:
+            vmem_walltime.append('vmem=%s' % (args.vmem))
+        if args.walltime != None:
+            vmem_walltime.append('walltime=%s' % (args.walltime))
+
+        if len(vmem_walltime) > 0:
+            tmp_str = '#PBS -l %s\n' % (','.join(vmem_walltime))
+            script_lines.append(tmp_str)
+
+        if args.jobdir != None:
+            script_lines.append('#PBS -d %s\n' % (os.path.expanduser(args.jobdir)))
+
+        script_lines.append('#PBS -o %s\n' % (os.path.expanduser(args.outfile)))
+        script_lines.append('#PBS -e %s\n' % (os.path.expanduser(args.errfile)))
+        script_lines.append('#PBS -j oe\n')
+
+        env_list = []
+        for variable, value in args.environment.items():
+            env_list.append('%s=%s' % (variable, value))
+
+        if len(env_list) > 0:
+            script_lines.append('#PBS -v %s \n' % (','.join(env_list)))
+
+        if args.conda != None:
+            script_lines.append('source activate %s\n' % args.conda )
+
+        script_lines.append('%s\n' % (self.command))
+        return script_lines
 
     def run(self, verbose=True, dryrun=False):
 
@@ -51,80 +120,7 @@ class PBSJob(object):
             if sp_input == None:
                 raise Exception('could not start job')
 
-        script_lines = []
-
-        script_lines.append('#!/bin/bash\n')
-
-        if not self.array is None:
-            script_lines.append('#PBS -t %s-%s\n' % (self.array[0], self.array[1]))
-
-        script_lines.append('#PBS -q %s\n' % (self.queue))
-        script_lines.append('#PBS -N %s\n' % (self.jobname))
-
-        if self.email != None:
-            script_lines.append('#PBS -M %s\n' % (self.email))
-
-        if self.email_options != None:
-            script_lines.append('#PBS -m %s\n' % (self.email_options))
-
-        if self.rerunable == False:
-            script_lines.append('#PBS -r n\n')
-
-        if not self.procs is None:
-            script_lines.append('#PBS -l procs={}\n'.format(self.procs))
-
-        cpu_ppn_node_list = []
-
-        if not self.ncpus is None:
-            cpu_ppn_node_list.append('ncpus=%d' % self.ncpus)
-
-        if not self.nodes is None:
-            cpu_ppn_node_list.append('nodes=%s' % self.nodes)
-
-        if not self.ppn is None:
-            cpu_ppn_node_list.append('ppn=%d' % self.ppn)
-        elif not self.procs:
-            script_lines.append('#PBS -n \n')
-
-        if len(cpu_ppn_node_list) > 0:
-            tmp_str = '#PBS -l %s\n' % ':'.join(cpu_ppn_node_list)
-            script_lines.append(tmp_str)
-
-        vmem_walltime = []
-        if self.mem != None:
-            vmem_walltime.append('mem=%s' % (self.mem))
-
-        if self.vmem != None:
-            vmem_walltime.append('vmem=%s' % (self.vmem))
-
-        if self.walltime != None:
-            vmem_walltime.append('walltime=%s' % (self.walltime))
-
-        if len(vmem_walltime) > 0:
-            tmp_str = '#PBS -l %s\n' % (','.join(vmem_walltime))
-            script_lines.append(tmp_str)
-
-        if self.jobdir != None:
-            script_lines.append('#PBS -d %s\n' % (os.path.expanduser(self.jobdir)))
-
-        script_lines.append('#PBS -o %s\n' % (os.path.expanduser(self.outfile)))
-        script_lines.append('#PBS -e %s\n' % (os.path.expanduser(self.errfile)))
-
-        env_list = []
-        for variable, value in self.environment.items():
-            env_list.append('%s=%s' % (variable, value))
-
-        if len(env_list) > 0:
-            script_lines.append('#PBS -v %s \n' % (','.join(env_list)))
-
-        if self.conda_env != None:
-            script_lines.append('source activate %s\n' % self.conda_env )
-
-        script_lines.append('%s\n' % (self.command))
-
-        script_string = ''.join(script_lines)
-
-        for line in script_lines:
+        for line in self.script_lines:
             if verbose: print line,
             if not dryrun: sp_input.write(line)
 
@@ -136,32 +132,31 @@ class PBSJob(object):
             result = None
         return result
 
-class PythonJob(PBSJob):
+class BmtkJob(PBSJob):
+    def __init__(self, args):
+        from ateam.sim.run import runner
+        super(BmtkJob, self).__init__(None, args)
+        args.jobdir = args.jobdir or os.path.dirname(args.config)
+        self.command = runner.bionet_mpi_command(config=args.config, ncores=self.n)
+        self.script_lines = self.generate_script(args)
 
-    def __init__(self, script=None, command=None, python_executable='python', python_args='', python_path = None, **kwargs):
+def run_hpc(args_list=None):
+    # parser = subparsers.add_parser()
+    parser.add_argument("command")
+    args = parser.parse_args(args_list)
+    job = PBSJob(args.command, args)
+    job.run(dryrun=args.dryrun)
 
-        self.python_executable = python_executable
-        # self.conda_env = conda_env
-        # assert os.path.exists(script)
-        assert (script or command) and not (script and command)
-        self.pycommand = "-c \"{command}\"".format(command=command) if command else script
-        self.python_args = python_args
-
-        command = '%s %s %s' % (self.python_executable, self.pycommand, self.python_args)
-
-        # if not conda_env is None:
-        #     command = 'source activate %s\n' % self.conda_env + command
-
-        if not python_path is None:
-            command = ("export PYTHONPATH=%s\n" % python_path) + command
-
-        super(PythonJob, self).__init__(command, **kwargs)
-
-pbs_parser = argparse.ArgumentParser()
-for key, val in default_settings.iteritems():
-    pbs_parser.add_argument('--%s' % key, default=str(val), type=str)
-
-
-
-if __name__ == "__main__":  # pragma: no cover
-    pass
+def run_hpc_bmtk(args_list=None):
+    parser.add_argument("config")
+    parser.add_argument("--overwrite", action='store_true', help="Overwrite existing sim output")
+    parser.set_defaults(jobname="bmtk_sim_test_job")
+    parser.set_defaults(jobdir=None)
+    args = parser.parse_args(args_list)
+    # TODO: actually check output from config
+    folder = os.path.dirname(args.config)
+    if not args.dryrun and not args.overwrite and os.path.isfile(os.path.join(folder, "output", "spikes.h5")):
+        print("Output already exists, aborting.")
+        return
+    job = BmtkJob(args)
+    job.run(dryrun=args.dryrun)

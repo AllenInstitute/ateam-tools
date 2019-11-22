@@ -26,7 +26,8 @@ setup(
     entry_points={
         'console_scripts':[
             'run_bionet = ateam.sim.run.run_bionet:main',
-            'run_hpc = ateam.sim.run.run_hpc:main'
+            'run_hpc_bmtk = ateam.sim.run.pbstools:run_hpc_bmtk',
+            'run_hpc = ateam.sim.run.pbstools:run_hpc',
         ]
     },
     platforms='any'

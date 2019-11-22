@@ -183,33 +183,44 @@ def sweepex_from_lims_file(nwb_file, sweepnum):
     sweepex = EphysSweepFeatureExtractor(t=time, v=voltage, i=current, start=tstart)
     return sweepex
 
-def get_tri_features_lims(limsreader, cells_df, max_cells=np.inf):
-    tri_data = dict()
-    cell_list = cells_df.index.values
-    for cell in cell_list:
-        nwb_path = cells_df.loc[cell].nwb_path
-        sweeps_tri = limsreader.get_sweeps(cell, TRIPLE)
-        if not sweeps_tri:
-            continue
-        cell_data = dict()
-        with h5py.File(nwb_path,'r') as nwb_file:
+import logging
+from functools import partial
+from multiprocessing import Pool
+
+import ateam.data.lims as lr
+def get_tri_features_lims_single(cells_df, cell):
+    limsreader = lr.LimsReader()
+    nwb_path = cells_df.loc[cell].nwb_path
+    sweeps_tri = limsreader.get_sweeps(cell, TRIPLE)
+    del limsreader
+    if not sweeps_tri:
+        return None
+    cell_data = dict()
+    with h5py.File(nwb_path,'r') as nwb_file:
+        try:
             for sweepnum in sweeps_tri:
                 # check for null stim
                 sweepex = sweepex_from_lims_file(nwb_file, sweepnum)
                 tri_dict = get_tri_features_single(sweepex)
                 if tri_dict:
                     cell_data[sweepnum] = tri_dict
-        cell_df = pd.DataFrame.from_dict(cell_data, orient='index')
-        tri_data[cell] = cell_df
-        if len(tri_data) >= max_cells:
-            break
-        # Need to find the final amplitude to skip the threshold-finding sweeps
-    tri_df = pd.concat(tri_data, names=['cell', 'sweep'], sort=True)
-    # tri_df = pd.concat(tri_data, keys=cell_list, names=['cell', 'sweep'], sort=True)
+        except Exception as detail:
+            logging.warn("Exception when processing specimen {:d}".format(cell))
+            logging.warn(detail)
+    cell_df = pd.DataFrame.from_dict(cell_data, orient='index')
+    return cell_df
 
-    tri_df.is_bursty = tri_df.is_bursty.astype('bool')
-    tri_df.is_complete = tri_df.is_complete.astype('bool')
-    tri_df["is_complete_noburst"] = tri_df.is_complete & ~tri_df.is_bursty
+def get_tri_features_lims(cells_df, run_parallel=True):
+    cell_list = cells_df.index.values
+    get_data_partial = partial(get_tri_features_lims_single, cells_df)
+    if run_parallel:
+        pool = Pool(processes=4)
+        tri_data = pool.map(get_data_partial, cell_list)
+    else:
+        tri_data = map(get_data_partial, cell_list)
+    # if stored as dict:
+    # tri_df = pd.concat(tri_data, names=['cell', 'sweep'], sort=True)
+    tri_df = pd.concat(tri_data, keys=cell_list, names=['cell', 'sweep'], sort=True)
     return tri_df
 
 def has_triblip_lims(limsreader, cell_id):
@@ -254,7 +265,7 @@ def get_tri_features_single(sweepex):
         sweepex.process_spikes()
     except ValueError:
         warnings.warn('Error processing spikes')
-        return sweep_data
+        return None
 
     spike_groups = spikegroups(sweepex)
     is_complete = all(spikes.size>0 for spikes in spike_groups)
@@ -281,14 +292,55 @@ def process_tri_trend(tri_df):
     series_trend.name = "trend_vpost"
     return series_trend
 
-def process_tri_burst(tri_df):
-    groups_cell = tri_df.groupby('cell')
-    series_trend = groups_cell.apply(vpost_trend).dropna()
-    series_trend.name = "trend_vpost"
-    return series_trend
+# Sigmoid functions
+import scipy.optimize as opt
+def df_mask_outliers(df, factor=4):
+    lq = df.quantile(0.25)
+    uq = df.quantile(0.75)
+    iqr = uq-lq
+    df = (df > uq + factor*iqr) | (df < lq - factor*iqr)
+    return df
 
-def process_groups(combined_df, group_col):
-    popdata = combined_df.trend_vpost
+def fsigmoid(f, v0, dv, f0, k):
+    return v0 + dv / (1.0 + np.exp(-k*(f-f0)))
+
+def fit_sigmoid(celldat, feature='postspike_v'):
+    min_sweeps = 10
+    f0_bound = [50, 150]
+    k_bound = [0.01, 0.5]
+    dv_bound = [-10, 10]
+    celldat = celldat[celldat.is_complete & ~celldat.outlier]
+    if len(celldat.is_complete) < min_sweeps:
+        raise Exception('Not enough triblip sweeps')
+    xdata = np.array(celldat.frequency)
+    ydata = np.array(celldat[feature])
+    v_bound = [min(ydata), max(ydata)]
+    bounds = list(zip(v_bound, dv_bound, f0_bound, k_bound))
+    p0 = [np.mean(ydata), 0, 80, 0.05]
+    
+    popt, pcov = opt.curve_fit(fsigmoid, xdata, ydata, method='trf', bounds=bounds, p0=p0)
+    triblip_dv = fsigmoid(150, *popt) - fsigmoid(50, *popt)
+    return list(popt)+[triblip_dv]
+            
+def process_tri_sigmoid(tri_df, relative=False):
+    feature = 'postspike_v' if not relative else 'postspike_v_relative'
+    tri_df['outlier'] = tri_df.groupby('cell')[feature].transform(df_mask_outliers)
+    cells = tri_df.index.unique(level='cell')
+    fit_data = {}
+    for cell in cells:
+        try:
+            celldat = tri_df.loc[cell]
+            popt = fit_sigmoid(celldat, feature=feature)
+            fit_data[cell] = popt
+        except Exception as detail:
+            warnings.warn("Exception when processing specimen {:d}".format(cell))
+            warnings.warn(detail)
+    fit_df = pd.DataFrame.from_dict(fit_data, orient='index', columns=['v0','dv','f0','k','triblip_dv'])
+    return fit_df
+
+# Population analysis
+def process_groups(combined_df, feature_col, group_col):
+    popdata = combined_df[feature_col]
     popstats = pop_stats_robust(popdata)
     def frac_str(col):
         nsig = (col>popstats.cutoff).sum()
@@ -301,7 +353,7 @@ def process_groups(combined_df, group_col):
         u, p = stats.mannwhitneyu(popdata, col, alternative='less')
         sign = np.sign(u - len(popdata)*len(col)/2)
         return p
-    return combined_df.groupby(group_col).trend_vpost.agg([frac_str, zscore, mw_test])
+    return combined_df.groupby(group_col)[feature_col].agg([frac_str, zscore, mw_test])
 
 def pop_stats_robust(series_trend, cutoff_z=3):
     data = series_trend.values
@@ -312,6 +364,7 @@ def pop_stats_robust(series_trend, cutoff_z=3):
     cutoff = trend_trimean + cutoff_z*trend_std
     return robust_stats(trend_trimean, trend_std, cutoff)
 
+# TODO: remove
 def load_ttype_df(shiny_path):
     ttype_df = pd.read_feather(shiny_path)
     ttype_df.spec_id_label.replace("ZZ_Missing", None, inplace=True)

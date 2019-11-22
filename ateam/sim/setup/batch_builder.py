@@ -113,9 +113,11 @@ def split_dict_lists(full_dict):
     return single_dict, list_dict
 
 
-def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1, \
-                net_name='batch', linked_dicts=None,use_abs_paths=False,\
-                coordinate_props= None):
+def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1,
+                net_name='batch', linked_dicts=None, use_abs_paths=False,
+                coordinate_props=None):
+    abs_path_input = True if use_abs_paths==True or use_abs_paths=='input' else False
+    abs_path_network = True if use_abs_paths==True or use_abs_paths=='network' else False
     node_props_base, node_props_vary = split_dict_lists(node_props)
     edge_props_base, edge_props_vary = split_dict_lists(edge_props)
     input_props_base, input_props_vary = split_dict_lists(input_props)
@@ -166,10 +168,10 @@ def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1, \
             multiple_inputs = True
             num_input = input_props.pop('num_input')
             rates = np.kron(np.ones(num_input),rates)
-        sm.write_spikeinput_poisson(input_net.name, rates, use_abs_paths=use_abs_paths, **input_props)
+        sm.write_spikeinput_poisson(input_net.name, rates, use_abs_paths=abs_path_input, **input_props)
 
     if spike_time is not None:
-        sm.write_spikeinput_vector(input_net.name, [spike_time], use_abs_paths=use_abs_paths)
+        sm.write_spikeinput_vector(input_net.name, [spike_time], use_abs_paths=abs_path_input)
 
     # For edge props, keep base and varying separate
     edge_props_vary.update( (key, all_props[key]) for key in edge_props_vary.keys() )
@@ -188,8 +190,8 @@ def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1, \
             prop_dict = dict(zip(node_ids, values))
             cm.add_properties(key, rule=lookup_by_target, rule_params={'prop_dict': prop_dict}, dtypes=values.dtype)
     net.build()
-    sm.save_network_files(use_abs_paths=use_abs_paths)
-    return net,input_net
+    sm.save_network_files(use_abs_paths=abs_path_network)
+    return net, input_net
 
 def read_node_props_batch(net_folder_path):
     # simple single-pop network, no need for fancy

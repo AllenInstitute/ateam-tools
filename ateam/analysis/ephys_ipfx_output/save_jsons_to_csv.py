@@ -11,17 +11,7 @@ import os
 import csv
 import numpy as np
 import pandas as pd
-
-
-# replace all non-numerical values with NaN's
-
-def isnumber(x):
-    try:
-        float(x)
-        return True
-    except:
-        return False
-
+import csv
 
 
 # # get all directory names
@@ -44,6 +34,7 @@ print dir_list
 
 # dictionary to store cells dictionary
 cells_dict={}
+failed_cell_ids=[]
 
 for i in np.arange(len(dir_list)):
     # extract the current dictionary
@@ -52,6 +43,10 @@ for i in np.arange(len(dir_list)):
     # save dictionary only if it is not empty
     if current_dict:
         cells_dict[dir_list[i]]=current_dict
+    # save the list of failed cell IDs
+    else:
+        failed_cell_ids.append(dir_list[i])
+
 
 # print the cell dictionary
 cells_dict
@@ -64,8 +59,19 @@ cells_dict
 
 # artificially add keys based on successful cell
 
-feature_names=cells_dict['539537044'].keys()
+feature_names=cells_dict['616840597'].keys()
+
+# add bursting features to the list
+#feature_names.append('burst_index_n')
+#feature_names.append('burst_index_t')
+#feature_names.append('burst_ratio')
+#feature_names.append('burst_index_n_max')
+#feature_names.append('burst_index_t_max')
+#feature_names.append('burst_ratio_max')
+
 cell_ids=cells_dict.keys()
+
+# remove the question mark from cell_ids
 
 
 # In[108]:
@@ -110,6 +116,14 @@ my_data_frame
 # In[105]:
 
 
+# replace all non-numerical values with NaN's
+
+def isnumber(x):
+    try:
+        float(x)
+        return True
+    except:
+        return False
 
 
 my_data_frame=my_data_frame[my_data_frame.applymap(isnumber)]
@@ -125,6 +139,11 @@ my_data_frame
 
 
 # save the final data to csv
-
 my_data_frame.to_csv('MET_ephys_scaling.csv',sep=',')
+
+
+# save the failed cell ID names
+with open('MET_failed_cell_ids.txt', 'w') as f:
+    for item in failed_cell_ids:
+        f.write("%s\n" % item)
 

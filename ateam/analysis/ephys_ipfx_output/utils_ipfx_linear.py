@@ -2,7 +2,7 @@ import json
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import ateam.analysis.ephys_features.burst as brst
+#import burst as brst
 
 
 def convert_keys_to_string(dictionary):
@@ -28,65 +28,105 @@ def parse_json_ipfx(cell_id):
         with open(cell_id + '/' + 'pipeline_output.json') as f:
             my_data = json.load(f)
 
-        additional_features=my_data['feature_extraction']['cell_record']
+        cell_record_features=my_data['feature_extraction']['cell_record']
 
 
         # remove setup-specific ephys features
-        del additional_features['blowout_mv']
-        del additional_features['electrode_0_pa']
-        del additional_features['thumbnail_sweep_num']
-        del additional_features['initial_access_resistance_mohm']
-        del additional_features['input_access_resistance_ratio']
-        del additional_features['rheobase_sweep_num']
-        del additional_features['seal_gohm']
+        del cell_record_features['input_resistance_mohm']
+        del cell_record_features['vm_for_sag']
+        del cell_record_features['rheobase_sweep_num']
+        del cell_record_features['thumbnail_sweep_num']
+        del cell_record_features['electrode_0_pa']
+        del cell_record_features['input_access_resistance_ratio']
+        del cell_record_features['blowout_mv']
+        del cell_record_features['seal_gohm']
+        del cell_record_features['initial_access_resistance_mohm']
 
-        # add additional bursting features (uncomment when it works)
+
+#        cell_record_features['burst_index_n']=np.nan
+#        cell_record_features['burst_index_t']=np.nan
+#        cell_record_features['burst_ratio']=np.nan
+#        cell_record_features['burst_index_n_max']=np.nan
+#        cell_record_features['burst_index_t_max']=np.nan
+#        cell_record_features['burst_ratio_max']=np.nan
+
+        # remove spike time related features
+#        del cell_record_features['trough_t_ramp']
+#        del cell_record_features['peak_t_ramp']
+#        del cell_record_features['fast_trough_t_ramp']
+#        del cell_record_features['slow_trough_t_ramp']
+#        del cell_record_features['threshold_t_ramp']
+
+#        del cell_record_features['trough_t_long_square']
+#        del cell_record_features['peak_t_long_square']
+#        del cell_record_features['fast_trough_t_long_square']
+#        del cell_record_features['slow_trough_t_long_square']
+#        del cell_record_features['threshold_t_long_square']
+
+#        del cell_record_features['trough_t_short_square']
+#        del cell_record_features['peak_t_short_square']
+#        del cell_record_features['fast_trough_t_short_square']
+#        del cell_record_features['slow_trough_t_short_square']
+#        del cell_record_features['threshold_t_short_square']
+
+        # remove short square related features (there is an error here)
+#        del cell_record_features['peak_v_short_square']
+#        del cell_record_features['upstroke_downstroke_ratio_short_square']
+#        del cell_record_features['threshold_v_short_square']
+#        del cell_record_features['threshold_i_short_square']
+#        del cell_record_features['fast_trough_v_short_square']
+#        del cell_record_features['slow_trough_v_short_square']
+#        del cell_record_features['trough_v_short_square']
+
+
+# add additional bursting features
+
         '''
         try:
-            import burst as brst
-            burst_dict=brst.process_cell(cell_id, use_silence=True)
+        	import burst as brst
+        	burst_dict=brst.process_cell(cell_id, use_silence=True)
 
-            # mean characteristics
-            burst_index_n=0
-            burst_index_t=0
-            burst_ratio=0
+        	# mean characteristics
+        	burst_index_n=0
+        	burst_index_t=0
+        	burst_ratio=0
 
-            # max characteristics
-            burst_index_n_max=0
-            burst_index_t_max=0
-            burst_ratio_max=0
+        	# max characteristics
+        	burst_index_n_max=0
+        	burst_index_t_max=0
+        	burst_ratio_max=0
 
-            for i in np.arange(len(burst_dict)):
-                # compute the mean
-                burst_index_n=burst_index_n + burst_dict[i]['burst_index_n']
-                burst_index_t=burst_index_t + burst_dict[i]['burst_index_t']
-                burst_ratio=burst_ratio + burst_dict[i]['burst_ratio']
+        	for i in np.arange(len(burst_dict)):
+        	    # compute the mean
+        	    burst_index_n=burst_index_n + burst_dict[i]['burst_index_n']
+        	    burst_index_t=burst_index_t + burst_dict[i]['burst_index_t']
+        	    burst_ratio=burst_ratio + burst_dict[i]['burst_ratio']
 
-                # compute the max values
-                if burst_index_n > burst_index_n_max:
-                    burst_index_n_max = burst_index_n
-                if burst_index_t > burst_index_n_max:
-                    burst_index_t_max = burst_index_t
-                if burst_ratio > burst_ratio:
-                    burst_ratio_max = burst_ratio
+        	    # compute the max values
+        	    if burst_index_n > burst_index_n_max:
+        		burst_index_n_max = burst_index_n
+        	    if burst_index_t > burst_index_n_max:
+        		burst_index_t_max = burst_index_t
+        	    if burst_ratio > burst_ratio:
+        		burst_ratio_max = burst_ratio
 
-            # get the average values
-            burst_index_n=burst_index_n/i
-            burst_index_t=burst_index_t/i
-            burst_ratio=burst_ratio/i
+        	# get the average values
+        	burst_index_n=burst_index_n/i
+        	burst_index_t=burst_index_t/i
+        	burst_ratio=burst_ratio/i
 
-            # add features to the dictionary
-            additional_features['burst_index_n']=burst_index_n
-            additional_features['burst_index_t']=burst_index_t
-            additional_features['burst_ratio']=burst_ratio
-            additional_features['burst_index_n_max']=burst_index_n_max
-            additional_features['burst_index_t_max']=burst_index_t_max
-            additional_features['burst_ratio_max']=burst_ratio_max
+        	# add features to the dictionary
+        	cell_record_features['burst_index_n']=burst_index_n
+        	cell_record_features['burst_index_t']=burst_index_t
+        	cell_record_features['burst_ratio']=burst_ratio
+        	cell_record_features['burst_index_n_max']=burst_index_n_max
+        	cell_record_features['burst_index_t_max']=burst_index_t_max
+        	cell_record_features['burst_ratio_max']=burst_ratio_max
 
         except (IOError, ValueError, RuntimeError, TypeError, NameError, KeyError):
             print 'Bursting metric problems'
-        '''
 
+        '''
 
         # create the dictionary of all sweeps
         sweep_len=len(my_data['sweep_extraction']['sweep_features'])
@@ -187,13 +227,13 @@ def parse_json_ipfx(cell_id):
                     downstroke.append(features_sweeps_dict[sweep_name][0]['downstroke'])
                     downstroke_current.append(features_sweeps_dict[sweep_name][0]['peak_i'])
 
-                # downstroke index
+                # downstroke_index
                 if features_sweeps_dict[sweep_name][0]['downstroke_index'] is not None:
                     downstroke_index.append(features_sweeps_dict[sweep_name][0]['downstroke_index'])
                     downstroke_index_current.append(features_sweeps_dict[sweep_name][0]['peak_i'])
 
                 # downstroke voltage time
-                if features_sweeps_dict[sweep_name][0]['downstroke_v'] is not None:
+                if features_sweeps_dict[sweep_name][0]['downstroke_t'] is not None:
                     downstroke_t.append(features_sweeps_dict[sweep_name][0]['downstroke_t'])
                     downstroke_t_current.append(features_sweeps_dict[sweep_name][0]['peak_i'])
 
@@ -315,8 +355,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['downstroke']=m
-            cell_features['downstroke_rheobase']=c
+            cell_features['downstroke_scaling']=m
+            cell_features['downstroke_rheobase']=y[x.index(min(x))]
 
 
         # downstroke_index
@@ -326,8 +366,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['downstroke_index']=m
-            cell_features['downstroke_index_rheobase']=c
+            cell_features['downstroke_index_scaling']=m
+            cell_features['downstroke_index_rheobase']=y[x.index(min(x))]
 
 
         # downstroke_t
@@ -337,8 +377,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['downstroke_t']=m
-            cell_features['downstroke_t_rheobase']=c
+            cell_features['downstroke_t_scaling']=m
+            cell_features['downstroke_t_rheobase']=y[x.index(min(x))]
 
 
         # downstroke_v
@@ -348,8 +388,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['downstroke_v']=m
-            cell_features['downstroke_v_rheobase']=c
+            cell_features['downstroke_v_scaling']=m
+            cell_features['downstroke_v_rheobase']=y[x.index(min(x))]
 
 
         # fast_trough_index
@@ -359,8 +399,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['fast_trough_index']=m
-            cell_features['fast_trough_index_rheobase']=c
+            cell_features['fast_trough_index_scaling']=m
+            cell_features['fast_trough_index_rheobase']=y[x.index(min(x))]
 
 
         # fast_trough_t
@@ -370,8 +410,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['fast_trough_t_index']=m
-            cell_features['fast_trough_t_rheobase']=c
+            cell_features['fast_trough_t_index_scaling']=m
+            cell_features['fast_trough_t_rheobase']=y[x.index(min(x))]
 
 
         # fast_trough_v
@@ -381,8 +421,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['fast_trough_v_index']=m
-            cell_features['fast_trough_v_rheobase']=c
+            cell_features['fast_trough_v_index_scaling']=m
+            cell_features['fast_trough_v_rheobase']=y[x.index(min(x))]
 
 
         # peak_index
@@ -392,8 +432,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['peak_index_index']=m
-            cell_features['peak_index_rheobase']=c
+            cell_features['peak_index_index_scaling']=m
+            cell_features['peak_index_rheobase']=y[x.index(min(x))]
 
 
         # peak_t
@@ -403,8 +443,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['peak_t_index']=m
-            cell_features['peak_t_rheobase']=c
+            cell_features['peak_t_index_scaling']=m
+            cell_features['peak_t_rheobase']=y[x.index(min(x))]
 
 
         # peak_v
@@ -414,8 +454,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['peak_v_index']=m
-            cell_features['peak_v_rheobase']=c
+            cell_features['peak_v_index_scaling']=m
+            cell_features['peak_v_rheobase']=y[x.index(min(x))]
 
 
         # slow_trough_index
@@ -425,8 +465,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['slow_trough_index']=m
-            cell_features['slow_trough_index_rheobase']=c
+            cell_features['slow_trough_index_scaling']=m
+            cell_features['slow_trough_index_rheobase']=y[x.index(min(x))]
 
 
         # slow_trough_t
@@ -436,8 +476,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['slow_trough_t']=m
-            cell_features['slow_trough_t_rheobase']=c
+            cell_features['slow_trough_t_scaling']=m
+            cell_features['slow_trough_t_rheobase']=y[x.index(min(x))]
 
 
         # slow_trough_v
@@ -447,8 +487,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['slow_trough_v']=m
-            cell_features['slow_trough_v_rheobase']=c
+            cell_features['slow_trough_v_scaling']=m
+            cell_features['slow_trough_v_rheobase']=y[x.index(min(x))]
 
 
         # threshold_index
@@ -458,8 +498,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['threshold_index']=m
-            cell_features['threshold_index_rheobase']=c
+            cell_features['threshold_index_scaling']=m
+            cell_features['threshold_index_rheobase']=y[x.index(min(x))]
 
 
         # threshold_t
@@ -469,8 +509,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['threshold_t']=m
-            cell_features['threshold_t_rheobase']=c
+            cell_features['threshold_t_scaling']=m
+            cell_features['threshold_t_rheobase']=y[x.index(min(x))]
 
         # threshold_v
         if threshold_v_current:
@@ -479,8 +519,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['threshold_v']=m
-            cell_features['threshold_v_rheobase']=c
+            cell_features['threshold_v_scaling']=m
+            cell_features['threshold_v_rheobase']=y[x.index(min(x))]
 
 
         # trough_index
@@ -490,8 +530,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['trough_index']=m
-            cell_features['trough_index_rheobase']=c
+            cell_features['trough_index_scaling']=m
+            cell_features['trough_index_rheobase']=y[x.index(min(x))]
 
 
         # trough_t
@@ -501,8 +541,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['trough_t']=m
-            cell_features['trough_t_rheobase']=c
+            cell_features['trough_t_scaling']=m
+            cell_features['trough_t_rheobase']=y[x.index(min(x))]
 
 
         # trough_v
@@ -512,8 +552,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['trough_v']=m
-            cell_features['trough_v_rheobase']=c
+            cell_features['trough_v_scaling']=m
+            cell_features['trough_v_rheobase']=y[x.index(min(x))]
 
 
         # upstroke
@@ -523,8 +563,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['upstroke']=m
-            cell_features['upstroke_rheobase']=c
+            cell_features['upstroke_scaling']=m
+            cell_features['upstroke_rheobase']=y[x.index(min(x))]
 
 
         # upstroke_downstroke_ratio
@@ -534,8 +574,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['upstroke_downstroke_ratio']=m
-            cell_features['upstroke_downstroke_ratio_rheobase']=c
+            cell_features['upstroke_downstroke_ratio_scaling']=m
+            cell_features['upstroke_downstroke_ratio_rheobase']=y[x.index(min(x))]
 
 
         # upstroke_index
@@ -545,8 +585,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['upstroke_index']=m
-            cell_features['upstroke_index_rheobase']=c
+            cell_features['upstroke_index_scaling']=m
+            cell_features['upstroke_index_rheobase']=y[x.index(min(x))]
 
 
         # upstroke_t
@@ -556,8 +596,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['upstroke_t']=m
-            cell_features['upstroke_t_rheobase']=c
+            cell_features['upstroke_t_scaling']=m
+            cell_features['upstroke_t_rheobase']=y[x.index(min(x))]
 
 
         # upstroke_v
@@ -567,8 +607,8 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['upstroke_v']=m
-            cell_features['upstroke_v_rheobase']=c
+            cell_features['upstroke_v_scaling']=m
+            cell_features['upstroke_v_rheobase']=y[x.index(min(x))]
 
 
         # width
@@ -578,14 +618,14 @@ def parse_json_ipfx(cell_id):
             A = np.vstack([x, np.ones(len(y))]).T
             m, c = np.linalg.lstsq(A, y)[0]
             # record slope and intercent
-            cell_features['width']=m
-            cell_features['width_rheobase']=c
+            cell_features['width_scaling']=m
+            cell_features['width_rheobase']=y[x.index(min(x))]
 
         # merge two dictionaries
         z = cell_features.copy()
 
         # currently we use only scaling features!
-        z.update(additional_features)
+        z.update(cell_record_features)
 
         # convert all keys to string
 #       z=convert_keys_to_string(z)
@@ -598,7 +638,3 @@ def parse_json_ipfx(cell_id):
         z={}
         return z
 
-    # if not all features are calculated
-#    if len(additional_features)+len(cell_features) < 96:
-#        z={}
-#        return z

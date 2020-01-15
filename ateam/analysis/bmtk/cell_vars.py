@@ -7,8 +7,7 @@ def plot_v(config_file, ax=None, colors=None, gids=None, stack_sep=40, show=Fals
 
 def plot_var(var_name, config_file, ax=None, colors=None, gids=None, stack_sep=None, compartments='origin', show=False):
     ax = ax or plt.gca()
-    report_file = cell_vars.get_cell_report(config_file)
-    var_report = cell_vars.CellVarsFile(report_file)
+    var_report = get_cellvar_report(config_file)
     tt = var_report.time_trace
     gids = gids or np.array(var_report.gids)
 
@@ -21,8 +20,12 @@ def plot_var(var_name, config_file, ax=None, colors=None, gids=None, stack_sep=N
     if show:
         plt.show()
                 
+def get_cellvar_report(config_file):
+    report_file = cell_vars.get_cell_report(config_file)
+    var_report = cell_vars.CellVarsFile(report_file)
+    return var_report
 
-def data_multicell(var_report, gid_list, var_name, time_window=None, compartments='origin'):
+def data_multicell(var_report, gid_list, var_name='v', time_window=None, compartments='origin'):
     data_iter = [var_report.data(gid, var_name, time_window, compartments) for gid in gid_list]
     data_stacked = np.stack(data_iter)
     return data_stacked

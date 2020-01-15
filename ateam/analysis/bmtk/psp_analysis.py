@@ -32,28 +32,34 @@ def epsp_analysis(report_file=None, config_file='config.json', t_spike=None, t_m
             (amp_min < amp) & (amp < amp_max))
 
     v_mid = (v_bl + v_peak)/2
-    v_10 = v_bl + 0.1*(v_peak-v_bl)
+    v_20 = v_bl + 0.2*(v_peak-v_bl)
+    v_80 = v_bl + 0.8*(v_peak-v_bl)
     n_conn = len(cells_epsp)
     i_start = np.zeros(n_conn, dtype=int)
     i_end = np.zeros(n_conn, dtype=int)
+    i_20 = np.zeros(n_conn, dtype=int)
+    i_80 = np.zeros(n_conn, dtype=int)
     area = np.zeros(n_conn)
     for i, cell in enumerate(cells_epsp):
         i_up = np.flatnonzero(v_all[cell,:] > v_mid[cell])
         i_start[i] = i_up[0]
         i_end[i] = i_up[-1]
+        i_20[i] = np.flatnonzero(v_all[cell,:] > v_20[cell])[0]
+        i_80[i] = np.flatnonzero(v_all[cell,:] > v_80[cell])[0]
 
-        i_area = np.flatnonzero(v_all[cell,:] > v_10[cell])
-        area[i] = np.sum(v_all[cell, i_area] - v_bl[cell])*var_report.dt
+        area[i] = np.sum(v_all[cell, :] - v_bl[cell])*var_report.dt
 
     t_start = tt[i_start]
     t_end = tt[i_end]
     width = t_end - t_start
+    peak_time = tt[i_peak[cells_epsp]] - t_start
     return {
         'gid': gids[cells_epsp], 
         'amp': amp[cells_epsp], 
         'width': width, 
-        'delay': t_start, 
-        'peak_delay': tt[i_peak[cells_epsp]], 
+        'latency': t_start, 
+        'peak_time': peak_time,
+        'rise_time': tt[i_80] - tt[i_20], 
         'area': area,
         }
         

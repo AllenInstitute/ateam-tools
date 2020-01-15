@@ -4,16 +4,23 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
+import statsmodels.api as sm
+from statsmodels.stats.anova import anova_lm
 import patsy
 import sklearn.metrics as metrics
 import sklearn.linear_model as sklm
 import sklearn.model_selection as skms   
 
-def ols_model(data, formula_rhs, feature):
+def ols_model(data, formula_rhs, feature, anova=True):
     metrics = ['aic', 'bic', 'fvalue', 'f_pvalue', 'llf', 'rsquared', 'rsquared_adj', 'nobs']
     formula = f"{feature} ~ {formula_rhs}"
     res = smf.ols(formula=formula, data=data).fit()
     fit_dict = {name: getattr(res, name) for name in metrics}
+
+    if anova:
+        anova = anova_lm(res, typ=2)
+        pvals = anova["PR(>F)"].dropna().rename(lambda x: f"pval_{x}")
+        fit_dict.update(pvals.to_dict())
     return fit_dict, res
 
 # TODO: make this fully interchangeable, not using res from statsmodels result for plot
@@ -31,9 +38,26 @@ def ols_cv(data, formula_rhs, feature):
     fit_dict.update(std_dict)
     return fit_dict
 
+def fit_partial_models(data, features, regressor, base_formulas):
+    all_fits = []
+    features = [str(x) for x in features]
+    base_formulas = [str(x) for x in base_formulas]
+    for feature in features:
+        for formula in base_formulas:
+            fitdata = data.dropna(subset=[feature, regressor]+formula.split('+'))
+            _, base = ols_model(fitdata, formula, feature, anova=False)
+            Y = base.resid
+            X = patsy.dmatrix(regressor, fitdata)
+            full = sm.OLS(Y,X).fit()
+            anova = anova_lm(base, full)
+            pvals = anova["Pr(>F)"].dropna().rename(lambda x: f"pval_{x}")
+            all_fits.append(dict(pvals, model=formula, feature=feature))
+    fits_df = pd.DataFrame(all_fits).pivot(index='feature', columns='model')
+    return fits_df
+    
 def fit_models(data, formulas, features, formula_names=None, feature_names=None):
-    formula_names = formula_names or formulas
-    feature_names = feature_names or features
+    feature_names = feature_names or [str(x) for x in features]
+    formula_names = formula_names or [str(x) for x in formulas]
     all_fits = []
     for feature, feature_name in zip(features, feature_names):
         for formula, formula_name in zip(formulas, formula_names):
@@ -43,7 +67,7 @@ def fit_models(data, formulas, features, formula_names=None, feature_names=None)
     fits_df = pd.DataFrame(all_fits)
     return fits_df
 
-def plot_fit(data, feature, formula, x=None, cluster='cluster', ax=None, legend=False, print_attr=None, attr_name=None, cv=False):
+def plot_fit(data, feature, formula, x=None, cluster='cluster', ax=None, legend=False, print_attr=None, print_pvals=True, cv=False):
     if not ax:
         fig, ax = plt.subplots()
 #     data = data.dropna(subset=variables+[feature])
@@ -64,14 +88,17 @@ def plot_fit(data, feature, formula, x=None, cluster='cluster', ax=None, legend=
     ax.set_ylabel(getattr(feature, "label", None) or feature)
     if legend:
         plt.legend(bbox_to_anchor=(1,1))
+    summary = ''
     if print_attr:
-        # value = getattr(res, print_attr)
         value = out_dict.get(print_attr)
-        # attr_name = attr_name or print_attr
         attr_name = getattr(print_attr, "label", None) or print_attr
-        summary = f"{attr_name} = {value:.2g}"
-        ax.text(0.5, 0.99, summary, transform=ax.transAxes,
-            verticalalignment='top', horizontalalignment='center')
+        summary = f"{attr_name} = {value:.2g}\n"
+    if print_pvals:
+        anova = anova_lm(res, typ=2)
+        pvals = anova["PR(>F)"].dropna()
+        summary += ", ".join(f"$p_{{{key}}}$={pvals[key]:.2g}" for key in pvals.index)
+    ax.text(0.5, 0.99, summary, transform=ax.transAxes,
+        verticalalignment='top', horizontalalignment='center')
     return out_dict
 
 def plot_grid(data, plot_fcn, row_args, col_args,  col_titles=None, sharex=False, sharey=False, figsize=None, **plot_args):

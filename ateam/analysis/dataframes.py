@@ -12,6 +12,7 @@ from six import string_types
 from future.standard_library import install_aliases
 install_aliases()
 from collections import UserString
+
 class LabeledVar(UserString):
     def __init__(self, string=None, label=None):
         super(LabeledVar, self).__init__(string)
@@ -39,6 +40,22 @@ def summary(series):
         out = "{} values".format(len(unique))
     return out
 
+def safe_join(dfa, dfb, **kwargs):
+    """Join two dataframes, discarding columns in the second that are already in the first
+    """
+    return dfa.join(dfb[dfb.columns.difference(dfa.columns)], **kwargs)
+
+def split_columns_by_groups(cells_fit_df, group_column, flatten=True):
+    """Restructure dataframe by pivoting group column values to new level of column labels,
+    optionally flattening the result (colA becomes colA_groupA, colA_groupB etc.).
+    """
+    # TODO: may only work if index is nonunique ID repeated across groups?
+    cells_fit_df = cells_fit_df.set_index([group_column], append=True)
+    cells_fit_df = cells_fit_df.unstack(level=group_column)
+    # could check for distinct values first
+    if flatten:
+        cells_fit_df = flatten_columns(cells_fit_df)
+    return cells_fit_df
 
 # Plotting functions
 # 
@@ -48,34 +65,49 @@ def scatterplot_fix(x=None, y=None, data=None, ypad=[], xpad=[], **kwargs):
     """
     sns.scatterplot(x=x, y=y, data=data, **kwargs)
     ax = kwargs.get('ax') or plt.gca()
-    ax.set_xlabel(getattr(x, "label", None) or x)
-    ax.set_ylabel(getattr(y, "label", None) or y)
-    ax.set_xlim(*limits_pad(data[x], *xpad))
-    ax.set_ylim(*limits_pad(data[y], *ypad))
+    if data is not None:
+        xlabel, ylabel = x, y
+        x = data[x]
+        y = data[y]
+        ax.set_xlabel(getattr(xlabel, "label", None) or xlabel)
+        ax.set_ylabel(getattr(ylabel, "label", None) or ylabel)
+    ax.set_xlim(*limits_pad(x, *xpad))
+    ax.set_ylim(*limits_pad(y, *ypad))
 
-def plot_reg_df(x, y, data=None, pval=False, **kwargs):
+def plot_reg_df(x, y, data=None, groups=None, showstats=True, pval=True, line_args={}, **kwargs):
     """Plot regression against a continuous x variable.
     Args use seaborn plotting conventions
     """
     import statsmodels.api as sm
+    # remove color kwarg in favor of hue (in case using in seaborn grid)
     kwargs.pop('color',None)
     scatterplot_fix(x=x, y=y, data=data, ypad=(0.2, 0), **kwargs)
 
     xd = data[x]; yd = data[y]
     results = sm.OLS(yd, sm.add_constant(xd), hasconst=True).fit()
+    if groups:
+        group_ints = data[groups].astype('category').cat.codes
+        results = results.get_robustcov_results(cov_type='cluster', groups=group_ints)
+    xpred =  np.linspace(xd.min(), xd.max(), 50)
+    ypred = results.predict(sm.add_constant(xpred))
+    
+    ax = kwargs.get('ax') or plt.gca()
+    ax.plot(xpred, ypred, **line_args)
+
     summary = "$R^2={:.2g}$".format(results.rsquared)
     if pval=='log':
         summary += ", $log(p)={:.2g}$".format(np.log(results.pvalues[1]))
     elif pval:
         summary += ", $p={:.2g}$".format(results.pvalues[1])
-    xpred =  np.linspace(xd.min(), xd.max(), 50)
-    ypred = results.predict(sm.add_constant(xpred))
-    
-    ax = kwargs.get('ax') or plt.gca()
-    ax.plot(xpred, ypred)
+    if showstats:
+        ax.text(0.5, 0.99, summary, transform=ax.transAxes,
+        verticalalignment='top', horizontalalignment='center')
 
-    ax.text(0.5, 0.99, summary, transform=ax.transAxes,
-            verticalalignment='top', horizontalalignment='center')
+def plot_grouped_corr(data, x, y, specimen, **kwargs):
+    data = data.sort_values(specimen)
+    scatterplot_fix(x, y, data=data, hue=specimen, legend=False, s=30, alpha=0.6, **kwargs)
+    data = data.groupby(specimen).mean().reset_index()
+    plot_reg_df(x, y, data=data.dropna(subset=[x,y]), hue=specimen, legend=False, s=100, pval=True, **kwargs)
 
 def plot_category_df(x, y, data=None, ticks=False, **kwargs):
     """Plot regression against a categorical x variable.
@@ -156,21 +188,23 @@ def combine_functions_hierarchical(xvar, yvar, functions, dropna=True):
     def combined_fcn(df):
         x, y = trend_from_df(df, xvar, yvar, dropna=True)
         outputs = [pd.Series(function(x,y)) for function in functions]
-        keys = [function.__name__ for function in functions]
-        df_hierarch = pd.concat(outputs, axis=0, keys=keys, names=["analysis", "feature"])
+        # Add labels by function as column multi-index?
+        # keys = [function.__name__ for function in functions]
+        # df_hierarch = pd.concat(outputs, axis=0, keys=keys, names=["analysis", "feature"])
+        df_hierarch = pd.concat(outputs, axis=0, names=["analysis"])
         return df_hierarch
     return combined_fcn
 
-def group_fit_df(df, xvar, yvar, compare):
+def group_fit_df(df, xvar, yvar, by):
     """Calculate linear fit of two-variable trend independently for each group of data in dataframe 
     
     Arguments:
         xvar, yvar -- columns to fit
-        compare -- column to group by
+        by -- columns to group by
     """
 #     to use multiple return values in apply(), create Series from dict
     fit_function = lambda df: pd.Series(linfit(*trend_from_df(df, xvar, yvar)))
-    df_fit = df.groupby([compare]).apply(fit_function)
+    df_fit = df.groupby(by).apply(fit_function)
     return df_fit
 
 def trend_from_df(df, xvar, yvar, dropna=True):
@@ -182,12 +216,21 @@ def trend_from_df(df, xvar, yvar, dropna=True):
     y = df[yvar]
     return x, y
 
+# TODO: could optimize by dealing with sorted data only
+def closest_value(x, y, x0):
+    error_out = {'y0': np.nan}
+    if not ((min(x)<x0) and (max(x)>x0)):
+        return error_out
+    i = np.argmin(np.abs(x-x0))
+    y0 = np.mean(y[x==x[i]])
+    return {'y0': y0}
+
 def threshold(x, y, n_repeats=5):
     error_out = {'min': np.nan, 'mean': np.nan}
     if len(y)<n_repeats:
         return error_out
     x_mins = np.partition(x, n_repeats-1)[:n_repeats]
-    return {'min': np.min(x_mins), 'mean': np.mean(x_mins)}
+    return {'thresh_min': np.min(x_mins), 'thresh_mean': np.mean(x_mins)}
     
 def linfit(x, y):
     error_out = {'slope':np.nan, 'yint':np.nan, 'xint':np.nan, 'error':np.nan}

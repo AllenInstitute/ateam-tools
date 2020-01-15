@@ -1,15 +1,20 @@
 import pandas as pd
+import os.path
 
-def load_shiny_data(species, drop_offpipeline=True, nms_pass=True):
-    shiny_df = _load_shiny_data(species)
+def load_shiny_data(species, csv_path=None, drop_offpipeline=True, nms_pass=True):
+    shiny_df = _load_shiny_data(species, csv_path)
     shiny_df = filter_shiny_data(shiny_df, drop_offpipeline=drop_offpipeline, nms_pass=nms_pass)
     return shiny_df
 
-def _load_shiny_data(species):
-    shiny_dir = shiny_directory(species)
-    shiny_df = pd.read_feather(shiny_dir + '/anno.feather')
-    shiny_df.drop(columns=[col for col in shiny_df.columns if not col.endswith('_label')], inplace=True)
+def _load_shiny_data(species, csv_path=None):
+    if csv_path:
+        shiny_df = pd.read_csv(csv_path)
+    else:
+        path = os.path.join(shiny_directory(species), 'anno.feather')
+        shiny_df = pd.read_feather(path)
+    shiny_df.drop(columns=[col for col in shiny_df.columns if col.endswith('_color') or col.endswith('_id')], inplace=True)
     shiny_df.rename(axis=1, mapper=lambda col: col.replace('_label',''), inplace=True)
+    shiny_df.replace('ZZ_Missing', float('nan'), inplace=True)
 
     # add a few helpful columns for the human data
     if species=='human':

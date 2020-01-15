@@ -44,6 +44,12 @@ class LimsReader(object):
         cells_df = pd.read_sql(sql, self.engine, index_col='id')
         return cells_df
 
+    def get_ephys_features(self, cells_list):
+        sql = "SELECT * from ephys_features ef"
+        if cells_list is not None:
+            sql += " WHERE ef.specimen_id IN ({})".format(", ".join([str(cell) for cell in cells_list]))
+        return pd.read_sql(sql, self.engine)
+
     def list_sweep_types(self):
         sql = "SELECT name from ephys_stimulus_types"
         return self.list_query(sql)
@@ -83,8 +89,23 @@ class LimsReader(object):
         distinct_col = "sw.stimulus_amplitude" if distinct_amp else "sw.id"
         return self.single_result_query(sql.format(on=distinct_col))
 
+    def get_sweeps_project(self, project_code, state=None):
+        sql = """
+            SELECT sw.*, 
+            stype.name, stim.description
+            FROM ephys_sweeps sw
+            JOIN ephys_stimuli stim ON stim.id = sw.ephys_stimulus_id
+            JOIN ephys_stimulus_types stype ON stype.id = stim.ephys_stimulus_type_id
+            JOIN specimens sp ON sw.specimen_id = sp.id
+            JOIN projects ON projects.id = sp.project_id
+            WHERE projects.code = '{}'
+            """.format(project_code)
+        if state:
+            sql += " AND sw.workflow_state = '{}'".format(state)
+        return pd.read_sql(sql, self.engine)
+            
     def get_sweep_info(self, cell_id, **sweep_filter_args):
-        """Get a table of information for all sweeps of a given celifl specimen
+        """Get a table of information for all sweeps of a given cell specimen
         """
         base_query = self.sweep_filter(cell_id, **sweep_filter_args)
         sql = """SELECT sw.*, 

@@ -1,6 +1,7 @@
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 import os.path
 import os
 from functools import partial
@@ -49,12 +50,12 @@ def fit_df_rate(cell, base_path, hof_id="", extra=None):
     combined_fcn = dfa.combine_functions_hierarchical(xvar, yvar, functions, dropna=True)
     fit_df = grouped_df.apply(combined_fcn)
     
-    fit_df = pd.concat([fit_df], axis=1, keys=[yvar], names=['prop'])
+    fit_df = pd.concat([fit_df], axis=1, keys=[yvar], names=['feature'])
     if extra:
         fit_df = pd.concat([grouped_df[extra].agg(dfa.summary), fit_df], axis=1, sort=True)
-    return fit_df
+    return fit_df.reset_index()
 
-def fit_df_psp(cell, base_path, hof_id="", extra=None):
+def fit_df_psp(cell, base_path, hof_id="", compare=["target_sections"], extra=None):
     try:
         df = extract_psp_data( config_path(base_path, cell, "psp", hof_id=hof_id) )
     except Exception as e:
@@ -63,19 +64,18 @@ def fit_df_psp(cell, base_path, hof_id="", extra=None):
         print(e)
         return None
     
-    compare = "target_sections"
     xvar = "distance_range_min"
-    ylist = ['amp','delay','area','width']
-    grouped_df = df.groupby([compare])
+    props = ['amp', 'area', 'width', 'rise_time', 'peak_time', 'latency']
+    grouped_df = df.groupby(compare)
     
-    functions = [dfa.linfit]
+    functions = [dfa.linfit, partial(dfa.closest_value, x0=200)]
     fit_list = [grouped_df.apply(dfa.combine_functions_hierarchical(xvar, yvar, functions, dropna=True)) 
-               for yvar in ylist]
+               for yvar in props]
     
-    fit_df = pd.concat(fit_list, axis=1, keys=ylist, names=['prop'])
+    fit_df = pd.concat(fit_list, axis=1, keys=props, names=['feature'])
     if extra:
         fit_df = pd.concat([grouped_df[extra].agg(dfa.summary), fit_df], axis=1, sort=True)
-    return fit_df
+    return fit_df.reset_index()
 
 def extract_rates_data(config_path):
     sm = sim.SimManager(config_path)
@@ -109,7 +109,7 @@ def plot_rates_config(config_path, ax=None):
     plt.xlabel('Input strength (a.u.)')
     plt.ylabel('Firing rate (Hz)')
     
-def plot_psp_df(cellname, df, propname, label=None, ax=None, legend=False):
+def plot_psp_df(df, propname, label=None, ax=None, legend=False):
     ax = ax or plt.axes()
     plt.sca(ax)
     colors = ['salmon', 'firebrick', 'k']
@@ -132,9 +132,9 @@ def plot_singlecell_rate_psp(cell, base_path=None, rate_sim=None, psp_sim=None, 
         pass
     try:
         df = extract_psp_data(psp_sim)
-        plot_psp_df(cell, df, 'amp', label='amp (mV)', ax=axes[0,1])
-        plot_psp_df(cell, df, 'area', label='area (mV*ms)', ax=axes[1,0])
-        plot_psp_df(cell, df, 'delay', label='delay (ms)', ax=axes[1,1])
+        plot_psp_df(df, 'amp', label='amp (mV)', ax=axes[0,1])
+        plot_psp_df(df, 'area', label='area (mV*ms)', ax=axes[1,0])
+        plot_psp_df(df, 'delay', label='delay (ms)', ax=axes[1,1])
     except:
         pass
     fig.suptitle("Cell {}".format(cell))
@@ -147,8 +147,29 @@ def plot_singlecell_rate_psp(cell, base_path=None, rate_sim=None, psp_sim=None, 
         plt.savefig(save_path)
     return fig
 
-def save_plots_all_cells(base_path, cells=None, filename="all_cells.pdf"):
+def plot_singlecell_ih(cell, base_path, n_ih=5, legend=False, **kwargs):
+    psp_sim = os.path.join(base_path, str(cell), "psp", "config.json")
+    df = extract_psp_data(psp_sim)
+
+    palette = sns.diverging_palette(220, 20, n=5, center='dark')
+    props = dict(err_style='bars', legend=legend, markers=True, palette=palette, **kwargs)
+
+    x='distance_range_min'
+    hue='ih_factor'
+    style='target_sections'
+    features = ['amp', 'area', 'width', 'rise_time', 'peak_time', 'latency']
+    fig, axes = plt.subplots(2,3, figsize=(14,8))
+    axes = axes.ravel()
+    for i, y in enumerate(features):
+        sns.lineplot(ax=axes[i], data=df, x=x, y=y, hue=hue, style=style, **props)
+        axes[i].set_ylim(0, None)
+    fig.suptitle("Cell {}".format(cell))
+    plt.tight_layout()
+    return fig
+
+def save_plots_all_cells(base_path, cells=None, filename="all_cells.pdf", plot_fcn=None):
     # import traceback
+    plot_fcn = plot_fcn or plot_singlecell_rate_psp
     cells = cells or os.listdir(base_path)
     if not os.path.isabs(filename):
         filename = os.path.join(base_path, filename)
@@ -157,7 +178,7 @@ def save_plots_all_cells(base_path, cells=None, filename="all_cells.pdf"):
         for cell in cells:
 #             file_path = os.path.join(fig_folder, '{}.pdf'.format(cell))
             try:
-                fig = plot_singlecell_rate_psp(cell, base_path)
+                fig = plot_fcn(cell, base_path)
                 pdf.savefig(fig)
                 plt.close()
             except Exception as exc:

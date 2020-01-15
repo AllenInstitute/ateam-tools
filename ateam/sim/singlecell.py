@@ -8,7 +8,7 @@ import numpy as np
 import os
 
 CONFIG_TEMPLATE_PATH = "/allen/aibs/mat/tmchartrand/bmtk_networks/biophys_components_shared/default_config.json"
-opt_params_path = "/allen/aibs/mat/ateam_shared/All_active_params"
+OPT_PARAMS_PATH = "/allen/aibs/mat/ateam_shared/All_active_params"
 
 def get_hof_params_path(cell_id, hof_id):
     path = "/allen/aibs/mat/ateam_shared/Human_Model_Fit_Metrics/{cell_id}/fitted_params/hof_param_{cell_id}_{hof_id}.json"
@@ -35,14 +35,22 @@ def get_node_props(cell_id, cell_name=None):
         }
     return node_props
 
-def build_epsp_batch(cell_id, sim_folder, cell_name=None, inh=False,
-    dmax=400, n_duplicates=10, edge_dict={}, node_dict={}, overwrite=False):
+def build_sim_manager(sim_folder, sim_time):
+    config_path = os.path.join(sim_folder, "config.json")
+    sm = sim.SimManager.from_template(config_template=CONFIG_TEMPLATE_PATH, overwrite=True, config_path=config_path)
+    sm.config.update_nested(components={"biophysical_neuron_models_dir": OPT_PARAMS_PATH})
+    sm.add_membrane_report()
+    sm.sim_time = sim_time
+    return sm
+
+def build_epsp_batch(cell_id, sim_folder, sm=None, cell_name=None, inh=False,
+    dmax=400, n_duplicates=10, edge_dict={}, node_dict={}, linked_dict=None, overwrite=False):
     synapse_cluster_scale = 40
     sim_time = 300
     input_props = {'spike_time':0.2}
     edge_props = edge_props_shared()
     edge_props.update({
-        # These must be included here if overwritten in linked props
+        # These must be included here if overwritten in linked props (edge props only)
         'target_sections': [0],
         'distance_range_min': [0],
         'distance_range_max': [0]
@@ -59,13 +67,17 @@ def build_epsp_batch(cell_id, sim_folder, cell_name=None, inh=False,
     edge_props.update(edge_dict)
     node_props = get_node_props(cell_id, cell_name)
     node_props.update(node_dict)
-    config_path = os.path.join(sim_folder, "config.json")
-    sm = sim.SimManager.from_template(config_template=CONFIG_TEMPLATE_PATH, overwrite=True, config_path=config_path)
-    sm.config.update_nested(components={"biophysical_neuron_models_dir": opt_params_path})
-    sm.add_membrane_report()
-    sm.sim_time = sim_time
+    # if linked_dict:
+    #     node_props.update({key: None for key in linked_dict})
 
-    net = bb.build_batch_all(sm, node_props, edge_props, input_props, linked_dicts=[linked_edge_props], n_duplicates=n_duplicates, use_abs_paths='input')
+    if sm is None:
+        sm = build_sim_manager(sim_folder, sim_time)    
+
+    linked_dicts=[linked_edge_props]
+    if linked_dict:
+        linked_dicts.append(linked_dict)
+    #     node_props.update({key: None for key in linked_dict})
+    net = bb.build_batch_all(sm, node_props, edge_props, input_props, linked_dicts=linked_dicts, n_duplicates=n_duplicates, use_abs_paths='input')
     return sm
 
 def build_rates_batch(cell_id, sim_folder, cell_name=None, inh=False,
@@ -83,9 +95,8 @@ def build_rates_batch(cell_id, sim_folder, cell_name=None, inh=False,
     
     edge_props.update(edge_dict)
     config_path = os.path.join(sim_folder, "config.json")
-    template = CONFIG_TEMPLATE_PATH
-    sm = sim.SimManager.from_template(config_template=template, overwrite=True, config_path=config_path)
-    sm.config.update_nested(components={"biophysical_neuron_models_dir": opt_params_path})
+    sm = sim.SimManager.from_template(config_template=CONFIG_TEMPLATE_PATH, overwrite=True, config_path=config_path)
+    sm.config.update_nested(components={"biophysical_neuron_models_dir": OPT_PARAMS_PATH})
 
     node_props = get_node_props(cell_id, cell_name)
     node_props.update(node_dict)

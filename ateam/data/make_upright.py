@@ -136,7 +136,7 @@ def make_upright_morphology(spec_id):
 
     # apply transform and save file
     try:
-        nrn.apply_affine(aff)
+        nrn.apply_affine(aff, scale=1)
         # print aff
     except:
         print("Error applying affine transform")

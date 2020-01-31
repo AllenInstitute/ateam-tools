@@ -10,17 +10,56 @@ import patsy
 import sklearn.metrics as metrics
 import sklearn.linear_model as sklm
 import sklearn.model_selection as skms   
+import ateam.analysis.dataframes as dfa
+
+def anova_all(data, feature, f1, f2='cluster', f1_name='gene', f2_name='cluster', cov_type='HC3'):
+    out = {
+        "feature":feature,
+        f1_name:f1,
+        f2_name:f2
+    }
+    data = data.dropna(subset=[f1, f2])
+    res3 = smf.ols(formula=f"{feature}~{f1}*{f2}", data=data).fit(cov_type=cov_type)
+    anova = anova_lm(res3, typ=2)#, robust=cov_type.lower())
+    out.update({
+                    f"p_{f2_name}_c_{f1_name}": anova.loc[f2,"PR(>F)"],
+                    f"p_{f1_name}_c_{f2_name}": anova.loc[f1,"PR(>F)"],
+                    "p_interaction": anova.loc[f"{f1}:{f2}","PR(>F)"],
+    })
+    
+    res1 = smf.ols(formula=f"{feature}~{f1}", data=data).fit(cov_type=cov_type)
+    res2 = smf.ols(formula=f"{feature}~{f2}", data=data).fit(cov_type=cov_type)
+    res12 = smf.ols(formula=f"{feature}~{f1}+{f2}", data=data).fit(cov_type=cov_type)
+    anova_add = anova_lm(res12, typ=2)#, robust=cov_type.lower())
+    # anova2 = anova_lm(res1, res12)#, robust=cov_type.lower())
+    # anova1 = anova_lm(res2, res12)#, robust=cov_type.lower())
+    # anova3 = anova_lm(res12, res3)#, robust=cov_type.lower())
+    # names = [1,2,12,3]
+    # aic = [res.aic for res in [res1,res2,res12,res3]]
+    # best = names[np.argmin(aic)]
+    out.update({
+        f"p_{f1_name}": res1.f_pvalue[0][0] if not np.isscalar(res1.f_pvalue) else res1.f_pvalue,
+        f"p_{f2_name}": res2.f_pvalue[0][0] if not np.isscalar(res2.f_pvalue) else res2.f_pvalue,
+        f"p_{f2_name}_c_{f1_name}_add": anova_add.loc[f2,"PR(>F)"],
+        f"p_{f1_name}_c_{f2_name}_add": anova_add.loc[f1,"PR(>F)"],
+        # "p_interaction_2":anova3.loc[1,"Pr(>F)"],
+    })
+    return out
 
 def ols_model(data, formula_rhs, feature, anova=True):
     metrics = ['aic', 'bic', 'fvalue', 'f_pvalue', 'llf', 'rsquared', 'rsquared_adj', 'nobs']
     formula = f"{feature} ~ {formula_rhs}"
-    res = smf.ols(formula=formula, data=data).fit()
+    res = smf.ols(formula=formula, data=data).fit(cov_type='HC3')
     fit_dict = {name: getattr(res, name) for name in metrics}
 
     if anova:
-        anova = anova_lm(res, typ=2)
+        anova = anova_lm(res, typ=2, cov_type='hc3')
         pvals = anova["PR(>F)"].dropna().rename(lambda x: f"pval_{x}")
+        fvals = anova["F"].dropna().rename(lambda x: f"fval_{x}")
+        eta = anova["sum_sq"].dropna().apply(lambda x: x/(x+res.ssr)).rename(lambda x: f"eta_p_{x}")
         fit_dict.update(pvals.to_dict())
+        fit_dict.update(fvals.to_dict())
+        fit_dict.update(eta.to_dict())
     return fit_dict, res
 
 # TODO: make this fully interchangeable, not using res from statsmodels result for plot
@@ -80,14 +119,15 @@ def plot_fit(data, feature, formula, x=None, cluster='cluster', ax=None, legend=
     # TODO: use hue_order 
     data = data.sort_values(cluster)
     sns.scatterplot(data=data, y=feature, x=x, hue=cluster, ax=ax, legend=legend, s=20)
+    # dfa.scatterplot_fix(data=data, y=feature, x=x, hue=cluster, ax=ax, legend=legend, s=20, xpad=[0,0], ypad=[0,0])
     hue = cluster if cluster in formula else None
     c = None if cluster in formula else 'k'
     y_fit = res.fittedvalues.reindex(data.index)
     sns.lineplot(data=data, y=y_fit, x=x, hue=hue, color=c, legend=False, ax=ax)
     ax.set_xlabel(getattr(x, "label", None) or x)
     ax.set_ylabel(getattr(feature, "label", None) or feature)
-    if legend:
-        plt.legend(bbox_to_anchor=(1,1))
+    # if legend:
+        # plt.legend(bbox_to_anchor=(1,1))
     summary = ''
     if print_attr:
         value = out_dict.get(print_attr)
@@ -96,7 +136,8 @@ def plot_fit(data, feature, formula, x=None, cluster='cluster', ax=None, legend=
     if print_pvals:
         anova = anova_lm(res, typ=2)
         pvals = anova["PR(>F)"].dropna()
-        summary += ", ".join(f"$p_{{{key}}}$={pvals[key]:.2g}" for key in pvals.index)
+        # summary += ", ".join(f"$p_{{{key}}}$={pvals[key]:.2g}" for key in pvals.index)
+        summary += ", ".join(f"p_{key}={pvals[key]:.2g}" for key in pvals.index)
     ax.text(0.5, 0.99, summary, transform=ax.transAxes,
         verticalalignment='top', horizontalalignment='center')
     return out_dict

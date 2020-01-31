@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import ateam.data.make_upright as mu 
+import allensdk.core.swc as swc
+from os.path import splitext
 
 def plot_cell_lims(specimen_id, scale_factor=None, scalebar=True):
     """Plot morphology from LIMS by specimen_id
@@ -14,6 +16,12 @@ def plot_cell_lims(specimen_id, scale_factor=None, scalebar=True):
     """
     nrn = mu.make_upright_morphology(specimen_id)
     plot_morph(nrn, scale_factor=scale_factor, scalebar=scalebar)
+
+def swc_to_svg(swc_path, out_path=None, scale_factor=None, scalebar=True, transparent=True):
+    out_path = out_path or splitext(swc_path)[0] + ".svg"
+    nrn = swc.read_swc(swc_path)
+    plot_morph(nrn, scale_factor=scale_factor, scalebar=scalebar)
+    plt.savefig(out_path, transparent=transparent)
 
 def plot_morph(nrn, scale_factor=None, scalebar=True):
     """Plot morphology from AllenSDK SWC object

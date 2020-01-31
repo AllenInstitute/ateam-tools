@@ -22,6 +22,9 @@ def process_morph_file(morph_file):
     morph_stats['length'] = sum(mm.segment_length(s) for s in nm.iter_segments(nrn, neurite_filter=neurite_filter))
     morph_stats['area'] = sum(mm.segment_area(s) for s in nm.iter_segments(nrn, neurite_filter=neurite_filter))
     morph_stats['volume'] = sum(mm.segment_volume(s) for s in nm.iter_segments(nrn, neurite_filter=neurite_filter))
+    radii = np.array([mm.segment_radius(s) for s in nm.iter_segments(nrn, neurite_filter=neurite_filter)])
+    morph_stats['radius_mean'] = np.mean(radii)
+    morph_stats['radius_max'] = np.max(radii)
     morph_stats['max_eff_length'] = max_fcn_terminals(section_eff_path_length, nrn, neurite_filter=neurite_filter)
     morph_stats['max_path_length'] = max_fcn_terminals(section_path_length, nrn, neurite_filter=neurite_filter)
     # Morph stats

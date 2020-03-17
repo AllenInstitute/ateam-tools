@@ -93,13 +93,14 @@ def extract_local_pipeline_output(output_json):
         record.update(extract_fx_output(fx_dict))
     return record
 
-def extract_fx_output(fx_dict):
+def extract_fx_output(fx_dict, v2=False):
     record = {}
-    record['failed_fx'] = fx_dict['cell_state'].get('failed_fx', False)
-    fail_message = fx_dict['cell_state'].get('fail_fx_message')
-    record['fail_fx_message'] = '; '.join(fail_message) if isinstance(fail_message, list) else fail_message
-    # TODO use below once rerun
-    # record['fail_fx_message'] = fx_dict['cell_state'].get('fail_fx_message')
+    cell_state = fx_dict.get('cell_state')
+    if cell_state is not None:
+        record['failed_fx'] = cell_state.get('failed_fx', False)
+        fail_message = cell_state.get('fail_fx_message')
+        # TODO: can remove list option after offpipeline rerun
+        record['fail_fx_message'] = '; '.join(fail_message) if isinstance(fail_message, list) else fail_message
 
     # cell_record = fx_dict.get('cell_record')
     # if cell_record is not None:
@@ -110,8 +111,10 @@ def extract_fx_output(fx_dict):
     #     for sweep_type in sweep_types:
     #         key = feature+sweep_type
     #         record[key] = cell_record.get(key)
-
-    cell_features = fx_dict.get('cell_features', {})
+    if v2:
+        cell_features = fx_dict["specimens"][0].get('cell_ephys_features', {})
+    else:
+        cell_features = fx_dict.get('cell_features', {})
     # if cell_features["ramps"]:
     #     ramp_mean_spike_0 = cell_features["ramps"]["mean_spike_0"]
     #     add_features_to_record(spike_features, ramp_mean_spike_0, record, suffix="_ramp")
@@ -168,7 +171,7 @@ def compile_lims_results(specimen_ids):
     for cell in specimen_ids:
         path = lq.get_fx_output_json(cell)
         if path.startswith('/'):
-            record = extract_fx_output(ju.read(path))
+            record = extract_fx_output(ju.read(path), v2=("V2" in path))
             record["specimen_id"] = cell
             records.append(record)
     ephys_df = pd.DataFrame.from_records(records, index="specimen_id")

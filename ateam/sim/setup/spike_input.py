@@ -5,10 +5,11 @@ import h5py
 from six import string_types
 from bmtk.builder.node_pool import NodePool
 
-class SpikeInput(object):
+class NodeInput(object):
     def __init__(self, nodes, populations=None):
-        """SpikeInput class creates and stores input spike trains to a set of nodes.
+        """Creates and stores inputs to a set of nodes.
         nodes can be either the path to a nodes h5 file, or a NodePool object.
+        Based on bmtk.utils.spike_trains.spikes_csv.SpikesGenerator
         """
         try:
             if isinstance(nodes, string_types):
@@ -21,29 +22,35 @@ class SpikeInput(object):
                 node_ids = []
                 for node_pop in populations:
                     node_ids.extend(nodes_grp[node_pop]['node_id'])
-                self._network = nodes.split('_')[0]
+                self.network = nodes.split('_')[0]
 
             else:
             # isinstance(nodes, NodePool):
                 node_ids = [node.node_id for node in nodes]
-                self._network = nodes.network_name
+                self.network = nodes.network_name
         except:
-            Exception("Can't read nodes.")
-        self._spikemap = {n: [] for n in nodes}
-        self._nodes = node_ids
+            raise Exception("Can't read nodes.")
+        self.nodes = node_ids
+        self._spike_inputs = None
+        self._current_inputs = None
 
-    @property
-    def network(self):
-        return self._network
+    def set_current_inputs(self, input_dict, csv_file_name):
+        self._current_inputs = input_dict
+        input_dict['gid'] = self.nodes
+        current_data = pd.DataFrame.from_dict(input_dict)
+        current_data.to_csv(csv_file_name, index=False)
 
-    def set_times_all(self, spike_times):
-        self._spikemap = {n: spike_times for n in self._nodes}
 
-    def save_csv(self, csv_file_name, in_ms=True):
-        conv = 1000.0 if in_ms else 1.0
+    def set_spike_inputs_all_nodes(self, spike_times, csv_file_name):
+        """Assign the same list of spike times to all nodes.
+        Spike times in ms.
+        """
+        self._spike_inputs = {n: spike_times for n in self.nodes}
+        self.save_spikes_csv(csv_file_name)
 
+    def save_spikes_csv(self, csv_file_name):
         with open(csv_file_name, 'w') as csv_file:
             csv_writer = csv.writer(csv_file, delimiter=' ')
             csv_writer.writerow(['gid', 'spike-times'])
-            for gid, rate_gen in self._spikemap.items():
+            for gid, rate_gen in self._spike_inputs.items():
                 csv_writer.writerow([gid, ','.join(str(r*conv) for r in rate_gen)])

@@ -12,7 +12,7 @@ import bmtk.utils.sim_setup as setup
 import bmtk.analyzer.visualization.spikes as vs
 
 from .config_class import ConfigBuilder
-from .spike_input import SpikeInput
+from .spike_input import NodeInput
 from ateam.sim.run import runner
 
 ConfigClass = ConfigBuilder
@@ -210,27 +210,27 @@ class SimManager(object):
 ### Configure inputs and modules
     def abspath(self, filename):
         return os.path.join(self.sim_folder, filename)
-
-    def add_spike_input(self, input_file, net_name, trial=None):
-        """Add specified spikeinput file to the config.
-        Note that node ids in the file must match those for the specified net.
-        """
-        # assert(self._networks_active.has_key(net_name))
-        ext = os.path.splitext(input_file)[1][1:]
-        inputs = {net_name: 
+    
+    def add_current_clamp_complex(self, net_name, input_dict, use_abs_paths=False, name=None):
+        name = name or net_name + "_current"
+        filename = name + ".csv"
+        filepath = self.abspath(filename)
+        inputs = NodeInput(self._networks_active[net_name].nodes())
+        inputs.set_current_inputs(input_dict, filepath)
+        if use_abs_paths:
+            filename = input_file
+        inputs = {name: 
             {
-            'input_type': 'spikes',
-            'module': ext,
-            'input_file': input_file,
+            'input_type': 'current_clamp',
+            'module': 'IClamp',
             'node_set': net_name,
-            'trial': trial
+            'input_file': filepath,
             }}
         self.config.update_nested(inputs=inputs)
         self.config.save()
-    
-    
-    def add_current_clamp_input(self, iclamp_name, input_dict, loop_delay = 0):
-        
+
+    # TODO: eliminate loop_delay param here - check Ani
+    def add_current_clamp_input(self, iclamp_name, input_dict, loop_delay=0):
         """Add specified current clamp input  to the config.
         Note that node ids in the file must match those for the specified net.
         """
@@ -247,32 +247,48 @@ class SimManager(object):
         self.config.update_nested(inputs=inputs)
         self.config.save()
     
-    def write_spikeinput_vector(self, net_name, times, spike_file_name='spike_input.csv',use_abs_paths=False):
-        """Write a new spikeinput file from a vector of times and add it to the config.
+    def add_spike_input_vector(self, net_name, times, spike_file_name='spike_input.csv', use_abs_paths=False):
+        """Write a new spike input file from a vector of times and add it to the config.
         All cells are assigned the same spike times."""
-        spikes = SpikeInput(self._networks_active[net_name].nodes())
-        spikes.set_times_all(times)
-        spikes.save_csv(self.abspath(spike_file_name))
-        if use_abs_paths:
-            spike_file = self.abspath(spike_file_name)
-        else:    
-            spike_file = spike_file_name
-        self.add_spike_input(spike_file, net_name)
 
-    def write_spikeinput_poisson(self, net_name, rate, tstart = 0, tstop=2000,\
-                                 spike_file_name='spike_input.h5',use_abs_paths=False):
-        """Write a new spikeinput file for independent Poisson spiking and add it to the config."""
+        spike_file = self.abspath(spike_file_name)
+        spikes = NodeInput(self._networks_active[net_name].nodes())
+        spikes.set_spike_inputs_all_nodes(times, spike_file)
+        if use_abs_paths:
+            spike_file_name = spike_file
+        self.link_spike_input_file(spike_file_name, net_name)
+
+    def add_spike_input_poisson(self, net_name, rate, tstart=0, tstop=2000,
+                                 spike_file_name='spike_input.h5', use_abs_paths=False):
+        """Write a new spike input file for independent Poisson spiking and add it to the config."""
+
         net = self._networks_active[net_name]
+        spike_file = self.abspath(spike_file_name)
         node_ids = [node.node_id for node in net.nodes_iter()]
         psg = PoissonSpikesGenerator(node_ids, rate, tstart = tstart, tstop=tstop)
-        spike_file = self.abspath(spike_file_name)
-        
-        if use_abs_paths:
-            spike_file = os.path.abspath(self.abspath(spike_file_name))
-            spike_file_name = os.path.abspath(self.abspath(spike_file_name))
-            
         psg.to_hdf5(spike_file)
-        self.add_spike_input(spike_file_name, net_name)
+        if use_abs_paths:
+            spike_file_name = spike_file
+        self.link_spike_input_file(spike_file_name, net_name)
+        
+    # TODO: what does trial spec do here? different sets of spikes?
+    def link_spike_input_file(self, input_file, net_name, trial=None, name=None):
+        """Add specified spikeinput file to the config.
+        Note that node ids in the file must match those for the specified net.
+        """
+        # assert(self._networks_active.has_key(net_name))
+        ext = os.path.splitext(input_file)[1][1:]
+        name = name or net_name + "_spikes"
+        inputs = {name: 
+            {
+            'input_type': 'spikes',
+            'module': ext,
+            'input_file': input_file,
+            'node_set': net_name,
+            'trial': trial
+            }}
+        self.config.update_nested(inputs=inputs)
+        self.config.save()
 
     def add_ecp_report(self, electrode_file=None, cells='all', file_name='ecp.h5', locs=[[0,0,0]], save_contributions=False):
         if electrode_file is None:

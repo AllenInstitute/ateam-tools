@@ -113,7 +113,18 @@ class LimsReader(object):
             """ + base_query
         return pd.read_sql(sql, self.engine)
   
-    def get_nwb_path_from_lims(self, cell_id, get_sdk_version=False):
+    def get_nwb_path_from_lims(self, cell_id, version='v1', get_sdk_version=False):
+        """Get a network path for an NWB file from the LIMS database
+
+        Args:
+            cell_id (int or str): cell id
+            version (str, optional): 'v1' or 'v2'. Defaults to 'v1'.
+            get_sdk_version (bool, optional): Get the release version with spike times
+            and other polish. Defaults to False.
+
+        Returns:
+            str: network path (unix formatted)
+        """        
         sql = """
             SELECT nwb.storage_directory || nwb.filename AS nwb_path
             FROM specimens sp
@@ -123,10 +134,12 @@ class LimsReader(object):
             WHERE sp.id = {id}
             AND nwb.attachable_type = 'EphysRoiResult'
             """
-        if get_sdk_version:
-            sql += "AND ftype.name = 'NWBDownload'"
-        else:
+        if version=='v1':
             sql += "AND ftype.name = 'NWB'"
+        elif version=='v2':
+            sql += "AND ftype.name = 'EphysNWB2'"
+        if get_sdk_version:
+            sql = sql[:-1] + "Download'"
         return self.single_result_query(sql.format(id=cell_id))
     
     def get_swc_path_from_lims(self, cell_id, manual_only=True):

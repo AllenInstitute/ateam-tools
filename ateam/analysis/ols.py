@@ -1,4 +1,3 @@
-import warnings
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -70,7 +69,7 @@ def anova_all(data, feature, f1, f2='cluster', f1_name='gene', f2_name='cluster'
 def plot_fit(data, feature, formula, x=None, res=None, cluster='cluster', ax=None, legend=False, print_attr=None, print_pvals=True, cv=False, **sns_args):
     if not ax:
         fig, ax = plt.subplots()
-#     data = data.dropna(subset=variables+[feature])
+    # data = data.dropna(subset=variables+[feature])
     if res is None:
         out_dict, res = ols_model(data, formula, feature)
     if cv:
@@ -82,10 +81,12 @@ def plot_fit(data, feature, formula, x=None, res=None, cluster='cluster', ax=Non
     data = data.sort_values(cluster)
     sns_args['s'] = sns_args.get('s', 25)
     sns.scatterplot(data=data, y=feature, x=x, hue=cluster, ax=ax, legend=legend, **sns_args)
+
     hue = cluster if cluster in formula else None
-    c = None if cluster in formula else 'k'
+    color = None if cluster in formula else 'k'
     y_fit = res.fittedvalues.reindex(data.index)
-    sns.lineplot(data=data, y=y_fit, x=x, hue=hue, color=c, legend=False, ax=ax)
+    sns_args.pop('s')
+    sns.lineplot(data=data, y=y_fit, x=x, hue=hue, color=color, legend=False, ax=ax, **sns_args)
     ax.set_xlabel(getattr(x, "label", None) or x)
     ax.set_ylabel(getattr(feature, "label", None) or feature)
     # if legend:

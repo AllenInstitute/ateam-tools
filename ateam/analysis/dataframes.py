@@ -5,6 +5,7 @@ import numpy as np
 import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
+from statsmodels.stats import multitest
 from scipy.stats import mannwhitneyu, linregress
 from itertools import combinations
 from six import string_types
@@ -75,8 +76,8 @@ def scatterplot_fix(x=None, y=None, data=None, ypad=[], xpad=[], **kwargs):
     ax.set_ylim(*limits_pad(y, *ypad))
 
 def plot_reg_df(x, y, data=None, groups=None, showstats=True, pval=True, line_args={}, **kwargs):
-    """Plot regression against a continuous x variable.
-    Args use seaborn plotting conventions
+    """Plot y vs. x regression and scatterplot from dataframe data
+    If groups are specified, adjusts stats via cluster-robust covariance estimates.
     """
     import statsmodels.api as sm
     # remove color kwarg in favor of hue (in case using in seaborn grid)
@@ -103,11 +104,16 @@ def plot_reg_df(x, y, data=None, groups=None, showstats=True, pval=True, line_ar
         ax.text(0.5, 0.99, summary, transform=ax.transAxes,
         verticalalignment='top', horizontalalignment='center')
 
-def plot_grouped_corr(data, x, y, specimen, **kwargs):
-    data = data.sort_values(specimen)
-    scatterplot_fix(x, y, data=data, hue=specimen, legend=False, s=30, alpha=0.6, **kwargs)
-    data = data.groupby(specimen).mean().reset_index()
-    plot_reg_df(x, y, data=data.dropna(subset=[x,y]), hue=specimen, legend=False, s=100, pval=True, **kwargs)
+def plot_grouped_corr(x, y, data, groups, **kwargs):
+    """Plot y vs. x regression of group means from dataframe data,
+    along with scatterplot of all data colored by group.
+    Results should be directly comparable to plot_reg_df.
+    kwargs pass through to seaborn scatterplot.
+    """
+    data = data.sort_values(groups)
+    scatterplot_fix(x, y, data=data, hue=groups, legend=False, s=30, alpha=0.6, **kwargs)
+    data = data.groupby(groups).mean().reset_index()
+    plot_reg_df(x, y, data=data.dropna(subset=[x,y]), hue=groups, legend=False, s=100, pval=True, **kwargs)
 
 def plot_category_df(x, y, data=None, ticks=False, **kwargs):
     """Plot regression against a categorical x variable.
@@ -115,8 +121,9 @@ def plot_category_df(x, y, data=None, ticks=False, **kwargs):
     """
     from statsmodels.formula.api import ols
     results = ols('{} ~ {}'.format(y, x), data=data).fit()
-    logp = np.log(results.f_pvalue)
-    summary = "$F={:.3g}$, $log(p)={:.3g}$".format(results.fvalue, logp)
+    # logp = np.log(results.f_pvalue)
+    # summary = "$F={:.3g}$, $log(p)={:.3g}$".format(results.fvalue, logp)
+    summary = "$R^2={:.2g}$".format(results.rsquared)
 
     sns.stripplot(x=x, y=y, data=data, palette='muted')
     plt.ylim(*limits_pad(data[y], 0.2, 0))
@@ -150,25 +157,42 @@ def boxplot_with_mw_bars(data, var, group, pairs=None, cutoff=0.05, show_swarm=T
     pairs, pairs_idx, pvals = pairwise_mw(data, var, group, pairs)
     plot_sig_bars(pvals, pairs_idx, cutoff)
 
-def plot_sig_bars(pvals, pairs_idx, cutoff=0.05):
-    ylim = plt.ylim()
+def plot_mw_bars(data, var, group, group_vals=None, pairs='all', cutoff=0.05, label='stars', ax=None, y0=None):
+    group_vals = group_vals or data[group].unique().tolist()
+    pairs_list, pairs_idx, pvals = pairwise_mw(data, var, group, group_vals, pairs)
+    pvals = multitest.multipletests(pvals, method='fdr_bh')[1]
+    y0 = data[ data[group].isin(set.union(*map(set,pairs_list))) ][var].max()
+    plot_sig_bars(pvals, pairs_idx, cutoff, label=label, ax=ax, y0=y0)
+
+def plot_sig_bars(pvals, pairs_idx, cutoff=0.05, label='stars', ax=None, y0=None):
+    ax = ax or plt.gca()
+    ylim = ax.get_ylim()
     pairs_sig = np.flatnonzero(np.array(pvals)<cutoff)
-
-    yrange = 0.15*(ylim[1]-ylim[0])
-    yvals = np.linspace(ylim[1], ylim[1]+yrange, len(pairs_sig))
+    
+    y0 = y0 or ylim[0]
+    n = len(pairs_sig)
+    dy = 0.04*(ylim[1]-ylim[0]) # use 5% of y-axis range
+    yvals = y0 + dy*np.arange(1, n+1)
     for i, pair in enumerate(pairs_sig):
-        plot_sig_bar(pvals[pair], yvals[i], pairs_idx[pair])
+        plot_sig_bar(pvals[pair], yvals[i], pairs_idx[pair], label=label, ax=ax)
 
-def plot_sig_bar(pval, y, x_pair):
-    plt.plot(x_pair, [y, y], 'k', linewidth=3)
-    plt.text(np.mean(x_pair), y, "p={p:.2}".format(p=pval), horizontalalignment='center', verticalalignment='bottom')
+def plot_sig_bar(pval, y, x_pair, label='stars', ax=None):
+    ax = ax or plt.gca()
+    ax.plot(x_pair, [y, y], 'grey')
+    if label=='stars':
+        text = np.choose(np.searchsorted([1e-3, 1e-2, 5e-2], pval), ['***','**','*',''])
+    elif label=='pval':
+        text = "p={p:.2}".format(p=pval)
+    else:
+        text = ''
+    ax.text(np.mean(x_pair), y, text, horizontalalignment='center', verticalalignment='bottom')
 
-def pairwise_mw(data, var, group, pairs=None):
-    data = data[~data[var].isna()].sort_values(group)
-    group_vals = data[group].unique().tolist()
-    group_vals.sort()
-    if pairs is None:
-        pairs = combinations(group_vals, 2)
+def pairwise_mw(data, var, group, group_vals=None, pairs='all'):
+    data = data[~data[var].isna()]#.sort_values(group)
+    group_vals = group_vals or data[group].unique().tolist()
+    # group_vals.sort()
+    if pairs is 'all':
+        pairs = list(combinations(group_vals, 2))
     pvals = []
     pairs_idx = []
     groups = data.groupby(group)[var]
@@ -176,7 +200,7 @@ def pairwise_mw(data, var, group, pairs=None):
         u, p = mannwhitneyu(groups.get_group(pair[0]), groups.get_group(pair[1]), alternative='two-sided')
         pvals.append(p)
         pairs_idx.append([group_vals.index(pair[0]), group_vals.index(pair[1])])
-    return list(pairs), pairs_idx, pvals
+    return pairs, pairs_idx, pvals
 
 
 # Analysis of two-variable relationships in dataframes
@@ -233,7 +257,7 @@ def threshold(x, y, n_repeats=5):
     return {'thresh_min': np.min(x_mins), 'thresh_mean': np.mean(x_mins)}
     
 def linfit(x, y):
-    error_out = {'slope':np.nan, 'yint':np.nan, 'xint':np.nan, 'error':np.nan}
+    error_out = {'slope':np.nan, 'yint':np.nan, 'xint':np.nan, 'error':np.nan, 'slope_rel':np.nan}
     try:
         if len(y)==0:
             return error_out
@@ -241,7 +265,7 @@ def linfit(x, y):
         xint = np.nan if slope==0 else -yint/slope
         yfit = slope*x + yint
         rmse = np.sqrt(np.mean( (y - yfit) ** 2))
-        results = {'slope':slope, 'yint':yint, 'xint':xint, 'error':rmse}
+        results = {'slope':slope, 'yint':yint, 'xint':xint, 'error':rmse, 'slope_rel':slope/yint}
     except Exception as e:
         warnings.warn(e)
         results = error_out

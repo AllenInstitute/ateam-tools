@@ -54,6 +54,13 @@ class LimsReader(object):
         sql = "SELECT name from ephys_stimulus_types"
         return self.list_query(sql)
     
+    def get_sweeps_df(self, cell_id, sweep_type=None, description=None, passed_only=False, spiking=None, depolarizing=None):
+        """Get a list of sweeps for a single cell specimen, by sweep type name
+        """
+        base_query = self.sweep_filter(cell_id, sweep_type, description, passed_only, spiking, depolarizing)
+        sql = "SELECT * " + base_query
+        return pd.read_sql(sql, self.engine)
+
     def get_sweeps(self, cell_id, sweep_type=None, description=None, passed_only=False, spiking=None, depolarizing=None):
         """Get a list of sweeps for a single cell specimen, by sweep type name
         """

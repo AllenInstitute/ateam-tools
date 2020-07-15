@@ -5,22 +5,22 @@ import numpy as np
 import ateam.data.allensdk_tools as asdk
 from bmtk.simulator.bionet.biophys_params import BiophysParams
 
-# Nov. 22 2019
-# Changes: vary Ih, fewer duplicates
+# April 17, 2020
+# Changes: vary Ih with longer transient
 
 # bootstrap from initial run
 cells_path = "/allen/aibs/mat/tmchartrand/bmtk_networks/singlecell/round1"
-cells_inh = os.listdir(os.path.join(cells_path,"IN"))
 cells_exc = os.listdir(os.path.join(cells_path,"PC"))
 cells_list = [int(cell) for cell in cells_exc]
 
-base_path = "/allen/aibs/mat/tmchartrand/bmtk_networks/singlecell/round4/Ih"
+base_path = "/allen/aibs/mat/tmchartrand/bmtk_networks/singlecell/round5/Ih"
 params_dir = sc.OPT_PARAMS_PATH
 
 inh=False
 n_duplicates=5
 overwrite=True
-level='folder'
+sim_time=300
+transient_time=500
 
 sim_path = os.path.join(base_path, "{cell}", "{sim}")
 base_id = cells_list[0]
@@ -40,8 +40,9 @@ for cell_id in cells_list[:]:
     ih_params = {prop: ih_factors*float(dp.get_nested(prop)) for prop in props}
     ih_params['ih_factor'] = ih_factors
     path = sim_path.format(cell=cell_id, sim='psp')
-    sm = sc.build_epsp_batch(cell_id, path, sm=None,
-                          inh=inh, n_duplicates=n_duplicates, overwrite=overwrite, edge_dict=edge_dict, node_dict={}, linked_dict=ih_params)
+    sm = sc.build_epsp_batch(cell_id, path, overwrite=overwrite,
+                          inh=inh, n_duplicates=n_duplicates, transient_time=transient_time,
+                          edge_dict=edge_dict, node_dict={}, linked_dict=ih_params)
     
     # account for junction potential
     vrest = cells_df.loc[cell_id, 'vrest'] - 14

@@ -3,10 +3,8 @@ from itertools import chain
 import pandas as pd
 import numpy as np
 import ateam.data.shiny as shiny
-from ateam.analysis import ols
 import sys
 from scipy.stats import pearsonr
-from pingouin import partial_corr
 
 variables_long = [
     'SeuratMapping',

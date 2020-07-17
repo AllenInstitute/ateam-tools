@@ -6,20 +6,22 @@ def load_shiny_data(species, csv_path=None, drop_offpipeline=True, nms_pass=True
     shiny_df = filter_shiny_data(shiny_df, drop_offpipeline=drop_offpipeline, nms_pass=nms_pass)
     return shiny_df
 
-def _load_shiny_data(species, csv_path=None):
+def _load_shiny_data(species=None, directory=None, csv_path=None):
     if csv_path:
         shiny_df = pd.read_csv(csv_path)
     else:
-        path = os.path.join(shiny_directory(species), 'anno.feather')
+        directory = directory or shiny_directory(species)
+        path = os.path.join(directory, 'anno.feather')
         shiny_df = pd.read_feather(path)
     shiny_df.drop(columns=[col for col in shiny_df.columns 
         if col.endswith('_color') or (col.endswith('_id') and not col in ['spec_id','sample_id'])], 
         inplace=True)
     shiny_df.rename(axis=1, mapper=lambda col: col.replace('_label',''), inplace=True)
-    shiny_df = shiny_df[shiny_df['spec_id'] != 'ZZ_Missing']
-    assert shiny_df['spec_id'].is_unique
-    shiny_df.index = shiny_df['spec_id'].astype(int)
     shiny_df.replace('ZZ_Missing', float('nan'), inplace=True)
+    if 'spec_id' in shiny_df.columns:
+        shiny_df = shiny_df[shiny_df['spec_id'] != 'ZZ_Missing']
+        assert shiny_df['spec_id'].is_unique
+        shiny_df.index = shiny_df['spec_id'].astype(int)
 
     # add a few helpful columns for the human data
     if species=='human':
@@ -47,10 +49,11 @@ def filter_shiny_data(shiny_df, drop_offpipeline=True, nms_pass=True):
         shiny_df = shiny_df[shiny_df['Norm_Marker_Sum.0.4']=='TRUE']
     return shiny_df
 
-def load_genes_shiny(species, genes, csv_path=None, drop_offpipeline=False, nms_pass=False):
-    shiny_dir = shiny_directory(species)
+def load_genes_shiny(genes, species=None, directory=None, csv_path=None, drop_offpipeline=False, nms_pass=False):
+    shiny_df = _load_shiny_data(species, directory, csv_path)
+
     join_on = 'sample_id'
-    genes_df = pd.read_feather(shiny_dir + '/data.feather', columns=genes+[join_on]).set_index(join_on)
-    shiny_df = _load_shiny_data(species, csv_path).join(genes_df, on=join_on)
+    genes_df = pd.read_feather(os.path.join(directory, 'data.feather'), columns=genes+[join_on]).set_index(join_on)
+    shiny_df = shiny_df.join(genes_df, on=join_on)
     shiny_df = filter_shiny_data(shiny_df, drop_offpipeline=drop_offpipeline, nms_pass=nms_pass)
     return shiny_df

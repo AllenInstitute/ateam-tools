@@ -3,10 +3,12 @@ import shutil
 import subprocess
 import itertools
 import csv
+import pandas as pd
 from collections import defaultdict
 # import bmtk.simulator.utils.config as config
 from bmtk.simulator.utils.config import ConfigDict
 from bmtk.utils.io.spike_trains import PoissonSpikesGenerator
+from bmtk.simulator.bionet.biophys_params import BiophysParams
 import bmtk.builder.networks as buildnet
 import bmtk.utils.sim_setup as setup
 import bmtk.analyzer.visualization.spikes as vs
@@ -71,7 +73,7 @@ class SimManager(object):
     @property
     def network_dir(self):
         # TODO: integrate with manifest!
-        return "networks"
+        return "network"
 
     @property
     def network_builders(self):
@@ -120,7 +122,8 @@ class SimManager(object):
         if use_abs_paths:
             trim_path = lambda path: path
         else:
-            trim_path = lambda path: os.path.relpath(path, self.sim_folder)
+            # trim_path = lambda path: os.path.relpath(path, self.sim_folder)
+            trim_path = lambda path: os.path.join('$NETWORK_DIR', os.path.relpath(path, net_path))
             
         for name, net in self._networks_active.items():
             if name not in self.networks_saved: # doesn't try to save already loaded networks
@@ -194,8 +197,7 @@ class SimManager(object):
         
     def update_node_type_props(self, net_name, props):
         assert(net_name in self.networks_saved)
-        node_types_file = self._nodes_dict[net_name]['node_types_file']
-        update_csv(self.abspath(node_types_file), props)
+        update_csv(self.node_types_file(net_name), props)
 
     def update_edge_type_props(self, src_name, dest_name, props):
         edges = self._edges_dict.get((src_name, dest_name))
@@ -215,24 +217,21 @@ class SimManager(object):
         name = name or net_name + "_current"
         filename = name + ".csv"
         filepath = self.abspath(filename)
+        # TODO: allow specifying gids here, not just list for whole net
         inputs = NodeInput(self._networks_active[net_name].nodes())
         inputs.set_current_inputs(input_dict, filepath)
-        if use_abs_paths:
-            filename = input_file
         inputs = {name: 
             {
             'input_type': 'current_clamp',
             'module': 'IClamp',
             'node_set': net_name,
-            'input_file': filepath,
+            'input_file': filepath if use_abs_paths else filename,
             }}
         self.config.update_nested(inputs=inputs)
         self.config.save()
 
-    # TODO: eliminate loop_delay param here - check Ani
-    def add_current_clamp_input(self, iclamp_name, input_dict, loop_delay=0):
-        """Add specified current clamp input  to the config.
-        Note that node ids in the file must match those for the specified net.
+    def add_current_clamp_input(self, input_dict, iclamp_name='IClamp'):
+        """Add specified current clamp input to the config.
         """
                 
         inputs = {iclamp_name: 
@@ -241,7 +240,7 @@ class SimManager(object):
             'module': 'IClamp',
             'node_set': 'all',
             'amp' : input_dict['amp'],
-            'delay' : input_dict['delay'] + loop_delay,
+            'delay' : input_dict['delay'],
             'duration' : input_dict['duration']
             }}
         self.config.update_nested(inputs=inputs)
@@ -331,18 +330,40 @@ class SimManager(object):
         reports[name].update(**kwargs)
         self.config.update_nested(reports=reports)
         self.config.save()
-        
-    def nodes_file(self, net):
+    
+    def get_single_net(self):
+        networks = self.networks
+        if len(networks)==1:
+            return networks[0]
+        else:
+            raise Exception("More than one network in simulation, must specify network name.")
+
+    def nodes_file(self, net=None):
         # TODO: check net in networks first?
         # return self.abspath("{}_nodes.h5".format(net))
+        if net is None:
+            net = self.get_single_net()
         path = self._nodes_dict[net]["nodes_file"]
         return self.abspath(path)
         
-    def node_types_file(self, net):
+    def node_types_file(self, net=None):
         # TODO: check net in networks first?
         # return self.abspath("{}_node_types.csv".format(net))
+        if net is None:
+            net = self.get_single_net()
         path = self._nodes_dict[net]["node_types_file"]
         return self.abspath(path)
+
+    def get_dynamics_param_vals(self, params_list, gid=0):
+        node_types = pd.read_csv(self.node_types_file(), delimiter=' ')
+
+        dynamics_file = node_types.loc[gid, 'dynamics_params']
+        dynamics_path = os.path.join(
+            self.configdict.biophysical_neuron_models_dir,
+            dynamics_file
+        )
+        dp = BiophysParams.from_json(dynamics_path)
+        return [float(dp.get_nested("genome."+param)) for param in params_list]
 
     @property
     def spikes_file(self):

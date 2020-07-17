@@ -53,4 +53,4 @@ class NodeInput(object):
             csv_writer = csv.writer(csv_file, delimiter=' ')
             csv_writer.writerow(['gid', 'spike-times'])
             for gid, rate_gen in self._spike_inputs.items():
-                csv_writer.writerow([gid, ','.join(str(r*conv) for r in rate_gen)])
+                csv_writer.writerow([gid, ','.join(str(r) for r in rate_gen)])

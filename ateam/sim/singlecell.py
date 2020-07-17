@@ -7,8 +7,12 @@ import ateam.sim.setup as sim
 import numpy as np
 import os
 
-CONFIG_TEMPLATE_PATH = "/allen/aibs/mat/tmchartrand/bmtk_networks/biophys_components_shared/default_config.json"
-OPT_PARAMS_PATH = "/allen/aibs/mat/ateam_shared/All_active_params"
+# CONFIG_TEMPLATE_PATH = "/allen/aibs/mat/tmchartrand/bmtk_networks/biophys_components_shared/default_config.json"
+# OPT_PARAMS_PATH = "/allen/aibs/mat/ateam_shared/All_active_params"
+
+networks_path = "/home/tom.chartrand/network/bmtk_networks/"
+CONFIG_TEMPLATE_PATH = networks_path + "biophys_components_shared/default_config.json"
+OPT_PARAMS_PATH = networks_path + "biophys_components_shared/biophysical_neuron_templates"
 
 def get_hof_params_path(cell_id, hof_id):
     path = "/allen/aibs/mat/ateam_shared/Human_Model_Fit_Metrics/{cell_id}/fitted_params/hof_param_{cell_id}_{hof_id}.json"
@@ -35,19 +39,31 @@ def get_node_props(cell_id, cell_name=None):
         }
     return node_props
 
-def build_sim_manager(sim_folder, sim_time):
+def build_sim_manager(sim_folder, sim_time, overwrite=False):
     config_path = os.path.join(sim_folder, "config.json")
-    sm = sim.SimManager.from_template(config_template=CONFIG_TEMPLATE_PATH, overwrite=True, config_path=config_path)
+    sm = sim.SimManager.from_template(config_template=CONFIG_TEMPLATE_PATH, overwrite=overwrite, config_path=config_path)
     sm.config.update_nested(components={"biophysical_neuron_models_dir": OPT_PARAMS_PATH})
     sm.add_membrane_report()
     sm.sim_time = sim_time
     return sm
 
 def build_epsp_batch(cell_id, sim_folder, sm=None, cell_name=None, inh=False,
-    dmax=400, n_duplicates=10, edge_dict={}, node_dict={}, linked_dict=None, overwrite=False):
-    synapse_cluster_scale = 40
-    sim_time = 300
-    input_props = {'spike_time':0.2}
+        dmax=400, n_duplicates=10, n_positions=10, synapse_cluster_scale=40, transient_time=200, psp_time=100,
+        edge_dict=None, node_dict=None, linked_dict=None, overwrite=False
+    ):
+    if sm is None:
+        sm = build_sim_manager(sim_folder, sim_time=transient_time+psp_time, overwrite=overwrite)   
+
+    input_props = {'spike_time': transient_time}
+    
+    nsecs = 1 if inh else 2
+    distance_min = np.linspace(0, dmax, n_positions)
+    distance_max = distance_min + synapse_cluster_scale
+    secs = ['s'] + n_positions*['d'] if inh else ['s'] + n_positions*['a'] + n_positions*['d']
+    linked_edge_props = {'target_sections': secs,
+        'distance_range_min':[0]+nsecs*list(distance_min), 
+        'distance_range_max':[1]+nsecs*list(distance_max)}
+
     edge_props = edge_props_shared()
     edge_props.update({
         # These must be included here if overwritten in linked props (edge props only)
@@ -55,28 +71,19 @@ def build_epsp_batch(cell_id, sim_folder, sm=None, cell_name=None, inh=False,
         'distance_range_min': [0],
         'distance_range_max': [0]
     })
-    ndist = 10
-    nsecs = 1 if inh else 2
-    distance_min = np.linspace(0, dmax, ndist)
-    distance_max = distance_min + synapse_cluster_scale
-    secs = ['s'] + ndist*['d'] if inh else ['s'] + ndist*['a'] + ndist*['d']
-    linked_edge_props = {'target_sections': secs,
-        'distance_range_min':[0]+nsecs*list(distance_min), 
-        'distance_range_max':[1]+nsecs*list(distance_max)}
 
+    if edge_dict is not None:
     edge_props.update(edge_dict)
-    node_props = get_node_props(cell_id, cell_name)
-    node_props.update(node_dict)
-    # if linked_dict:
-    #     node_props.update({key: None for key in linked_dict})
 
-    if sm is None:
-        sm = build_sim_manager(sim_folder, sim_time)    
+    node_props = get_node_props(cell_id, cell_name)
+    if node_dict is not None:
+    node_props.update(node_dict)
 
     linked_dicts=[linked_edge_props]
-    if linked_dict:
+    if linked_dict is not None:
         linked_dicts.append(linked_dict)
     #     node_props.update({key: None for key in linked_dict})
+
     net = bb.build_batch_all(sm, node_props, edge_props, input_props, linked_dicts=linked_dicts, n_duplicates=n_duplicates, use_abs_paths='input')
     return sm
 

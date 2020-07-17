@@ -84,7 +84,9 @@ def extract_rates_data(config_path):
     df = nodes_df.join(pd.Series(spikes.get_rates_config(sm.config_path), name='rate'))
     return df
 
-def extract_psp_data(config_path):
+def extract_psp_data(config_path, remove_transient=False, old_units=False):
+    # need this for backwards-compatibility with old sims, will remove
+    t_factor = 1000 if old_units else 1
     sm = sim.SimManager(config_path)
     net = 'batch'
     nodes_df = nodes.create_node_table(sm.nodes_file(net), sm.node_types_file(net))
@@ -92,7 +94,7 @@ def extract_psp_data(config_path):
     assert(len(spike_time)==1)
     spike_time = spike_time[0]
     # TODO: work with vector of spike times?
-    props = psp.epsp_analysis(config_file=sm.config_path, t_spike=1000*spike_time)
+    props = psp.epsp_analysis(config_file=sm.config_path, t_spike=t_factor*spike_time, remove_transient=remove_transient)
     syn_df = pd.DataFrame(props)
     syn_df.set_index('gid', inplace=True)
     df = syn_df.join(nodes_df)
@@ -147,11 +149,11 @@ def plot_singlecell_rate_psp(cell, base_path=None, rate_sim=None, psp_sim=None, 
         plt.savefig(save_path)
     return fig
 
-def plot_singlecell_ih(cell, base_path, n_ih=5, legend=False, **kwargs):
-    psp_sim = os.path.join(base_path, str(cell), "psp", "config.json")
-    df = extract_psp_data(psp_sim)
+def plot_singlecell_ih(cell, base_path=None, psp_sim=None, n_ih=5, legend=False, remove_transient=False, **kwargs):
+    psp_sim = psp_sim or os.path.join(base_path, str(cell), "psp", "config.json")
+    df = extract_psp_data(psp_sim, remove_transient=remove_transient)
 
-    palette = sns.diverging_palette(220, 20, n=5, center='dark')
+    palette = sns.diverging_palette(220, 20, n=n_ih, center='dark')
     props = dict(err_style='bars', legend=legend, markers=True, palette=palette, **kwargs)
 
     x='distance_range_min'

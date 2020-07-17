@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import h5py as h5
 import os.path
+from copy import deepcopy
 from six import string_types
 from collections import Iterable
 
@@ -27,7 +28,7 @@ def build_props_combinatorial(props_base=None, n_duplicates=1, linked_dicts=None
     are restricted to vary together (eg. distance_range min and max)
     If props_base dict is supplied, output will be a merged dict of base props and varied props.
     """
-    props = props_base.copy() if props_base else {}
+    props = props_base.deepcopy() if props_base else {}
     # TODO: remove these lines, check for duplicate props
     keys_scalar = (key for key in props_indep.keys() if np.isscalar(props_indep[key]))
     props.update((key, props_indep.pop(key)) for key in keys_scalar)
@@ -130,12 +131,14 @@ def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1,
     all_props = build_props_combinatorial(n_duplicates=n_duplicates, linked_dicts=linked_dicts, **node_props_vary)
     N = all_props.pop('N')
 
-    # Attach all props to the nodes just for record-keeping
     net = NetworkBuilder(net_name)
     input_net = None
-    # node_props.update(edge_props_base) fails from dynamics_params
-    node_props.update(input_props_base)
+
+    # Attach all props to the nodes just for record-keeping
+    node_props = deepcopy(node_props)
     node_props.update(all_props)
+    node_props.update(input_props_base)
+    # node_props.update(edge_props_base) fails from dynamics_params
 
     if coordinate_props:
 
@@ -154,7 +157,6 @@ def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1,
         net.add_nodes(N=N, **node_props)
 
     sm.add_network(net)
-    node_ids = get_node_ids(net)
 
     # For input props, combine base and varying
     input_props.update( (key, all_props[key]) for key in input_props_vary.keys() )
@@ -179,7 +181,6 @@ def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1,
             sm.add_spike_input_vector(input_net.name, [spike_time], use_abs_paths=abs_path_input)
 
         # For edge props, keep base and varying separate
-        edge_props_vary.update( (key, all_props[key]) for key in edge_props_vary.keys() )
         if multiple_inputs:
             connections = []
             for ii in range(num_input):
@@ -188,10 +189,13 @@ def build_batch_all(sm, node_props, edge_props, input_props, n_duplicates=1,
         else:
             connections = [net.add_edges(source=input_net.nodes(), target=net.nodes(), iterator='paired', **edge_props_base)]
 
-        for cm in connections:
-            for key, values in edge_props_vary.items():
-                prop_dict = dict(zip(node_ids, values))
-                cm.add_properties(key, rule=lookup_by_target, rule_params={'prop_dict': prop_dict}, dtypes=values.dtype)
+        if len(edge_props_vary) > 0:
+            node_ids = get_node_ids(net)
+            edge_props_vary.update( (key, all_props[key]) for key in edge_props_vary.keys() )
+            for cm in connections:
+                for key, values in edge_props_vary.items():
+                    prop_dict = dict(zip(node_ids, values))
+                    cm.add_properties(key, rule=lookup_by_target, rule_params={'prop_dict': prop_dict}, dtypes=values.dtype)
     
     if current_inputs:
         sm.add_current_clamp_complex(net.name, input_props, use_abs_paths=abs_path_input)

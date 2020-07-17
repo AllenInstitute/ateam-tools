@@ -27,12 +27,14 @@ def inter_intra_mean_ratio(data, labels, metric='euclidean'):
         for i,j in combinations(np.unique(labels),2)])
     return inter/intra
 
-def cv_confusion_matrix(X, y, classifier, cv):
+def cv_confusion_matrix(X, y, classifier, cv, normalize_axis=None):
     output = []
     for train, test in cv.split(X, y):
         classifier.fit(X[train,:], y[train])
         output.append(metrics.confusion_matrix(y[test], classifier.predict(X[test])))
     cm = np.mean(output, axis=0)
-#     cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-    cm = cm/cm.sum()
+    if normalize_axis is not None:
+        cm = cm / cm.sum(axis=normalize_axis, keepdims=True)
+    else:
+        cm = cm / cm.sum()
     return cm

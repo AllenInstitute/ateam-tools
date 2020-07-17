@@ -142,17 +142,19 @@ class BmtkJob(PBSJob):
 
 def run_hpc(args_list=None):
     # parser = subparsers.add_parser()
-    parser.add_argument("command")
-    args = parser.parse_args(args_list)
+    myparser = argparse.ArgumentParser(add_help=False, parents=[parser])
+    myparser.add_argument("command")
+    args = myparser.parse_args(args_list)
     job = PBSJob(args.command, args)
     job.run(dryrun=args.dryrun)
 
 def run_hpc_bmtk(args_list=None):
-    parser.add_argument("config")
-    parser.add_argument("--overwrite", action='store_true', help="Overwrite existing sim output")
-    parser.set_defaults(jobname="bmtk_sim_test_job")
-    parser.set_defaults(jobdir=None)
-    args = parser.parse_args(args_list)
+    myparser = argparse.ArgumentParser(add_help=False, parents=[parser])
+    myparser.add_argument("config")
+    myparser.add_argument("--overwrite", action='store_true', help="Overwrite existing sim output")
+    myparser.set_defaults(jobname="bmtk_sim_test_job")
+    myparser.set_defaults(jobdir=None)
+    args = myparser.parse_args(args_list)
     # TODO: actually check output from config
     folder = os.path.dirname(args.config)
     if not args.dryrun and not args.overwrite and os.path.isfile(os.path.join(folder, "output", "spikes.h5")):

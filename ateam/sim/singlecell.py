@@ -73,11 +73,11 @@ def build_epsp_batch(cell_id, sim_folder, sm=None, cell_name=None, inh=False,
     })
 
     if edge_dict is not None:
-    edge_props.update(edge_dict)
+        edge_props.update(edge_dict)
 
     node_props = get_node_props(cell_id, cell_name)
     if node_dict is not None:
-    node_props.update(node_dict)
+        node_props.update(node_dict)
 
     linked_dicts=[linked_edge_props]
     if linked_dict is not None:

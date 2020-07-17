@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import matplotlib.gridspec as gridspec
+import pandas as pd
 
 def get_spike_file(config_file):
     sm = SimManager(config_file)
@@ -24,6 +25,38 @@ def get_rates_config(config_file):
     rates = counts / sm.sim_time * 1000.
     return dict(zip(gids, rates))
 
+def get_spike_features_config(config_file, functions, names=None, start=0, end=None):
+    sm = SimManager(config_file)
+    spikesfile = SpikesFile(sm.spikes_file)
+    if names is None:
+        names = [f.__name__ for f in functions]
+    if end is None:
+        end = sm.sim_time
+    gids = spikesfile.gids
+
+    records = []
+    for gid in gids:
+        spikes = spikesfile.get_spikes(gid)
+        records.append({name: f(spikes, start, end) for name, f in zip(names, functions)})
+    return pd.DataFrame.from_records(records, index=gids)
+
+def rate(spikes, start, end):
+    return len(spikes) / (end-start) * 1000
+
+def latency(spikes, start, end):
+    return spikes[0] - start
+
+def inverse_first_isi(spikes, start, end):
+    if len(spikes)>1:
+        return 1000 / (spikes[1] - spikes[0])
+    else:
+        return float('nan')
+
+def inverse_mean_isi(spikes, start, end):
+    if len(spikes)>1:
+        return 1000 / np.mean(np.diff(spikes))
+    else:
+        return float('nan')
 
 def plot_spikes_rates(config_file, netname, group_key=None, exclude=[], color_dict=None, cmap='hsv', bins=100, fig=None, tlim=None):
     sm = SimManager(config_file)

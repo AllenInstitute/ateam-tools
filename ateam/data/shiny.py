@@ -19,7 +19,8 @@ def _load_shiny_data(species=None, directory=None, csv_path=None):
     shiny_df.rename(axis=1, mapper=lambda col: col.replace('_label',''), inplace=True)
     shiny_df.replace('ZZ_Missing', float('nan'), inplace=True)
     if 'spec_id' in shiny_df.columns:
-        shiny_df = shiny_df[shiny_df['spec_id'] != 'ZZ_Missing']
+        shiny_df = shiny_df[shiny_df['spec_id'] != 'ZZ_Missing'] # may be nan now
+        shiny_df = shiny_df.dropna(subset=['spec_id'])
         assert shiny_df['spec_id'].is_unique
         shiny_df.index = shiny_df['spec_id'].astype(int)
 
@@ -44,7 +45,7 @@ def filter_shiny_data(shiny_df, drop_offpipeline=True, nms_pass=True):
     project_col = 'cell_specimen_project'
     if drop_offpipeline:
         # ends with MET, not METx, METc etc
-        shiny_df = shiny_df[shiny_df[project_col].str.endswith("MET")]
+        shiny_df = shiny_df[~shiny_df[project_col].isna() & shiny_df[project_col].str.endswith("MET")]
     if nms_pass:
         shiny_df = shiny_df[shiny_df['Norm_Marker_Sum.0.4']=='TRUE']
     return shiny_df

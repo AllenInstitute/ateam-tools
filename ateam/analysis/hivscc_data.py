@@ -3,17 +3,17 @@ import numpy as np
 from pathlib import Path
 
 ephys_path = Path('../data/human_mouse_ephys_all_0127.csv')
-mouse_cells_path = Path("../metadata/consolidated_clusters_and_metadata/mouse_IVSCC_excitatory_L23_consolidated_0129.csv")
-human_cells_path = Path("../metadata/consolidated_clusters_and_metadata/human_IVSCC_excitatory_L23_consolidated_0131.csv")
-mouse_cells_path = Path("../data/current/All_Mouse_Cells_Lockdown_All_raw_features.csv")
-human_cells_path = Path("../data/current/All_L23_Lockdown_all_raw_features.csv")
-    feather_path = Path('../data/feather/dataH.feather')
+mouse_cells_path = Path("../data/mouse_IVSCC_excitatory_L23_consolidated_0129.csv")
+human_cells_path = Path("../data/human_IVSCC_excitatory_L23_consolidated_0131.csv")
+mouse_morph_path = Path("../data/All_Mouse_Cells_Lockdown_All_raw_features.csv")
+human_morph_path = Path("../data/All_L23_Lockdown_all_raw_features.csv")
+feather_path = Path('../data/feather/dataH.feather')
 
 def load_data():
     ephys_df = pd.read_csv(ephys_path, index_col=0).dropna(how='all')
     morph_df = pd.concat([
-        pd.read_csv(mouse_cells_path, index_col=0),
-        pd.read_csv(human_cells_path, index_col=0),
+        pd.read_csv(mouse_morph_path, index_col=0),
+        pd.read_csv(human_morph_path, index_col=0),
     ])
 
     human_df = (pd.read_csv(human_cells_path, index_col=0)
@@ -34,12 +34,14 @@ cluster = "SeuratMapping"
 types_ordered = [ 'LTK', 'GLP2R', 'FREM3', 'CARM1P1', 'COL22A1',
       'Adamts2', 'Rrad', 'Agmat', ]
 
+from pandas.api.types import CategoricalDtype
+ttype_categorical = CategoricalDtype(categories=types_ordered, ordered=True)
+
 def fix_df(df):
     return (df.assign(cluster=lambda df: df[cluster]
                         .apply(lambda name: name.split(' ')[-1])
-                        .astype('category', categories=types_ordered, ordered=True),
+                        .astype(ttype_categorical),
                     depth=lambda df: df[depth])
-                # sample shuffles cell order for plotting
                 .sample(frac=1, random_state=42))
 
 def join_gene_data(df, genes):

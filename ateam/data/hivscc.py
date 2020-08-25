@@ -7,6 +7,9 @@ cluster = "SeuratMapping"
 order=[ 'LTK', 'GLP2R', 'FREM3', 'CARM1P1', 'COL22A1',
       'Adamts2', 'Rrad', 'Agmat', ]
 
+from pandas.api.types import CategoricalDtype
+ttype_categorical = CategoricalDtype(categories=order, ordered=True)
+
 def load_data():
     ephys_df = pd.read_csv('../data/human_mouse_ephys_all_0127.csv', index_col=0).dropna(how='all')
     morph_df = pd.concat([
@@ -36,9 +39,8 @@ def load_data():
 def fix_df(df):
     return (df.assign(cluster=lambda df: df[cluster]
                         .apply(lambda name: name.split(' ')[-1])
-                        .astype('category', categories=order, ordered=True),
+                        .astype(ttype_categorical),
                     depth=lambda df: df[depth])
-    #             .sort_values('cluster')
                 .sample(frac=1, random_state=42))
 
 def join_gene_data(df, genes):

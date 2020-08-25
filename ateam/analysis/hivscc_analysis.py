@@ -2,8 +2,6 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from scipy.stats import mannwhitneyu
-from itertools import combinations
 import statsmodels.formula.api as smf
 import statsmodels.api as sm
 from statsmodels.stats.multitest import multipletests
@@ -37,8 +35,7 @@ def fit_models(data, formulas, features, formula_names=None, feature_names=None,
     fits_df = pd.DataFrame(all_fits)
     return fits_df
 
-def plot_fit(data, feature, formula, x=None, cluster='cluster', ax=None, legend=False,
-            print_attr=None, print_pvals=True, **sns_args):
+def plot_fit(data, feature, formula, x=None, cluster='cluster', ax=None, print_attr=None, print_pvals=True, **sns_args):
     if not ax:
         fig, ax = plt.subplots()
 #     data = data.dropna(subset=variables+[feature])
@@ -67,7 +64,6 @@ def plot_fit(data, feature, formula, x=None, cluster='cluster', ax=None, legend=
     ax.text(0.5, 0.99, summary, transform=ax.transAxes,
         verticalalignment='top', horizontalalignment='center')
     sns.despine()
-    return out_dict
 
 def plot_mw_bars(data, var, group, group_vals=None, pairs='all', cutoff=0.05, label='stars', ax=None, y0=None):
     group_vals = group_vals or data[group].unique().tolist()
@@ -112,3 +108,112 @@ def pairwise_mw(data, var, group, group_vals=None, pairs='all'):
         pvals.append(p)
         pairs_idx.append([group_vals.index(pair[0]), group_vals.index(pair[1])])
     return pairs, pairs_idx, pvals
+
+def outline_boxplot(ax):
+    for i,artist in enumerate(ax.artists):
+        # Set the linecolor on the artist to the facecolor, and set the facecolor to None
+        col = artist.get_facecolor()
+        artist.set_edgecolor(col)
+        artist.set_facecolor('None')
+
+        # Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
+        # Loop over them here, and use the same colour as above
+        n=5
+        for j in range(i*n,i*n+n):
+            line = ax.lines[j]
+            line.set_color(col)
+            line.set_mfc(col)
+            line.set_mec(col)
+            
+def plot_boxplot_multiple(data, features, x='cluster', labels=None, horizontal=False, figsize=(4,8),
+                            palette=None, strip_width=0.2, pairs_sets=[], cutoff=0.05, 
+                             invert_y=False, label_yaxis=False, pad_title=0,
+                            ):
+    n = len(features)
+    labels = labels or features
+    if horizontal:
+        fig, axes = plt.subplots(1,n, figsize=figsize, sharex=True)
+    else:    
+        fig, axes = plt.subplots(n,1, figsize=figsize, sharex=True)
+        
+    for i, ax in enumerate(axes):
+        plot_box_cluster_feature(data, y=features[i], x=x, label=labels[i], ax=ax,
+                    palette=palette, strip_width=strip_width, pairs_sets=pairs_sets, cutoff=cutoff, 
+                    invert_y=invert_y, label_yaxis=label_yaxis, pad_title=pad_title,
+                    )
+
+def plot_box_cluster_feature(data, y, x='cluster', label=None, ax=None,
+                    palette=None, strip_width=0.2, pairs_sets=[], cutoff=0.05, 
+                    invert_y=False, label_yaxis=False, pad_title=0,
+                    ):
+        if ax is None:
+            fig, ax = plt.subplots()
+        sns.stripplot(data=data, x=x, y=y, palette=palette, ax=ax, jitter=strip_width, size=3, alpha=0.7)
+        sns.boxplot(data=data, x=x, y=y, palette=palette, ax=ax, showfliers=False)
+        
+        outline_boxplot(ax)
+        ax.set_xlabel(None)
+        sns.despine()
+        if label_yaxis:
+            ax.set_ylabel(label)
+        else:
+            ax.set_ylabel(None)
+            ax.set_title(label, loc='right', pad=pad_title)
+        ax.set_xticklabels(ax.get_xmajorticklabels(), rotation=45, fontstyle='italic', ha='right')
+        if data[y].mean()>0:
+            ax.set_ylim(0, None, auto=True)
+            
+        for pairs in pairs_sets:
+            group_vals=data[x].cat.categories.to_list()
+            plot_mw_bars(data, y, x, group_vals=group_vals, pairs=pairs, ax=ax, cutoff=cutoff, label=None)
+            
+        if data[y].mean()>0:
+            ax.set_ylim(0, None, auto=True)
+        if invert_y:
+            ax.invert_yaxis()
+
+def run_cluster_anova(df, features, cluster_var='cluster', pval='pval_cluster', cov_type='HC3', fdr_method='fdr_bh',):
+    df = df.copy()
+    df['cluster'] = df[cluster_var]
+    fdr_method='fdr_bh'
+    
+    results = (fit_models(df, ['cluster'], features, cov_type=cov_type).set_index('feature')
+        .sort_values('rsquared', ascending=False)
+    )
+    results[pval] = (
+        results[pval].pipe(pd.DataFrame)#in case this is Series
+        .apply(lambda col: multipletests(col, method=fdr_method)[1]).astype(float)
+    )
+    return results
+
+def plot_cluster_anova_bar(results, pval='pval_cluster', val='rsquared', cov_type='HC3', ylabels=None, 
+                               figsize=(1.5,8), nshow=20):
+
+    data = results.loc[:,pval]
+    stars = pd.cut(data.iloc[:nshow], [0, 0.001, 0.01, 0.05, 1], labels=['***','**','*',''])
+
+
+    fig, ax = plt.subplots(figsize=figsize)
+    bardata = results.iloc[:nshow].loc[:,val].reset_index().melt(id_vars=['feature'])
+    sns.barplot(data=bardata, y='feature', x='value', hue='variable')
+    sns.despine()
+    if ylabels is not None:
+        ax.set_yticklabels([ylabels[label.get_text()] for label in ax.get_yticklabels()])
+    ax.set_ylabel(None)
+    ax.set_xlabel(None)
+    ax.set_title('Cluster ANOVA $\eta^2$')
+    ax.get_legend().remove()
+
+    nfeat = min(nshow, len(ylabels)) if ylabels is not None else nshow
+    for i, p in enumerate(ax.patches):
+        # Set the linecolor on the artist to the facecolor, and set the facecolor to None
+        annot = stars[i]
+        if not annot:
+            col = p.get_facecolor()
+            p.set_edgecolor(col)
+            p.set_facecolor('None')
+        else:
+            space = 0.005
+            _x = p.get_x() + p.get_width() + float(space)
+            _y = p.get_y() + p.get_height()
+            ax.text(_x, _y, annot, ha="left")

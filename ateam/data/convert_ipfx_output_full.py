@@ -4,6 +4,7 @@ import argschema as ags
 import glob
 import os.path
 import ipfx.lims_queries as lq
+# from ipfx.stimulus_protocol_analysis import LongSquareAnalysis
 import allensdk.core.json_utilities as ju
 import logging
 
@@ -53,39 +54,50 @@ hero_sweep_features = [
 ]
 rheo_sweep_features = [
     'latency',
-    'first_isi',
     'avg_rate',
 ]
 mean_sweep_features = [
     'adapt',
 ]
-spike_features = [
+ss_spike_features = [
+    'upstroke_downstroke_ratio',
+    'threshold_v',
+    'peak_v',
+    'fast_trough_v',
+]
+ramp_spike_features = [
     'upstroke_downstroke_ratio',
     'threshold_v',
     'peak_v',
     'fast_trough_v',
     'trough_v',
-    # include all troughs?
-    # 'slow_trough_v',
-    # TODO: add features not already averaged
-    # 'width',
-    # 'upstroke',
-    # 'downstroke',
-]
-ramp_spike_features = [
     'threshold_i',
 ]
 ls_spike_features = [
+    'upstroke_downstroke_ratio',
+    'threshold_v',
+    'peak_v',
+    # include all troughs?
+    'fast_trough_v',
+    'trough_v',
     # not in cell record
     'width',
     'upstroke',
     'downstroke',
 ]
+spike_adapt_features = [
+    'isi',
+    'width',
+    'upstroke',
+    'downstroke',
+    'threshold_v',
+    'fast_trough_v',
+]
 invert = ["first_isi"]
 spike_threshold_shift = ["trough_v", "fast_trough_v", "peak_v"]
 
 
-def extract_local_pipeline_output(output_json):
+def extract_local_pipeline_output(output_json, extra=[]):
     output = ju.read(output_json)
     record = {}
     cell_state = output.get('qc', {}).get('cell_state')
@@ -95,10 +107,22 @@ def extract_local_pipeline_output(output_json):
 
     fx_dict = output.get('feature_extraction')
     if fx_dict is not None:
-        record.update(extract_fx_output(fx_dict))
+        record.update(extract_fx_output(fx_dict, extra=extra))
     return record
 
-def extract_fx_output(fx_dict, v2=False):
+def get_cell_features_lims(specimen_id):
+    path = get_fx_output_json(specimen_id)
+    if not path.startswith('/'):
+        return None
+    v2 = ("V2" in path) or ("DATAFIX" in path)
+    fx_dict = ju.read(path)
+    if v2:
+        cell_features = fx_dict["specimens"][0].get('cell_ephys_features', {})
+    else:
+        cell_features = fx_dict.get('cell_features', {})
+    return cell_features
+
+def extract_fx_output(fx_dict, v2=False, extra=['60pa','5spikes']):
     record = {}
     cell_state = fx_dict.get('cell_state')
     if cell_state is not None:
@@ -110,37 +134,65 @@ def extract_fx_output(fx_dict, v2=False):
     else:
         cell_features = fx_dict.get('cell_features', {})
 
-    if "ramps" in cell_features:
-        mean_spike_0 = cell_features["ramps"]["mean_spike_0"]
-        add_features_to_record(spike_features + ramp_spike_features, mean_spike_0, record, suffix="_ramp")
+    ramps = cell_features.get('ramps')
+    if ramps is not None:
+        mean_spike_0 = ramps["mean_spike_0"]
+        add_features_to_record(ramp_spike_features, mean_spike_0, record, suffix="_ramp")
 
-    if "short_squares" in cell_features:
-        mean_spike_0 = cell_features["short_squares"]["mean_spike_0"]
-        add_features_to_record(spike_features, mean_spike_0, record, suffix="_short_square")
+    short_squares = cell_features.get('short_squares')
+    if short_squares is not None:
+        mean_spike_0 = short_squares["mean_spike_0"]
+        add_features_to_record(ss_spike_features, mean_spike_0, record, suffix="_short_square")
 
-    long_squares = cell_features.get('long_squares')
-    if long_squares is not None:
-        add_features_to_record(ls_features, long_squares, record)
+    # spiking_sweep_features_df = pd.DataFrame.from_records(sweeps)
+    # if '60pa' in extra:
+    #     sweep = LongSquareAnalysis.find_hero_sweep(long_squares_analysis['rheobase_i'], spiking_sweep_features_df, min_offset=59)
+    #     if sweep is not None:
+    #         add_features_to_record(hero_sweep_features, sweep, record, suffix='_60pa')
+    #         add_features_to_record(ls_spike_features, sweep["spikes"][0], record, suffix="_60pa")
+    #         add_feature_ratios_to_record(spike_adapt_features, sweep["spikes"], record, suffix="_60pa")
 
-        sweep = long_squares.get('rheobase_sweep',{})
-        add_features_to_record(rheo_sweep_features, sweep, record, suffix='_rheo')
-        add_features_to_record(spike_features + ls_spike_features, sweep["spikes"][0], record, suffix="_rheo")
-        add_feature_ratios_to_record(spike_features + ls_spike_features, sweep["spikes"], record, suffix="_rheo")
-
-        sweep = long_squares.get('hero_sweep',{})
-        add_features_to_record(hero_sweep_features, sweep, record, suffix='_hero')
-        add_features_to_record(spike_features + ls_spike_features, sweep["spikes"][0], record, suffix="_hero")
-        add_feature_ratios_to_record(spike_features + ls_spike_features, sweep["spikes"], record, suffix="_hero")
-
-        sweeps = long_squares.get('spiking_sweeps',{})
-        for feature in mean_sweep_features:
-            key = feature+'_mean'
-            feat_list = [sweep[feature] for sweep in sweeps if feature in sweep]
-            record[key] = np.mean([x for x in feat_list if x is not None])
-
+    # if '5spikes' in extra:
+    #     spike_sets = [sweep["spikes"] for sweep in sweeps]
+    #     sweep = find_spiking_sweep_by_min_spikes(spiking_sweep_features_df, spike_sets)
+    #     if sweep is not None:
+    #         add_features_to_record(hero_sweep_features, sweep, record, suffix='_5spikes')
+    #         add_features_to_record(ls_spike_features, sweep["spikes"][0], record, suffix="_5spikes")
+    #         add_feature_ratios_to_record(spike_adapt_features, sweep["spikes"], record, suffix="_5spikes")
+            
     offset_feature_values(spike_threshold_shift, record, "threshold_v")
     invert_feature_values(invert, record)
+
+    long_squares_analysis = cell_features.get('long_squares')
+    if long_squares_analysis is not None:
+        record.update(get_complete_long_square_features(long_squares_analysis))
+    
     return record
+
+def get_complete_long_square_features(long_squares_analysis):
+    record = {}
+    add_features_to_record(ls_features, long_squares_analysis, record)
+
+    sweep = long_squares_analysis.get('rheobase_sweep',{})
+    add_features_to_record(rheo_sweep_features, sweep, record, suffix='_rheo')
+    add_features_to_record(ls_spike_features, sweep["spikes"][0], record, suffix="_rheo")
+
+    sweep = long_squares_analysis.get('hero_sweep',{})
+    add_features_to_record(hero_sweep_features, sweep, record, suffix='_hero')
+    add_features_to_record(ls_spike_features, sweep["spikes"][0], record, suffix="_hero")
+    add_feature_ratios_to_record(spike_adapt_features, sweep["spikes"], record, suffix="_hero")
+
+    sweeps = long_squares_analysis.get('spiking_sweeps',{})
+    # TODO: work on dataframe / reuse code
+    for feature in mean_sweep_features:
+        key = feature+'_mean'
+        feat_list = [sweep[feature] for sweep in sweeps if feature in sweep]
+        record[key] = np.mean([x for x in feat_list if x is not None])
+    
+    
+    offset_feature_values(spike_threshold_shift, record, "threshold_v")
+    invert_feature_values(invert, record)
+
 
 def offset_feature_values(features, record, relative_to):
     for feature in features:
@@ -148,7 +200,8 @@ def offset_feature_values(features, record, relative_to):
         for match in matches:
             suffix = match[len(feature):]
             val = record.pop(match)
-            record[match+"_rel"] = (val - record[relative_to+suffix]) if val is not None else None
+            feature_short = feature[:-2] #drop the "_v"
+            record[feature_short + "_deltav" + suffix] = (val - record[relative_to+suffix]) if val is not None else None
 
 def invert_feature_values(features, record):
     for feature in features:
@@ -156,29 +209,43 @@ def invert_feature_values(features, record):
         for match in matches:
             suffix = match[len(feature):]
             val = record.pop(match)
-            record[match+"_inv"] = 1/val if val is not None else None
+            record[feature + "_inv" + suffix] = 1/val if val is not None else None
 
 def add_features_to_record(features, feature_data, record, suffix=""):
     record.update({feature+suffix: feature_data.get(feature) for feature in features})
 
 def add_feature_ratios_to_record(features, dict_list, record, suffix=""):
-    suffix = "_ratio" + suffix
+    suffix = "_adapt_ratio" + suffix
     nspikes = len(dict_list)
-    if nspikes==1:
+    for i in range(nspikes-1):
+        dict_list[i]['isi'] = dict_list[i+1]['peak_t'] - dict_list[i]['peak_t']
+    if nspikes<4:
         return
     for feature in features:
-        last = dict_list[-1].get(feature)
-        if last is None and nspikes >= 3:
-            last = dict_list[-2].get(feature)
+        last = dict_list[-2].get(feature)
+        # if last is None and nspikes >= 3:
+        #     last = dict_list[-2].get(feature)
         if last is not None:
             record.update({feature+suffix: last/dict_list[0].get(feature)})
 
-def compile_lims_results(specimen_ids):
+def find_spiking_sweep_by_min_spikes(spiking_features, spikes_set, min_spikes=5):
+    num_spikes = np.array([len(spikes) for spikes in spikes_set])
+    # spiking_features['spikes'] = spikes_set
+    spiking_features = spiking_features.loc[num_spikes >= min_spikes].sort_values("stim_amp")
+    spiking_features_depolarized = spiking_features[spiking_features["stim_amp"] > 0]
+
+    if spiking_features_depolarized.empty:
+        logging.info("Cannot find sweep with >{min_spikes} spikes.")
+        return None
+    else:
+        return spiking_features_depolarized.iloc[0]
+
+def compile_lims_results(specimen_ids, extra=['60pa','5spikes']):
     records = []
     for cell in specimen_ids:
         path = get_fx_output_json(cell)
         if path.startswith('/'):
-            record = extract_fx_output(ju.read(path), v2=("V2" in path) or ("DATAFIX" in path))
+            record = extract_fx_output(ju.read(path), v2=("V2" in path) or ("DATAFIX" in path), extra=extra)
             record["specimen_id"] = cell
             records.append(record)
     ephys_df = pd.DataFrame.from_records(records, index="specimen_id")
